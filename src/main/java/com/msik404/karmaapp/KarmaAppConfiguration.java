@@ -8,7 +8,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import com.msik404.karmaapp.user.KarmaAppUserDetailsService;
+import com.msik404.karmaapp.user.UserDetailsServiceImpl;
 
 @Configuration
 public class KarmaAppConfiguration {
@@ -19,7 +19,7 @@ public class KarmaAppConfiguration {
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider(KarmaAppUserDetailsService userDetailsService) {
+    public AuthenticationProvider authenticationProvider(UserDetailsServiceImpl userDetailsService) {
 
         var authProvider = new DaoAuthenticationProvider(bCryptPasswordEncoder());
         authProvider.setUserDetailsService(userDetailsService);
