@@ -1,4 +1,4 @@
-package com.msik404.karmaapp.user.dtos;
+package com.msik404.karmaapp.user.dto;
 
 import jakarta.validation.constraints.Email;
 import lombok.Getter;

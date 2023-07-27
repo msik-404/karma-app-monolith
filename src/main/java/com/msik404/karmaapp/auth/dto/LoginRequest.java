@@ -1,4 +1,4 @@
-package com.msik404.karmaapp.auth;
+package com.msik404.karmaapp.auth.dto;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

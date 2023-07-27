@@ -1,10 +1,13 @@
 package com.msik404.karmaapp.user;
 
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
 
-import com.msik404.karmaapp.user.dtos.UserDtoWithAdminPrivilege;
-import com.msik404.karmaapp.user.dtos.UserDtoWithUserPrivilege;
+import com.msik404.karmaapp.auth.DuplicateEmailExeption;
+import com.msik404.karmaapp.user.dto.UserDtoWithAdminPrivilege;
+import com.msik404.karmaapp.user.dto.UserDtoWithUserPrivilege;
 import com.msik404.karmaapp.user.handler.UserUpdateHandlerWithAdminPrivilege;
 import com.msik404.karmaapp.user.handler.UserUpdateHandlerWithUserPrivilege;
 
@@ -21,7 +24,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
     private final CriteriaBuilder cb;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UserRepositoryCustomImpl(EntityManager entityManager, 
+    public UserRepositoryCustomImpl(EntityManager entityManager,
             BCryptPasswordEncoder bCryptPasswordEncoder) {
 
         this.entityManager = entityManager;
@@ -30,8 +33,9 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
     }
 
     @Override
-    @Transactional
-    public void updateNonNull(Long userId, UserDtoWithUserPrivilege dto) {
+    @Transactional(rollbackOn = DuplicateEmailExeption.class)
+    public void updateNonNull(Long userId, UserDtoWithUserPrivilege dto)
+            throws DuplicateEmailExeption {
 
         CriteriaUpdate<User> criteriaUpdate = cb.createCriteriaUpdate(User.class);
         Root<User> root = criteriaUpdate.from(User.class);
@@ -41,12 +45,17 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 
         criteriaUpdate.where(cb.equal(root.get("id"), userId));
 
-        entityManager.createQuery(criteriaUpdate).executeUpdate();
+        try {
+            entityManager.createQuery(criteriaUpdate).executeUpdate();
+        } catch (ConstraintViolationException ex) {
+            throw new DuplicateEmailExeption();
+        }
     }
 
     @Override
-    @Transactional
-    public void updateNonNull(Long userId, UserDtoWithAdminPrivilege dto) {
+    @Transactional(rollbackOn = DuplicateEmailExeption.class)
+    public void updateNonNull(Long userId, UserDtoWithAdminPrivilege dto)
+            throws DuplicateEmailExeption {
 
         CriteriaUpdate<User> criteriaUpdate = cb.createCriteriaUpdate(User.class);
         Root<User> root = criteriaUpdate.from(User.class);
@@ -57,7 +66,11 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 
         criteriaUpdate.where(cb.equal(root.get("id"), userId));
 
-        entityManager.createQuery(criteriaUpdate).executeUpdate();
+        try {
+            entityManager.createQuery(criteriaUpdate).executeUpdate();
+        } catch (ConstraintViolationException ex) {
+            throw new DuplicateEmailExeption();
+        }
     }
 
 }

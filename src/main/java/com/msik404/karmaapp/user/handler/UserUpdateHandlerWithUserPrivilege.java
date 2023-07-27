@@ -3,7 +3,7 @@ package com.msik404.karmaapp.user.handler;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.msik404.karmaapp.user.User;
-import com.msik404.karmaapp.user.dtos.UserDtoWithUserPrivilege;
+import com.msik404.karmaapp.user.dto.UserDtoWithUserPrivilege;
 
 import jakarta.persistence.criteria.CriteriaUpdate;
 import jakarta.persistence.criteria.Root;

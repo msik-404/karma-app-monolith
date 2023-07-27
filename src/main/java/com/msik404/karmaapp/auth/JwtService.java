@@ -12,7 +12,10 @@ import org.springframework.stereotype.Service;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 
 @Service
 public class JwtService {
@@ -34,24 +37,19 @@ public class JwtService {
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(currentTime))
                 .setExpiration(new Date(expirationTime))
+                // TODO: check for behaviour for weak secret.
                 .signWith(Keys.hmacShaKeyFor(secret.getBytes()))
                 .compact();
     }
 
-    public Claims extractAllClaims(String jwt) {
+    public Claims extractAllClaims(String jwt)
+            throws UnsupportedJwtException, MalformedJwtException, SignatureException, IllegalArgumentException {
 
         return Jwts.parserBuilder()
+                // TODO: check for behaviour for weak secret.
                 .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes()))
                 .build()
                 .parseClaimsJws(jwt)
                 .getBody();
-    }
-
-    public boolean isValid(Claims claims, UserDetails userDetails) {
-        return (claims.getSubject().equals(userDetails.getUsername()) && !isTokenExpired(claims));
-    }
-
-    public boolean isTokenExpired(Claims claims) {
-        return claims.getExpiration().before(new Date());
     }
 }

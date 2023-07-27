@@ -1,4 +1,4 @@
-package com.msik404.karmaapp.user.dtos;
+package com.msik404.karmaapp.user.dto;
 
 import com.msik404.karmaapp.user.Role;
 

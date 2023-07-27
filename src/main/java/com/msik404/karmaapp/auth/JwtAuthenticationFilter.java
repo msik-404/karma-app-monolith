@@ -3,11 +3,9 @@ package com.msik404.karmaapp.auth;
 import java.io.IOException;
 
 import org.springframework.lang.NonNull;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -49,20 +47,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Checks whether user is not already authenticated,
         // this is useful when there are many authentication methods.
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            try {
-                User user = userService.findByEmail(username);
-                var authentication = new UsernamePasswordAuthenticationToken(user.getId(), null,
-                        user.getAuthorities());
-                // Adds interesting data like ip address and session id
-                authentication.setDetails(new WebAuthenticationDetails(request));
-                // Docs state that this is required for thread safety:
-                // https://docs.spring.io/spring-security/reference/servlet/authentication/architecture.html
-                SecurityContext context = SecurityContextHolder.createEmptyContext();
-                context.setAuthentication(authentication);
-                SecurityContextHolder.setContext(context);
-            } catch (UsernameNotFoundException e) {
-                throw new AccessDeniedException("Access denied");
-            }
+            User user = userService.findByEmail(username);
+            var authentication = new UsernamePasswordAuthenticationToken(user.getId(), null,
+                    user.getAuthorities());
+            // Adds interesting data like ip address and session id
+            authentication.setDetails(new WebAuthenticationDetails(request));
+            // Docs state that this is required for thread safety:
+            // https://docs.spring.io/spring-security/reference/servlet/authentication/architecture.html
+            SecurityContext context = SecurityContextHolder.createEmptyContext();
+            context.setAuthentication(authentication);
+            SecurityContextHolder.setContext(context);
         }
         filterChain.doFilter(request, response);
     }

@@ -1,7 +1,7 @@
 package com.msik404.karmaapp.user.handler;
 
 import com.msik404.karmaapp.user.User;
-import com.msik404.karmaapp.user.dtos.UserDtoWithAdminPrivilege;
+import com.msik404.karmaapp.user.dto.UserDtoWithAdminPrivilege;
 
 import jakarta.persistence.criteria.CriteriaUpdate;
 import jakarta.persistence.criteria.Root;
