@@ -38,7 +38,6 @@ public class JwtService {
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(currentTime))
                 .setExpiration(new Date(expirationTime))
-                // TODO: check for behaviour for weak secret.
                 .signWith(Keys.hmacShaKeyFor(secret.getBytes()))
                 .compact();
     }
@@ -47,7 +46,6 @@ public class JwtService {
             throws ExpiredJwtException, UnsupportedJwtException, MalformedJwtException, SignatureException, IllegalArgumentException {
 
         return Jwts.parserBuilder()
-                // TODO: check for behaviour for weak secret.
                 .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes()))
                 .build()
                 .parseClaimsJws(jwt)
