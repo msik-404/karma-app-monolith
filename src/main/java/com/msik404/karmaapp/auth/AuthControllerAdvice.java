@@ -58,8 +58,8 @@ public class AuthControllerAdvice extends ResponseEntityExceptionHandler {
         return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, "JWT signature is malformed");
     }
 
-    @ExceptionHandler(DuplicateEmailExeption.class)
-    public ProblemDetail duplicateEmailExeption(DuplicateEmailExeption ex) {
+    @ExceptionHandler(DuplicateEmailException.class)
+    public ProblemDetail duplicateEmailExeption(DuplicateEmailException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, "This email is already used");
     }
 

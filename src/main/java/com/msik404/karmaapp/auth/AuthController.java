@@ -23,7 +23,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<Void> register(@Valid @RequestBody RegisterRequest request)
-            throws DuplicateEmailExeption {
+            throws DuplicateEmailException {
 
         authenticationService.register(request);
 

@@ -33,7 +33,7 @@ public class AuthService {
     private final JwtService jwtService;
 
     public void register(RegisterRequest request)
-            throws DuplicateEmailExeption {
+            throws DuplicateEmailException {
 
         try {
             repository.save(User.builder()
@@ -50,7 +50,7 @@ public class AuthService {
                     .enabled(true)
                     .build());
         } catch (DataIntegrityViolationException ex) {
-            throw new DuplicateEmailExeption();
+            throw new DuplicateEmailException();
         }
     }
 

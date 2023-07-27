@@ -5,7 +5,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
 
-import com.msik404.karmaapp.auth.DuplicateEmailExeption;
+import com.msik404.karmaapp.auth.DuplicateEmailException;
 import com.msik404.karmaapp.user.dto.UserDtoWithAdminPrivilege;
 import com.msik404.karmaapp.user.dto.UserDtoWithUserPrivilege;
 import com.msik404.karmaapp.user.handler.UserUpdateHandlerWithAdminPrivilege;
@@ -33,9 +33,9 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
     }
 
     @Override
-    @Transactional(rollbackOn = DuplicateEmailExeption.class)
+    @Transactional(rollbackOn = DuplicateEmailException.class)
     public void updateNonNull(Long userId, UserDtoWithUserPrivilege dto)
-            throws DuplicateEmailExeption {
+            throws DuplicateEmailException {
 
         CriteriaUpdate<User> criteriaUpdate = cb.createCriteriaUpdate(User.class);
         Root<User> root = criteriaUpdate.from(User.class);
@@ -48,14 +48,14 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
         try {
             entityManager.createQuery(criteriaUpdate).executeUpdate();
         } catch (ConstraintViolationException ex) {
-            throw new DuplicateEmailExeption();
+            throw new DuplicateEmailException();
         }
     }
 
     @Override
-    @Transactional(rollbackOn = DuplicateEmailExeption.class)
+    @Transactional(rollbackOn = DuplicateEmailException.class)
     public void updateNonNull(Long userId, UserDtoWithAdminPrivilege dto)
-            throws DuplicateEmailExeption {
+            throws DuplicateEmailException {
 
         CriteriaUpdate<User> criteriaUpdate = cb.createCriteriaUpdate(User.class);
         Root<User> root = criteriaUpdate.from(User.class);
@@ -69,7 +69,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
         try {
             entityManager.createQuery(criteriaUpdate).executeUpdate();
         } catch (ConstraintViolationException ex) {
-            throw new DuplicateEmailExeption();
+            throw new DuplicateEmailException();
         }
     }
 

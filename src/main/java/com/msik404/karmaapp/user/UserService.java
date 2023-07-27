@@ -6,7 +6,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.msik404.karmaapp.auth.DuplicateEmailExeption;
+import com.msik404.karmaapp.auth.DuplicateEmailException;
 import com.msik404.karmaapp.user.dto.UserDtoWithAdminPrivilege;
 import com.msik404.karmaapp.user.dto.UserDtoWithUserPrivilege;
 
@@ -37,7 +37,7 @@ public class UserService {
     public UserDtoWithUserPrivilege updateWithUserPrivilege(
             @Nonnull Long userId,
             @Nonnull UserDtoWithUserPrivilege request) 
-            throws AccessDeniedException, DuplicateEmailExeption {
+            throws AccessDeniedException, DuplicateEmailException {
 
         if (!sameAsAuthenticatedUser(userId)) {
             throw new AccessDeniedException("Access denied");
@@ -51,7 +51,7 @@ public class UserService {
     public UserDtoWithAdminPrivilege updateWithAdminPrivilege(
             @Nonnull Long userId,
             @Nonnull UserDtoWithAdminPrivilege request) 
-            throws DuplicateEmailExeption {
+            throws DuplicateEmailException {
 
         userRepository.updateNonNull(userId, request);
 

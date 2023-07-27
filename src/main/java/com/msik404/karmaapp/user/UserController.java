@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.msik404.karmaapp.auth.DuplicateEmailExeption;
+import com.msik404.karmaapp.auth.DuplicateEmailException;
 import com.msik404.karmaapp.user.dto.UserDtoWithAdminPrivilege;
 import com.msik404.karmaapp.user.dto.UserDtoWithUserPrivilege;
 
@@ -25,7 +25,7 @@ public class UserController {
     public ResponseEntity<UserDtoWithUserPrivilege> updateWithUserPrivilege(
             @PathVariable Long userId,
             @Valid @RequestBody UserDtoWithUserPrivilege request)
-            throws AccessDeniedException, DuplicateEmailExeption {
+            throws AccessDeniedException, DuplicateEmailException {
 
         return ResponseEntity.ok(userService.updateWithUserPrivilege(userId, request));
     }
@@ -34,7 +34,7 @@ public class UserController {
     public ResponseEntity<UserDtoWithAdminPrivilege> updateWithAdminPrivilege(
             @PathVariable Long userId,
             @Valid @RequestBody UserDtoWithAdminPrivilege request) 
-            throws DuplicateEmailExeption {
+            throws DuplicateEmailException {
 
         return ResponseEntity.ok(userService.updateWithAdminPrivilege(userId, request));
     }
