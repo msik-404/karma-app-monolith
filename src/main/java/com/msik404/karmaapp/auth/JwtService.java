@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -43,7 +44,7 @@ public class JwtService {
     }
 
     public Claims extractAllClaims(String jwt)
-            throws UnsupportedJwtException, MalformedJwtException, SignatureException, IllegalArgumentException {
+            throws ExpiredJwtException, UnsupportedJwtException, MalformedJwtException, SignatureException, IllegalArgumentException {
 
         return Jwts.parserBuilder()
                 // TODO: check for behaviour for weak secret.

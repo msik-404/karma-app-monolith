@@ -20,47 +20,57 @@ public class AuthControllerAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(DisabledException.class)
     public ProblemDetail disabledException(DisabledException ex) {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, "Account is disabled");
+        return ProblemDetail.forStatusAndDetail(
+                HttpStatus.UNAUTHORIZED, "Account is disabled");
     }
 
     @ExceptionHandler(LockedException.class)
     public ProblemDetail lockedException(LockedException ex) {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, "Account is locked");
+        return ProblemDetail.forStatusAndDetail(
+                HttpStatus.UNAUTHORIZED, "Account is locked");
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     public ProblemDetail badCredentialsException(BadCredentialsException ex) {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, "Invalid credentials provided");
+        return ProblemDetail.forStatusAndDetail(
+                HttpStatus.UNAUTHORIZED, "Invalid credentials provided");
     }
 
     @ExceptionHandler(AuthenticationCredentialsNotFoundException.class)
-    public ProblemDetail authenticationCredentialsNotFoundException(AuthenticationCredentialsNotFoundException ex) {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, "Credentials were not provided");
+    public ProblemDetail authenticationCredentialsNotFoundException(
+            AuthenticationCredentialsNotFoundException ex) {
+        return ProblemDetail.forStatusAndDetail(
+                HttpStatus.UNAUTHORIZED, "Credentials were not provided");
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ProblemDetail accessDeniedException(AccessDeniedException ex) {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, "Access denied");
+        return ProblemDetail.forStatusAndDetail(
+                HttpStatus.UNAUTHORIZED, "Access denied");
     }
 
     @ExceptionHandler(ExpiredJwtException.class)
     public ProblemDetail expiredJwtException(ExpiredJwtException ex) {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, "JWT is expired");
+        return ProblemDetail.forStatusAndDetail(
+                HttpStatus.UNAUTHORIZED, "JWT is expired");
     }
 
     @ExceptionHandler(SignatureException.class)
     public ProblemDetail signatureException(SignatureException ex) {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, "JWT signature is invalid");
+        return ProblemDetail.forStatusAndDetail(
+                HttpStatus.UNAUTHORIZED, "JWT signature is invalid");
     }
 
     @ExceptionHandler(MalformedJwtException.class)
     public ProblemDetail malformedJwtException(MalformedJwtException ex) {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, "JWT signature is malformed");
+        return ProblemDetail.forStatusAndDetail(
+                HttpStatus.UNAUTHORIZED, "JWT signature is malformed");
     }
 
     @ExceptionHandler(DuplicateEmailException.class)
     public ProblemDetail duplicateEmailExeption(DuplicateEmailException ex) {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, "This email is already used");
+        return ProblemDetail.forStatusAndDetail(
+                HttpStatus.CONFLICT, "This email is already used");
     }
 
 }
