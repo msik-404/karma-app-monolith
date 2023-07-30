@@ -3,15 +3,13 @@ package com.msik404.karmaapp.user;
 import java.util.Collection;
 import java.util.Set;
 
+import com.msik404.karmaapp.karma.KarmaScore;
+import com.msik404.karmaapp.post.Post;
+import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -39,6 +37,12 @@ public class User implements UserDetails {
     private boolean accountNonLocked;
     private boolean credentialsNonExpired;
     private boolean enabled;
+
+    @OneToMany(mappedBy = "user")
+    private Set<Post> posts;
+
+    @OneToMany(mappedBy = "user")
+    private Set<KarmaScore> karmaScores;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
