@@ -4,11 +4,9 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
 
-import com.msik404.karmaapp.auth.DuplicateEmailException;
+import com.msik404.karmaapp.uniqueConstraintExceptions.DuplicateEmailException;
 import com.msik404.karmaapp.user.dto.UserDtoWithAdminPrivilege;
 import com.msik404.karmaapp.user.dto.UserDtoWithUserPrivilege;
-import com.msik404.karmaapp.user.handler.UserUpdateHandlerWithAdminPrivilege;
-import com.msik404.karmaapp.user.handler.UserUpdateHandlerWithUserPrivilege;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -23,14 +21,20 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
     private final CriteriaBuilder cb;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UserRepositoryCustomImpl(EntityManager entityManager,
-            BCryptPasswordEncoder bCryptPasswordEncoder) {
+    private final UserCriteriaUpdater userCriteriaUpdater;
+
+    public UserRepositoryCustomImpl(
+            EntityManager entityManager,
+            BCryptPasswordEncoder bCryptPasswordEncoder,
+            UserCriteriaUpdater userCriteriaUpdater) {
 
         this.entityManager = entityManager;
         this.cb = entityManager.getCriteriaBuilder();
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.userCriteriaUpdater = userCriteriaUpdater;
     }
 
+    // TODO: chain of responsibility here doesn't make really sense
     @Override
     @Transactional(rollbackOn = DuplicateEmailException.class)
     public void updateNonNull(Long userId, UserDtoWithUserPrivilege dto)
@@ -39,14 +43,13 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
         CriteriaUpdate<User> criteriaUpdate = cb.createCriteriaUpdate(User.class);
         Root<User> root = criteriaUpdate.from(User.class);
 
-        var handler = new UserUpdateHandlerWithUserPrivilege(root, dto, bCryptPasswordEncoder);
-        handler.handle(criteriaUpdate);
-
+        userCriteriaUpdater.updateUserCriteria(dto, bCryptPasswordEncoder, root, criteriaUpdate);
         criteriaUpdate.where(cb.equal(root.get("id"), userId));
 
         try {
             entityManager.createQuery(criteriaUpdate).executeUpdate();
         } catch (ConstraintViolationException ex) {
+            // TODO: Handle username unique constraint exception
             throw new DuplicateEmailException();
         }
     }
@@ -59,15 +62,14 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
         CriteriaUpdate<User> criteriaUpdate = cb.createCriteriaUpdate(User.class);
         Root<User> root = criteriaUpdate.from(User.class);
 
-        var handler = new UserUpdateHandlerWithUserPrivilege(root, dto, bCryptPasswordEncoder);
-        handler.setNext(new UserUpdateHandlerWithAdminPrivilege(root, dto));
-        handler.handle(criteriaUpdate);
-
+        userCriteriaUpdater.updateUserCriteria(dto, bCryptPasswordEncoder, root, criteriaUpdate);
+        userCriteriaUpdater.updateAdminCriteria(dto, root, criteriaUpdate);
         criteriaUpdate.where(cb.equal(root.get("id"), userId));
 
         try {
             entityManager.createQuery(criteriaUpdate).executeUpdate();
         } catch (ConstraintViolationException ex) {
+            // TODO: Handle username unique constraint exception
             throw new DuplicateEmailException();
         }
     }
