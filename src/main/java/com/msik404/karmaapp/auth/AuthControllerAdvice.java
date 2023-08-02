@@ -70,7 +70,7 @@ public class AuthControllerAdvice extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(DuplicateEmailException.class)
-    public ProblemDetail duplicateEmailExeption(DuplicateEmailException ex) {
+    public ProblemDetail duplicateEmailException(DuplicateEmailException ex) {
         return ProblemDetail.forStatusAndDetail(
                 HttpStatus.CONFLICT, ex.getMessage());
     }
