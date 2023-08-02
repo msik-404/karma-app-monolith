@@ -1,17 +1,15 @@
 package com.msik404.karmaapp.user;
 
+import com.msik404.karmaapp.constraintExceptions.DuplicateEmailException;
+import com.msik404.karmaapp.user.dto.UserDtoWithAdminPrivilege;
+import com.msik404.karmaapp.user.dto.UserDtoWithUserPrivilege;
+import jakarta.annotation.Nonnull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import com.msik404.karmaapp.auth.DuplicateEmailException;
-import com.msik404.karmaapp.user.dto.UserDtoWithAdminPrivilege;
-import com.msik404.karmaapp.user.dto.UserDtoWithUserPrivilege;
-
-import jakarta.annotation.Nonnull;
-import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -19,9 +17,15 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public User findByEmail(String username) throws UsernameNotFoundException {
+    public User findById(long id) throws  UsernameNotFoundException {
 
-        return userRepository.findByEmail(username).orElseThrow(
+        return userRepository.findById(id).orElseThrow(
+                () -> new UsernameNotFoundException("User not found"));
+    }
+
+    public User findByUsername(String username) throws UsernameNotFoundException {
+
+        return userRepository.findByUsername(username).orElseThrow(
                 () -> new UsernameNotFoundException("User not found"));
     }
 
@@ -36,7 +40,7 @@ public class UserService {
 
     public UserDtoWithUserPrivilege updateWithUserPrivilege(
             @Nonnull Long userId,
-            @Nonnull UserDtoWithUserPrivilege request) 
+            @Nonnull UserDtoWithUserPrivilege request)
             throws AccessDeniedException, DuplicateEmailException {
 
         if (!sameAsAuthenticatedUser(userId)) {
@@ -50,7 +54,7 @@ public class UserService {
 
     public UserDtoWithAdminPrivilege updateWithAdminPrivilege(
             @Nonnull Long userId,
-            @Nonnull UserDtoWithAdminPrivilege request) 
+            @Nonnull UserDtoWithAdminPrivilege request)
             throws DuplicateEmailException {
 
         userRepository.updateNonNull(userId, request);

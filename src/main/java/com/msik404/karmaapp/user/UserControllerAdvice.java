@@ -1,13 +1,12 @@
 package com.msik404.karmaapp.user;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-
-import jakarta.persistence.EntityNotFoundException;
 
 @RestControllerAdvice
 public class UserControllerAdvice extends ResponseEntityExceptionHandler {

@@ -1,19 +1,15 @@
 package com.msik404.karmaapp.auth;
 
-import javax.naming.AuthenticationException;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.msik404.karmaapp.auth.dto.LoginRequest;
 import com.msik404.karmaapp.auth.dto.LoginResponse;
 import com.msik404.karmaapp.auth.dto.RegisterRequest;
-
+import com.msik404.karmaapp.constraintExceptions.DuplicateEmailException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,7 +28,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request)
-            throws AuthenticationException, UsernameNotFoundException {
+            throws org.springframework.security.core.AuthenticationException {
 
         return ResponseEntity.ok(authenticationService.login(request));
     }

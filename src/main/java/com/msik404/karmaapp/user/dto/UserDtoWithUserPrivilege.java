@@ -6,12 +6,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-@RequiredArgsConstructor @ToString @Setter @Getter
+@RequiredArgsConstructor
+@ToString
+@Setter
+@Getter
 public class UserDtoWithUserPrivilege {
 
     private final String firstName;
     private final String lastName;
 
+    private final String username;
     @Email
     private final String email;
     private final String password;

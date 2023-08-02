@@ -1,5 +1,11 @@
 package com.msik404.karmaapp.auth;
 
+import com.msik404.karmaapp.constraintExceptions.DuplicateEmailException;
+import com.msik404.karmaapp.constraintExceptions.DuplicateUsernameException;
+import com.msik404.karmaapp.constraintExceptions.UndefinedConstraintException;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.security.access.AccessDeniedException;
@@ -10,10 +16,6 @@ import org.springframework.security.authentication.LockedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.security.SignatureException;
 
 @RestControllerAdvice
 public class AuthControllerAdvice extends ResponseEntityExceptionHandler {
@@ -70,7 +72,19 @@ public class AuthControllerAdvice extends ResponseEntityExceptionHandler {
     @ExceptionHandler(DuplicateEmailException.class)
     public ProblemDetail duplicateEmailExeption(DuplicateEmailException ex) {
         return ProblemDetail.forStatusAndDetail(
-                HttpStatus.CONFLICT, "This email is already used");
+                HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    @ExceptionHandler(DuplicateUsernameException.class)
+    public ProblemDetail duplicateUsernameException(DuplicateUsernameException ex) {
+        return ProblemDetail.forStatusAndDetail(
+                HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    @ExceptionHandler(UndefinedConstraintException.class)
+    public ProblemDetail undefinedConstraintException(UndefinedConstraintException ex) {
+        return ProblemDetail.forStatusAndDetail(
+                HttpStatus.CONFLICT, ex.getMessage());
     }
 
 }

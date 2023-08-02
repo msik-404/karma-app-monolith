@@ -6,31 +6,39 @@ import java.util.Set;
 import com.msik404.karmaapp.karma.KarmaScore;
 import com.msik404.karmaapp.post.Post;
 import jakarta.persistence.*;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-@Entity @Table(name = "users")
-@Data @NoArgsConstructor @AllArgsConstructor @Builder
+@Entity
+@Table(name = "users")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User implements UserDetails {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     private Long id;
 
     private String firstName;
     private String lastName;
 
     @Column(unique = true)
+    private String username;
+
+    @Column(unique = true)
     @Email
     private String email;
     private String password;
 
+    @Enumerated(EnumType.STRING)
     private Role role;
 
     private boolean accountNonExpired;
@@ -51,7 +59,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return username;
     }
 
     @Override
