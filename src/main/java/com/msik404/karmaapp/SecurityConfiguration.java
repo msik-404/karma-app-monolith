@@ -10,6 +10,8 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.RequestCacheConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
 
@@ -36,13 +38,13 @@ public class SecurityConfiguration {
         // I disabled many of the filters, because I don't like to have
         // things that I won't use
         return httpSecurity
-                .csrf(csrf -> csrf.disable())
-                .logout(logout -> logout.disable())
-                .sessionManagement(session -> session.disable())
-                .securityContext(context -> context.disable()) // This is for securityContext persistence
-                .anonymous(anonymous -> anonymous.disable())
-                .headers(headers -> headers.disable())
-                .requestCache(cache -> cache.disable())
+                .csrf(AbstractHttpConfigurer::disable)
+                .logout(AbstractHttpConfigurer::disable)
+                .sessionManagement(AbstractHttpConfigurer::disable)
+                .securityContext(AbstractHttpConfigurer::disable) // This is for securityContext persistence
+                .anonymous(AbstractHttpConfigurer::disable)
+                .headers(AbstractHttpConfigurer::disable)
+                .requestCache(RequestCacheConfigurer::disable)
 
                 .exceptionHandling(handler -> handler.authenticationEntryPoint(entryPoint))
 
