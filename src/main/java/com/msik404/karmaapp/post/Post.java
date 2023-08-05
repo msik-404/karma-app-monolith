@@ -12,7 +12,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "posts")
+@Table(name = "posts", indexes = @Index(name = "posts_keyset_pagination", columnList = "id ASC, karmaScore DESC"))
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,6 +24,10 @@ public class Post {
     private Long id;
 
     private String text;
+
+    // This will be updated in transaction with KarmaScore, so that these values will be kept in sync.
+    // Doing so we won't have to scan KarmaScore table each time we need to get the score of a post.
+    private Long karmaScore;
 
     @Enumerated(EnumType.STRING)
     private PostVisibility visibility;
