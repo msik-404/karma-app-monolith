@@ -52,7 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // this is useful when there are many authentication methods.
         if (claims.getSubject() != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             // parse userId Long type represented as string to Long type
-            final long userId = Long.parseLong(claims.getSubject());
+            final Long userId = Long.parseLong(claims.getSubject());
             User user = userService.findById(userId);
             var authentication = new UsernamePasswordAuthenticationToken(user.getId(), null,
                     user.getAuthorities());
