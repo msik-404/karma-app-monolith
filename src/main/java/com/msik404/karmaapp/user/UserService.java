@@ -31,9 +31,7 @@ public class UserService {
 
     public Boolean sameAsAuthenticatedUser(@Nonnull Long id) {
 
-        Authentication authentication = SecurityContextHolder
-                .getContext()
-                .getAuthentication();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Long userId = (Long) authentication.getPrincipal();
         return userId.equals(id);
     }

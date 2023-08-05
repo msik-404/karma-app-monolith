@@ -2,10 +2,9 @@ package com.msik404.karmaapp.post;
 
 import java.util.List;
 
+import com.msik404.karmaapp.post.dto.NewPostRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -13,7 +12,7 @@ public class PostController {
 
     private final PostService postService;
 
-    // TODO: get paginated posts with image and karma score
+    // TODO: add image support
     @GetMapping("user/posts")
     public List<Post> findPaginated(
             @RequestParam(value = "post_id", required = false) Long postId,
@@ -23,8 +22,13 @@ public class PostController {
         return postService.findManyBykeysetPagination(postId, karmaScore, size);
     }
 
-    // TODO: create new post with uploading image
+    // TODO: add image support
+    @PostMapping("user/posts")
+    public void create(@RequestBody NewPostRequest request) {
+        postService.create(request);
+    }
+
     // TODO: Give positive or negative karma score
-    // TODO: Mod can hide post
-    // TODO: Admin can delete post
+    // TODO: Mod and user can hide post
+    // TODO: Admin and user can delete post
 }
