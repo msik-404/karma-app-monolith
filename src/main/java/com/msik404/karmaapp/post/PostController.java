@@ -2,6 +2,8 @@ package com.msik404.karmaapp.post;
 
 import java.util.List;
 
+import com.msik404.karmaapp.karma.KarmaScoreAlreadyExistsException;
+import com.msik404.karmaapp.karma.KarmaScoreNotFoundException;
 import com.msik404.karmaapp.post.dto.NewPostRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +30,18 @@ public class PostController {
         postService.create(request);
     }
 
-    // TODO: Give positive or negative karma score
+    // TODO: write controller advice for these new exceptions
+    @PostMapping("user/posts/{postId}/rate")
+    public void rate(@PathVariable Long postId, @RequestParam("is_positive") boolean isPositive)
+            throws KarmaScoreAlreadyExistsException, PostNotFoundException {
+        postService.rate(postId, isPositive);
+    }
+
+    @PostMapping("user/posts/{postId}/unrate")
+    public void unrate(@PathVariable Long postId) throws KarmaScoreNotFoundException, PostNotFoundException {
+        postService.unrate(postId);
+    }
+
     // TODO: Mod and user can hide post
     // TODO: Admin and user can delete post
 }

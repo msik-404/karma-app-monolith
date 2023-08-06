@@ -3,9 +3,7 @@ package com.msik404.karmaapp.post;
 import java.util.List;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
@@ -55,5 +53,44 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         final int offset = 0;
         return entityManager.createQuery(criteriaQuery).setFirstResult(offset).setMaxResults(size).getResultList();
     }
+
+    public void addKarmaScoreToPost(@NonNull Long postId, @NonNull Long value) throws PostNotFoundException {
+
+        CriteriaUpdate<Post> criteriaUpdate = cb.createCriteriaUpdate(Post.class);
+        Root<Post> root = criteriaUpdate.getRoot();
+
+        Path<Long> karmaScorePath = root.get("karmaScore");
+
+        criteriaUpdate.set(karmaScorePath, cb.sum(karmaScorePath, value));
+        criteriaUpdate.where(cb.equal(root.get("id"), postId));
+
+        int rowsAffected = entityManager.createQuery(criteriaUpdate).executeUpdate();
+        if (rowsAffected == 0) {
+            throw new PostNotFoundException();
+        }
+    }
+
+    // private void createKarmaScoreRelation(Long postId, Long userId, boolean isPositive) {
+
+    //     String queryString = "INSERT INTO " + KarmaScore.class.getSimpleName() +
+    //             " (post_id, user_id, is_positive) VALUES (:postId, :userId, :isPositive)";
+
+    //     entityManager.createNativeQuery(queryString)
+    //             .setParameter("postId", postId)
+    //             .setParameter("userId", userId)
+    //             .setParameter("isPositive", isPositive)
+    //             .executeUpdate();
+    // }
+
+    // private void deleteKarmaScoreRelation(Long postId, Long userId) {
+
+    //     String queryString = "DELETE FROM " + KarmaScore.class.getSimpleName()
+    //             + " WHERE post_id = :postId AND user_id = :userId";
+
+    //     entityManager.createNativeQuery(queryString)
+    //             .setParameter("post_id", postId)
+    //             .setParameter("user_id", userId)
+    //             .executeUpdate();
+    // }
 
 }
