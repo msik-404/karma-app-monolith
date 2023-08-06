@@ -21,8 +21,9 @@ public class JwtService {
     /**
      * Generates new JWT.
      * Subject is set to user's Long type identifier which will be transformed to string.
+     *
      * @param user object representing user
-     * @param opt additional claims which will be added to JWT
+     * @param opt  additional claims which will be added to JWT
      * @return string with JWT
      */
     public String generateJwt(
