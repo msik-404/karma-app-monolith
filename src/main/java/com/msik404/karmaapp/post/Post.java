@@ -32,7 +32,7 @@ public class Post {
     @Enumerated(EnumType.STRING)
     private PostVisibility visibility;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
