@@ -65,17 +65,20 @@ public class PostService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         var userId = (Long) authentication.getPrincipal();
 
+        long scoreDiff = isPositive ? 1L : -1L;
         try {
             var karmaScore = karmaScoreService.findById(new KarmaKey(userId, postId));
-            if (karmaScore.getIsPositive().equals(isPositive)) {
+            Boolean wasPositive = karmaScore.getIsPositive();
+            if (wasPositive.equals(isPositive)) {
                 String message = isPositive ? "positively" : "negatively";
-                throw new KarmaScoreAlreadyExistsException("This post has been already rated" + message + "by you");
+                throw new KarmaScoreAlreadyExistsException("This post has been already rated " + message + "by you");
             }
             karmaScore.setIsPositive(isPositive);
+            scoreDiff = wasPositive ? -2L : 2L;
         } catch (KarmaScoreNotFoundException ex) {
             karmaScoreService.create(userId, postId, isPositive);
         }
-        repository.addKarmaScoreToPost(postId, isPositive ? 1L : -1L);
+        repository.addKarmaScoreToPost(postId, scoreDiff);
     }
 
     /**
