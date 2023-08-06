@@ -12,4 +12,6 @@ public interface PostRepositoryCustom {
 
     void addKarmaScoreToPost(@NonNull Long postId, @NonNull Long value) throws PostNotFoundException;
 
+    void changeVisibilityById(@NonNull Long postId, @NonNull PostVisibility visibility) throws PostNotFoundException;
+
 }

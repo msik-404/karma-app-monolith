@@ -13,8 +13,8 @@ public class KarmaScoreService {
         return repository.findById(id).orElseThrow(KarmaScoreNotFoundException::new);
     }
 
-    // TODO: possibly constraintException
-    public KarmaScore create(Long userId, Long postId, boolean isPositive) throws KarmaScoreAlreadyExistsException {
+    // WARNING THERE MAY BE possible errors when entity with that KarmaKey exists
+    public KarmaScore create(Long userId, Long postId, boolean isPositive) {
 
         var karmaScore = KarmaScore.builder()
                 .id(new KarmaKey(userId, postId))

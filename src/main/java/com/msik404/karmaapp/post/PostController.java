@@ -6,6 +6,7 @@ import com.msik404.karmaapp.karma.KarmaScoreAlreadyExistsException;
 import com.msik404.karmaapp.karma.KarmaScoreNotFoundException;
 import com.msik404.karmaapp.post.dto.NewPostRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -30,10 +31,10 @@ public class PostController {
         postService.create(request);
     }
 
-    // TODO: write controller advice for these new exceptions
     @PostMapping("user/posts/{postId}/rate")
     public void rate(@PathVariable Long postId, @RequestParam("is_positive") boolean isPositive)
             throws KarmaScoreAlreadyExistsException, PostNotFoundException {
+
         postService.rate(postId, isPositive);
     }
 
@@ -42,6 +43,23 @@ public class PostController {
         postService.unrate(postId);
     }
 
-    // TODO: Mod and user can hide post
-    // TODO: Admin and user can delete post
+    @PostMapping("user/posts/{postId}/hide")
+    public void hideByUser(@PathVariable Long postId) throws AccessDeniedException, PostNotFoundException {
+        postService.changeVisibilityByUser(postId, PostVisibility.HIDDEN);
+    }
+
+    @PostMapping("mod/posts/{postId}/hide")
+    public void hideByMod(@PathVariable Long postId) throws PostNotFoundException {
+        postService.changeVisibility(postId, PostVisibility.HIDDEN);
+    }
+
+    @PostMapping("user/posts/{postId}/delete")
+    public void deleteByUser(@PathVariable Long postId) throws AccessDeniedException, PostNotFoundException {
+        postService.changeVisibilityByUser(postId, PostVisibility.DELETED);
+    }
+
+    @PostMapping("admin/posts/{postId}/delete")
+    public void deleteByAdmin(@PathVariable Long postId) throws AccessDeniedException, PostNotFoundException {
+        postService.changeVisibility(postId, PostVisibility.DELETED);
+    }
 }

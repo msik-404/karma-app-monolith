@@ -70,6 +70,22 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         }
     }
 
+    @Override
+    public void changeVisibilityById(@NonNull Long postId, @NonNull PostVisibility visibility)
+            throws PostNotFoundException {
+
+        CriteriaUpdate<Post> criteriaUpdate = cb.createCriteriaUpdate(Post.class);
+        Root<Post> root = criteriaUpdate.getRoot();
+
+        criteriaUpdate.set(root.get("visibility"), visibility);
+        criteriaUpdate.where(cb.equal(root.get("id"), postId));
+
+        int rowsAffected = entityManager.createQuery(criteriaUpdate).executeUpdate();
+        if (rowsAffected == 0) {
+            throw new PostNotFoundException();
+        }
+    }
+
     // private void createKarmaScoreRelation(Long postId, Long userId, boolean isPositive) {
 
     //     String queryString = "INSERT INTO " + KarmaScore.class.getSimpleName() +

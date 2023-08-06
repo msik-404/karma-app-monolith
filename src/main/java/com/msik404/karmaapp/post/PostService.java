@@ -1,12 +1,17 @@
 package com.msik404.karmaapp.post;
 
 import java.util.List;
+import java.util.Optional;
 
-import com.msik404.karmaapp.karma.*;
+import com.msik404.karmaapp.karma.KarmaKey;
+import com.msik404.karmaapp.karma.KarmaScoreAlreadyExistsException;
+import com.msik404.karmaapp.karma.KarmaScoreNotFoundException;
+import com.msik404.karmaapp.karma.KarmaScoreService;
 import com.msik404.karmaapp.post.dto.NewPostRequest;
 import com.msik404.karmaapp.user.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -50,7 +55,8 @@ public class PostService {
      * 1) create new KarmaScore and modify Post entity karma score value, three queries
      * 2) modify KarmaScore isPositive field and modify Post entity karma score value, three queries
      * 3) throw exception if required action result is already the current state, single query
-     * @param postId Long id of post whose score will be changed
+     *
+     * @param postId     Long id of post whose score will be changed
      * @param isPositive boolean value indicating whether to change to positive or negative
      */
     @Transactional
@@ -87,4 +93,29 @@ public class PostService {
         repository.addKarmaScoreToPost(postId, karmaScore.getIsPositive() ? -1L : 1L);
         karmaScoreService.deleteById(karmaKey);
     }
+
+    public void changeVisibilityByUser(Long postId, PostVisibility visibility)
+            throws AccessDeniedException, PostNotFoundException {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        var userId = (Long) authentication.getPrincipal();
+
+        Optional<Post> optionalPost = repository.findById(postId);
+        optionalPost.ifPresentOrElse(
+                post -> {
+                    // Id is lazy loaded
+                    if (!post.getUser().getId().equals(userId)) {
+                        throw new AccessDeniedException("Access denied");
+                    }
+                    post.setVisibility(visibility);
+                    repository.save(post);
+                },
+                PostNotFoundException::new
+        );
+    }
+
+    public void changeVisibility(Long postId, PostVisibility visibility) throws PostNotFoundException {
+        repository.changeVisibilityById(postId, visibility);
+    }
+
 }
