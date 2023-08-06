@@ -17,16 +17,15 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public User findById(Long id) throws  UsernameNotFoundException {
+    public User findById(Long id) throws UserNotFoundException {
 
-        return userRepository.findById(id).orElseThrow(
-                () -> new UsernameNotFoundException("User not found"));
+        return userRepository.findById(id).orElseThrow(UserNotFoundException::new);
     }
 
     public User findByUsername(String username) throws UsernameNotFoundException {
 
         return userRepository.findByUsername(username).orElseThrow(
-                () -> new UsernameNotFoundException("User not found"));
+                () -> new UsernameNotFoundException("User with that username was not found"));
     }
 
     public Boolean sameAsAuthenticatedUser(@Nonnull Long id) {
@@ -39,7 +38,7 @@ public class UserService {
     public UserDtoWithUserPrivilege updateWithUserPrivilege(
             @Nonnull Long userId,
             @Nonnull UserDtoWithUserPrivilege request)
-            throws AccessDeniedException, DuplicateEmailException {
+            throws AccessDeniedException, DuplicateEmailException, UserNotFoundException {
 
         if (!sameAsAuthenticatedUser(userId)) {
             throw new AccessDeniedException("Access denied");
@@ -53,7 +52,7 @@ public class UserService {
     public UserDtoWithAdminPrivilege updateWithAdminPrivilege(
             @Nonnull Long userId,
             @Nonnull UserDtoWithAdminPrivilege request)
-            throws DuplicateEmailException {
+            throws DuplicateEmailException, UserNotFoundException {
 
         userRepository.updateNonNull(userId, request);
 

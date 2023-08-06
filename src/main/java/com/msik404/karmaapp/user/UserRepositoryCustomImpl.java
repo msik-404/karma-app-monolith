@@ -46,7 +46,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
     @Override
     @Transactional(rollbackOn = DuplicateEmailException.class)
     public void updateNonNull(Long userId, UserDtoWithUserPrivilege dto)
-            throws DuplicateEmailException {
+            throws DuplicateEmailException, UserNotFoundException {
 
         CriteriaUpdate<User> criteriaUpdate = cb.createCriteriaUpdate(User.class);
         Root<User> root = criteriaUpdate.from(User.class);
@@ -55,7 +55,10 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
         criteriaUpdate.where(cb.equal(root.get("id"), userId));
 
         try {
-            entityManager.createQuery(criteriaUpdate).executeUpdate();
+            int rowsAffected = entityManager.createQuery(criteriaUpdate).executeUpdate();
+            if (rowsAffected == 0) {
+                throw new UserNotFoundException();
+            }
         } catch (ConstraintViolationException ex) {
             constraintExceptionsHandler.handle(ex, extractionStrategy, parseStrategy);
         }
@@ -64,7 +67,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
     @Override
     @Transactional(rollbackOn = DuplicateEmailException.class)
     public void updateNonNull(Long userId, UserDtoWithAdminPrivilege dto)
-            throws DuplicateEmailException {
+            throws DuplicateEmailException, UserNotFoundException {
 
         CriteriaUpdate<User> criteriaUpdate = cb.createCriteriaUpdate(User.class);
         Root<User> root = criteriaUpdate.from(User.class);
@@ -74,7 +77,10 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
         criteriaUpdate.where(cb.equal(root.get("id"), userId));
 
         try {
-            entityManager.createQuery(criteriaUpdate).executeUpdate();
+            int rowsAffected = entityManager.createQuery(criteriaUpdate).executeUpdate();
+            if (rowsAffected == 0) {
+                throw new UserNotFoundException();
+            }
         } catch (ConstraintViolationException ex) {
             constraintExceptionsHandler.handle(ex, extractionStrategy, parseStrategy);
         }

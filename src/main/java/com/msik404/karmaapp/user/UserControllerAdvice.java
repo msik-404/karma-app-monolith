@@ -20,7 +20,13 @@ public class UserControllerAdvice extends ResponseEntityExceptionHandler {
     @ExceptionHandler(UsernameNotFoundException.class)
     public ProblemDetail usernameNotFoundException(UsernameNotFoundException ex) {
         return ProblemDetail.forStatusAndDetail(
-                HttpStatus.BAD_REQUEST, "Username with that id/email was not found");
+                HttpStatus.BAD_REQUEST, "User with that username was not found");
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ProblemDetail userNotFoundException(UserNotFoundException ex) {
+        return ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST, "User with that id was not found");
     }
 
 }

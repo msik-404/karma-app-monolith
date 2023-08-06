@@ -22,7 +22,7 @@ public class UserController {
     public ResponseEntity<UserDtoWithUserPrivilege> updateWithUserPrivilege(
             @PathVariable Long userId,
             @Valid @RequestBody UserDtoWithUserPrivilege request)
-            throws AccessDeniedException, DuplicateEmailException {
+            throws AccessDeniedException, DuplicateEmailException, UserNotFoundException {
 
         return ResponseEntity.ok(userService.updateWithUserPrivilege(userId, request));
     }
@@ -31,7 +31,7 @@ public class UserController {
     public ResponseEntity<UserDtoWithAdminPrivilege> updateWithAdminPrivilege(
             @PathVariable Long userId,
             @Valid @RequestBody UserDtoWithAdminPrivilege request)
-            throws DuplicateEmailException {
+            throws DuplicateEmailException, UserNotFoundException {
 
         return ResponseEntity.ok(userService.updateWithAdminPrivilege(userId, request));
     }
