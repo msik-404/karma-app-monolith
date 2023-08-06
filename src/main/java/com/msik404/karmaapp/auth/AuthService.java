@@ -60,7 +60,7 @@ public class AuthService {
 
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 
-        User user = userService.findByUsername(request.getUsername());
+        var user = userService.findByUsername(request.getUsername());
 
         return new LoginResponse(jwtService.generateJwt(user, Optional.empty()));
     }

@@ -8,8 +8,6 @@ import com.msik404.karmaapp.user.dto.UserDtoWithAdminPrivilege;
 import com.msik404.karmaapp.user.dto.UserDtoWithUserPrivilege;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaUpdate;
-import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -45,35 +43,16 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 
     @Override
     @Transactional(rollbackOn = DuplicateEmailException.class)
-    public void updateNonNull(Long userId, UserDtoWithUserPrivilege dto)
+    public void updateNonNull(long userId, UserDtoWithUserPrivilege dto)
             throws DuplicateEmailException, UserNotFoundException {
 
-        CriteriaUpdate<User> criteriaUpdate = cb.createCriteriaUpdate(User.class);
-        Root<User> root = criteriaUpdate.from(User.class);
+        var criteriaUpdate = cb.createCriteriaUpdate(User.class);
+        var root = criteriaUpdate.from(User.class);
 
         userCriteriaUpdater.updateUserCriteria(dto, bCryptPasswordEncoder, root, criteriaUpdate);
-        criteriaUpdate.where(cb.equal(root.get("id"), userId));
-
-        try {
-            int rowsAffected = entityManager.createQuery(criteriaUpdate).executeUpdate();
-            if (rowsAffected == 0) {
-                throw new UserNotFoundException();
-            }
-        } catch (ConstraintViolationException ex) {
-            constraintExceptionsHandler.handle(ex, extractionStrategy, parseStrategy);
+        if (dto instanceof UserDtoWithAdminPrivilege) {
+            userCriteriaUpdater.updateAdminCriteria((UserDtoWithAdminPrivilege) dto, root, criteriaUpdate);
         }
-    }
-
-    @Override
-    @Transactional(rollbackOn = DuplicateEmailException.class)
-    public void updateNonNull(Long userId, UserDtoWithAdminPrivilege dto)
-            throws DuplicateEmailException, UserNotFoundException {
-
-        CriteriaUpdate<User> criteriaUpdate = cb.createCriteriaUpdate(User.class);
-        Root<User> root = criteriaUpdate.from(User.class);
-
-        userCriteriaUpdater.updateUserCriteria(dto, bCryptPasswordEncoder, root, criteriaUpdate);
-        userCriteriaUpdater.updateAdminCriteria(dto, root, criteriaUpdate);
         criteriaUpdate.where(cb.equal(root.get("id"), userId));
 
         try {

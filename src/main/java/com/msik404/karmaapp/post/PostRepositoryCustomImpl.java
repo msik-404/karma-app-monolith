@@ -21,8 +21,8 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     @Override
     public List<Post> findTopN(int size) {
 
-        CriteriaQuery<Post> criteriaQuery = cb.createQuery(Post.class);
-        Root<Post> root = criteriaQuery.from(Post.class);
+        var criteriaQuery = cb.createQuery(Post.class);
+        var root = criteriaQuery.from(Post.class);
 
         criteriaQuery.select(root);
 
@@ -35,10 +35,10 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<Post> findTopNextN(@NonNull Long postId, @NonNull Long karmaScore, int size) {
+    public List<Post> findTopNextN(long postId, long karmaScore, int size) {
 
-        CriteriaQuery<Post> criteriaQuery = cb.createQuery(Post.class);
-        Root<Post> root = criteriaQuery.from(Post.class);
+        var criteriaQuery = cb.createQuery(Post.class);
+        var root = criteriaQuery.from(Post.class);
 
         criteriaQuery.select(root);
 
@@ -54,10 +54,10 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         return entityManager.createQuery(criteriaQuery).setFirstResult(offset).setMaxResults(size).getResultList();
     }
 
-    public void addKarmaScoreToPost(@NonNull Long postId, @NonNull Long value) throws PostNotFoundException {
+    public void addKarmaScoreToPost(long postId, long value) throws PostNotFoundException {
 
-        CriteriaUpdate<Post> criteriaUpdate = cb.createCriteriaUpdate(Post.class);
-        Root<Post> root = criteriaUpdate.getRoot();
+        var criteriaUpdate = cb.createCriteriaUpdate(Post.class);
+        var root = criteriaUpdate.getRoot();
 
         Path<Long> karmaScorePath = root.get("karmaScore");
 
@@ -71,11 +71,11 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public void changeVisibilityById(@NonNull Long postId, @NonNull PostVisibility visibility)
+    public void changeVisibilityById(long postId, @NonNull PostVisibility visibility)
             throws PostNotFoundException {
 
-        CriteriaUpdate<Post> criteriaUpdate = cb.createCriteriaUpdate(Post.class);
-        Root<Post> root = criteriaUpdate.getRoot();
+        var criteriaUpdate = cb.createCriteriaUpdate(Post.class);
+        var root = criteriaUpdate.getRoot();
 
         criteriaUpdate.set(root.get("visibility"), visibility);
         criteriaUpdate.where(cb.equal(root.get("id"), postId));
@@ -85,28 +85,5 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
             throw new PostNotFoundException();
         }
     }
-
-    // private void createKarmaScoreRelation(Long postId, Long userId, boolean isPositive) {
-
-    //     String queryString = "INSERT INTO " + KarmaScore.class.getSimpleName() +
-    //             " (post_id, user_id, is_positive) VALUES (:postId, :userId, :isPositive)";
-
-    //     entityManager.createNativeQuery(queryString)
-    //             .setParameter("postId", postId)
-    //             .setParameter("userId", userId)
-    //             .setParameter("isPositive", isPositive)
-    //             .executeUpdate();
-    // }
-
-    // private void deleteKarmaScoreRelation(Long postId, Long userId) {
-
-    //     String queryString = "DELETE FROM " + KarmaScore.class.getSimpleName()
-    //             + " WHERE post_id = :postId AND user_id = :userId";
-
-    //     entityManager.createNativeQuery(queryString)
-    //             .setParameter("post_id", postId)
-    //             .setParameter("user_id", userId)
-    //             .executeUpdate();
-    // }
 
 }

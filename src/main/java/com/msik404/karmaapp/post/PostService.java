@@ -1,7 +1,6 @@
 package com.msik404.karmaapp.post;
 
 import java.util.List;
-import java.util.Optional;
 
 import com.msik404.karmaapp.karma.KarmaKey;
 import com.msik404.karmaapp.karma.KarmaScoreAlreadyExistsException;
@@ -12,7 +11,6 @@ import com.msik404.karmaapp.user.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -37,8 +35,8 @@ public class PostService {
 
     public void create(NewPostRequest request) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        var userId = (Long) authentication.getPrincipal();
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        var userId = (long) authentication.getPrincipal();
 
         var newPost = Post.builder()
                 .text(request.getText())
@@ -60,17 +58,17 @@ public class PostService {
      * @param isPositive boolean value indicating whether to change to positive or negative
      */
     @Transactional
-    public void rate(Long postId, boolean isPositive) {
+    public void rate(long postId, boolean isPositive) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        var userId = (Long) authentication.getPrincipal();
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        var userId = (long) authentication.getPrincipal();
 
         long scoreDiff = isPositive ? 1L : -1L;
         try {
             var karmaScore = karmaScoreService.findById(new KarmaKey(userId, postId));
-            Boolean wasPositive = karmaScore.getIsPositive();
-            if (wasPositive.equals(isPositive)) {
-                String message = isPositive ? "positively" : "negatively";
+            boolean wasPositive = karmaScore.getIsPositive();
+            if (wasPositive == isPositive) {
+                var message = isPositive ? "positively" : "negatively";
                 throw new KarmaScoreAlreadyExistsException("This post has been already rated " + message + "by you");
             }
             karmaScore.setIsPositive(isPositive);
@@ -86,10 +84,10 @@ public class PostService {
      * @throws KarmaScoreNotFoundException This exception is thrown when KarmaScore entity is not found
      */
     @Transactional
-    public void unrate(Long postId) throws KarmaScoreNotFoundException, PostNotFoundException {
+    public void unrate(long postId) throws KarmaScoreNotFoundException, PostNotFoundException {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        var userId = (Long) authentication.getPrincipal();
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        var userId = (long) authentication.getPrincipal();
 
         var karmaKey = new KarmaKey(userId, postId);
         var karmaScore = karmaScoreService.findById(karmaKey);
@@ -97,13 +95,13 @@ public class PostService {
         karmaScoreService.deleteById(karmaKey);
     }
 
-    public void changeVisibilityByUser(Long postId, PostVisibility visibility)
+    public void changeVisibilityByUser(long postId, PostVisibility visibility)
             throws AccessDeniedException, PostNotFoundException {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        var userId = (Long) authentication.getPrincipal();
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        var userId = (long) authentication.getPrincipal();
 
-        Optional<Post> optionalPost = repository.findById(postId);
+        var optionalPost = repository.findById(postId);
         optionalPost.ifPresentOrElse(
                 post -> {
                     // Id is lazy loaded
@@ -117,7 +115,7 @@ public class PostService {
         );
     }
 
-    public void changeVisibility(Long postId, PostVisibility visibility) throws PostNotFoundException {
+    public void changeVisibility(long postId, PostVisibility visibility) throws PostNotFoundException {
         repository.changeVisibilityById(postId, visibility);
     }
 

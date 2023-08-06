@@ -2,7 +2,6 @@ package com.msik404.karmaapp.auth;
 
 import java.io.IOException;
 
-import com.msik404.karmaapp.user.User;
 import com.msik404.karmaapp.user.UserNotFoundException;
 import com.msik404.karmaapp.user.UserService;
 import io.jsonwebtoken.Claims;
@@ -52,8 +51,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // this is useful when there are many authentication methods.
         if (claims.getSubject() != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             // parse userId Long type represented as string to Long type
-            final Long userId = Long.parseLong(claims.getSubject());
-            User user = userService.findById(userId);
+            final long userId = Long.parseLong(claims.getSubject());
+            var user = userService.findById(userId);
             var authentication = new UsernamePasswordAuthenticationToken(user.getId(), null,
                     user.getAuthorities());
             // Adds interesting data like ip address and session id

@@ -6,7 +6,6 @@ import com.msik404.karmaapp.user.dto.UserDtoWithUserPrivilege;
 import jakarta.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -17,7 +16,7 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public User findById(Long id) throws UserNotFoundException {
+    public User findById(long id) throws UserNotFoundException {
 
         return userRepository.findById(id).orElseThrow(UserNotFoundException::new);
     }
@@ -28,15 +27,15 @@ public class UserService {
                 () -> new UsernameNotFoundException("User with that username was not found"));
     }
 
-    public Boolean sameAsAuthenticatedUser(@Nonnull Long id) {
+    public Boolean sameAsAuthenticatedUser(long id) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Long userId = (Long) authentication.getPrincipal();
-        return userId.equals(id);
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        var userId = (long) authentication.getPrincipal();
+        return userId == id;
     }
 
     public UserDtoWithUserPrivilege updateWithUserPrivilege(
-            @Nonnull Long userId,
+            long userId,
             @Nonnull UserDtoWithUserPrivilege request)
             throws AccessDeniedException, DuplicateEmailException, UserNotFoundException {
 
@@ -50,7 +49,7 @@ public class UserService {
     }
 
     public UserDtoWithAdminPrivilege updateWithAdminPrivilege(
-            @Nonnull Long userId,
+            long userId,
             @Nonnull UserDtoWithAdminPrivilege request)
             throws DuplicateEmailException, UserNotFoundException {
 

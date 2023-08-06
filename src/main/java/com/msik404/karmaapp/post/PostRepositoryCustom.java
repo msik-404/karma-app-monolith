@@ -8,10 +8,10 @@ public interface PostRepositoryCustom {
 
     List<Post> findTopN(int size);
 
-    List<Post> findTopNextN(@NonNull Long postId, @NonNull Long karmaScore, int size);
+    List<Post> findTopNextN(long postId, long karmaScore, int size);
 
-    void addKarmaScoreToPost(@NonNull Long postId, @NonNull Long value) throws PostNotFoundException;
+    void addKarmaScoreToPost(long postId, long value) throws PostNotFoundException;
 
-    void changeVisibilityById(@NonNull Long postId, @NonNull PostVisibility visibility) throws PostNotFoundException;
+    void changeVisibilityById(long postId, @NonNull PostVisibility visibility) throws PostNotFoundException;
 
 }

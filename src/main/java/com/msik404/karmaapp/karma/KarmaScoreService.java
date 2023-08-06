@@ -18,7 +18,7 @@ public class KarmaScoreService {
     }
 
     // WARNING THERE MAY BE possible errors when entity with that KarmaKey exists
-    public KarmaScore create(Long userId, Long postId, boolean isPositive) {
+    public KarmaScore create(long userId, long postId, boolean isPositive) {
 
         var karmaScore = KarmaScore.builder()
                 .id(new KarmaKey(userId, postId))
