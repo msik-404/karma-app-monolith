@@ -7,6 +7,7 @@ import com.msik404.karmaapp.constraintExceptions.DuplicateEmailException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,7 +29,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request)
-            throws org.springframework.security.core.AuthenticationException {
+            throws AuthenticationException {
 
         return ResponseEntity.ok(authenticationService.login(request));
     }
