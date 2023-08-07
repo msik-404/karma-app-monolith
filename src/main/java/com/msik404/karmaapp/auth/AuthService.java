@@ -48,8 +48,8 @@ public class AuthService {
                     // basic values
                     .accountNonExpired(true)
                     .accountNonLocked(true)
-                    .credentialsNonExpired(true).
-                    enabled(true)
+                    .credentialsNonExpired(true)
+                    .enabled(true)
                     .build());
         } catch (DataIntegrityViolationException ex) {
             constraintExceptionsHandler.handle(ex, extractionStrategy, parseStrategy);
