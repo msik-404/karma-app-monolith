@@ -12,7 +12,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-// visibility is the most restrictive, karmaScore and id is the same order as order in query
+// I chose this index because of required sorting in this method of pagination.
+// I am not sure if this index is perfect, because karmaScore will often change and also visibility is not indexed
+// and is used in where clause
 @Table(name = "posts", indexes = @Index(name = "posts_keyset_pagination", columnList = "karmaScore DESC, id"))
 @Data
 @NoArgsConstructor
