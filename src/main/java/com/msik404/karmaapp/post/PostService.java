@@ -7,6 +7,7 @@ import com.msik404.karmaapp.karma.KarmaScoreAlreadyExistsException;
 import com.msik404.karmaapp.karma.KarmaScoreNotFoundException;
 import com.msik404.karmaapp.karma.KarmaScoreService;
 import com.msik404.karmaapp.post.dto.NewPostRequest;
+import com.msik404.karmaapp.post.dto.PostResponse;
 import com.msik404.karmaapp.user.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -22,15 +23,8 @@ public class PostService {
     private final UserRepository userRepository;
     private final KarmaScoreService karmaScoreService;
 
-    public List<Post> findManyBykeysetPagination(Long postId, Long karmaScore, int size) {
-
-        List<Post> pageContents;
-        if (postId != null && karmaScore != null) {
-            pageContents = repository.findTopNextN(postId, karmaScore, size);
-        } else {
-            pageContents = repository.findTopN(size);
-        }
-        return pageContents;
+    public List<PostResponse> findKeysetPagination(Long postId, Long karmaScore, int size) {
+        return repository.findKeysetPaginated(postId, karmaScore, size);
     }
 
     public void create(NewPostRequest request) {
@@ -38,14 +32,12 @@ public class PostService {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         var userId = (long) authentication.getPrincipal();
 
-        var newPost = Post.builder()
+        repository.save(Post.builder()
                 .text(request.getText())
                 .karmaScore(0L)
                 .visibility(PostVisibility.ACTIVE)
                 .user(userRepository.getReferenceById(userId))
-                .build();
-
-        repository.save(newPost);
+                .build());
     }
 
     /**
@@ -69,7 +61,7 @@ public class PostService {
             boolean wasPositive = karmaScore.getIsPositive();
             if (wasPositive == isPositive) {
                 var message = isPositive ? "positively" : "negatively";
-                throw new KarmaScoreAlreadyExistsException("This post has been already rated " + message + "by you");
+                throw new KarmaScoreAlreadyExistsException(String.format("This post has been already rated %s by you", message));
             }
             karmaScore.setIsPositive(isPositive);
             scoreDiff = wasPositive ? -2L : 2L;

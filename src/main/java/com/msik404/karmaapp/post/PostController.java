@@ -5,6 +5,7 @@ import java.util.List;
 import com.msik404.karmaapp.karma.KarmaScoreAlreadyExistsException;
 import com.msik404.karmaapp.karma.KarmaScoreNotFoundException;
 import com.msik404.karmaapp.post.dto.NewPostRequest;
+import com.msik404.karmaapp.post.dto.PostResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
@@ -16,13 +17,13 @@ public class PostController {
     private final PostService postService;
 
     // TODO: add image support
-    @GetMapping("user/posts")
-    public List<Post> findPaginated(
+    @GetMapping("guest/posts")
+    public List<PostResponse> findPaginated(
             @RequestParam(value = "post_id", required = false) Long postId,
             @RequestParam(value = "karma_score", required = false) Long karmaScore,
             @RequestParam(value = "size", defaultValue = "100") int size) {
 
-        return postService.findManyBykeysetPagination(postId, karmaScore, size);
+        return postService.findKeysetPagination(postId, karmaScore, size);
     }
 
     // TODO: add image support

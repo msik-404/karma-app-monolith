@@ -1,9 +1,13 @@
 package com.msik404.karmaapp.post;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.msik404.karmaapp.post.dto.PostResponse;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.criteria.*;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Predicate;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
@@ -19,39 +23,39 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<Post> findTopN(int size) {
+    public List<PostResponse> findKeysetPaginated(Long postId, Long karmaScore, int size) {
 
-        var criteriaQuery = cb.createQuery(Post.class);
-        var root = criteriaQuery.from(Post.class);
+        var criteriaQuery = cb.createQuery(PostResponse.class);
+        var postRoot = criteriaQuery.from(Post.class);
+        var userJoin = postRoot.join("user");
 
-        criteriaQuery.select(root);
+        criteriaQuery.select(
+                cb.construct(
+                        PostResponse.class,
+                        postRoot.get("id"),
+                        postRoot.get("text"),
+                        postRoot.get("karmaScore"),
+                        userJoin.get("username")
+                )
+        );
 
-        criteriaQuery.orderBy(
-                cb.asc(root.get("id")),
-                cb.desc(root.get("karmaScore")));
-
-        final int offset = 0;
-        return entityManager.createQuery(criteriaQuery).setFirstResult(offset).setMaxResults(size).getResultList();
-    }
-
-    @Override
-    public List<Post> findTopNextN(long postId, long karmaScore, int size) {
-
-        var criteriaQuery = cb.createQuery(Post.class);
-        var root = criteriaQuery.from(Post.class);
-
-        criteriaQuery.select(root);
-
-        criteriaQuery.where(cb.and(
-                cb.greaterThan(root.get("id"), postId),
-                cb.lessThan(root.get("karmaScore"), karmaScore)));
+        var predicates = new ArrayList<Predicate>();
+        predicates.add(cb.equal(postRoot.get("visibility"), PostVisibility.ACTIVE));
+        if (postId != null && karmaScore != null) {
+           predicates.add(cb.greaterThan(postRoot.get("id"), postId));
+           predicates.add(cb.lessThan(postRoot.get("karmaScore"), karmaScore));
+        }
+        criteriaQuery.where(cb.and(predicates.toArray(new Predicate[0])));
 
         criteriaQuery.orderBy(
-                cb.asc(root.get("id")),
-                cb.desc(root.get("karmaScore")));
+                cb.desc(postRoot.get("karmaScore")),
+                cb.asc(postRoot.get("id")));
 
         final int offset = 0;
-        return entityManager.createQuery(criteriaQuery).setFirstResult(offset).setMaxResults(size).getResultList();
+        return entityManager.createQuery(criteriaQuery)
+                .setFirstResult(offset)
+                .setMaxResults(size)
+                .getResultList();
     }
 
     public void addKarmaScoreToPost(long postId, long value) throws PostNotFoundException {
