@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 // visibility is the most restrictive, karmaScore and id is the same order as order in query
-@Table(name = "posts", indexes = @Index(name = "posts_keyset_pagination", columnList = "visibility, karmaScore DESC, id"))
+@Table(name = "posts", indexes = @Index(name = "posts_keyset_pagination", columnList = "karmaScore DESC, id"))
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

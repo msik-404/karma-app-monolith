@@ -18,12 +18,11 @@ public class PostController {
 
     // TODO: add image support
     @GetMapping("guest/posts")
-    public List<PostResponse> findPaginated(
-            @RequestParam(value = "post_id", required = false) Long postId,
+    public List<PostResponse> findKeysetPaginated(
             @RequestParam(value = "karma_score", required = false) Long karmaScore,
             @RequestParam(value = "size", defaultValue = "100") int size) {
 
-        return postService.findKeysetPagination(postId, karmaScore, size);
+        return postService.findKeysetPaginated(karmaScore, size);
     }
 
     // TODO: add image support

@@ -23,8 +23,8 @@ public class PostService {
     private final UserRepository userRepository;
     private final KarmaScoreService karmaScoreService;
 
-    public List<PostResponse> findKeysetPagination(Long postId, Long karmaScore, int size) {
-        return repository.findKeysetPaginated(postId, karmaScore, size);
+    public List<PostResponse> findKeysetPaginated(Long karmaScore, int size) {
+        return repository.findKeysetPaginated(karmaScore, size);
     }
 
     public void create(NewPostRequest request) {

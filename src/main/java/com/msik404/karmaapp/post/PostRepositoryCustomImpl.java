@@ -23,7 +23,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<PostResponse> findKeysetPaginated(Long postId, Long karmaScore, int size) {
+    public List<PostResponse> findKeysetPaginated(Long karmaScore, int size) {
 
         var criteriaQuery = cb.createQuery(PostResponse.class);
         var postRoot = criteriaQuery.from(Post.class);
@@ -41,8 +41,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
 
         var predicates = new ArrayList<Predicate>();
         predicates.add(cb.equal(postRoot.get("visibility"), PostVisibility.ACTIVE));
-        if (postId != null && karmaScore != null) {
-           predicates.add(cb.greaterThan(postRoot.get("id"), postId));
+        if (karmaScore != null) {
            predicates.add(cb.lessThan(postRoot.get("karmaScore"), karmaScore));
         }
         criteriaQuery.where(cb.and(predicates.toArray(new Predicate[0])));

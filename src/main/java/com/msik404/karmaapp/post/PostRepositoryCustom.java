@@ -7,7 +7,7 @@ import org.springframework.lang.NonNull;
 
 public interface PostRepositoryCustom {
 
-    List<PostResponse> findKeysetPaginated(Long postId, Long karmaScore, int size);
+    List<PostResponse> findKeysetPaginated(Long karmaScore, int size);
 
     void addKarmaScoreToPost(long postId, long value) throws PostNotFoundException;
 
