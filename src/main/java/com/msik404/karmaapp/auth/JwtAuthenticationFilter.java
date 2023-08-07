@@ -26,7 +26,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final static String tokenPrefix = "Bearer ";
+    private final static String TOKEN_PREFIX = "Bearer ";
 
     private final JwtService jwtService;
     private final UserService userService;
@@ -40,11 +40,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             SignatureException, IllegalArgumentException, UserNotFoundException {
 
         final String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith(tokenPrefix)) {
+        if (authHeader == null || !authHeader.startsWith(TOKEN_PREFIX)) {
             filterChain.doFilter(request, response);
             return;
         }
-        final String jwt = authHeader.substring(tokenPrefix.length());
+        final String jwt = authHeader.substring(TOKEN_PREFIX.length());
         final Claims claims = jwtService.extractAllClaims(jwt);
         // 1. Get subject from token claims, null if something is wrong
         // 2. Checks whether user is not already authenticated,
