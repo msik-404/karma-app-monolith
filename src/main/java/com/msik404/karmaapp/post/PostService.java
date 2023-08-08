@@ -47,26 +47,28 @@ public class PostService {
      * 3) throw exception if required action result is already the current state, single query
      *
      * @param postId     Long id of post whose score will be changed
-     * @param isPositive boolean value indicating whether to change to positive or negative
+     * @param isNewRatingPositive boolean value indicating whether to change to positive or negative
      */
-    @Transactional
-    public void rate(long postId, boolean isPositive) {
+    @Transactional(rollbackOn = {KarmaScoreAlreadyExistsException.class, PostNotFoundException.class})
+    public void rate(long postId, boolean isNewRatingPositive)
+            throws KarmaScoreAlreadyExistsException, PostNotFoundException {
 
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         var userId = (long) authentication.getPrincipal();
 
-        long scoreDiff = isPositive ? 1L : -1L;
+        long scoreDiff = isNewRatingPositive ? 1L : -1L;
         try {
             var karmaScore = karmaScoreService.findById(new KarmaKey(userId, postId));
-            boolean wasPositive = karmaScore.getIsPositive();
-            if (wasPositive == isPositive) {
-                var message = isPositive ? "positively" : "negatively";
-                throw new KarmaScoreAlreadyExistsException(String.format("This post has been already rated %s by you", message));
+            boolean isOldRatingPositive = karmaScore.getIsPositive();
+            if (isOldRatingPositive == isNewRatingPositive) {
+                throw new KarmaScoreAlreadyExistsException(String.format(
+                        "This post has been already rated %s by you",
+                        isNewRatingPositive ? "positively" : "negatively"));
             }
-            karmaScore.setIsPositive(isPositive);
-            scoreDiff = wasPositive ? -2L : 2L;
+            karmaScore.setIsPositive(isNewRatingPositive);
+            scoreDiff = isOldRatingPositive ? -2L : 2L;
         } catch (KarmaScoreNotFoundException ex) {
-            karmaScoreService.create(userId, postId, isPositive);
+            karmaScoreService.create(userId, postId, isNewRatingPositive);
         }
         repository.addKarmaScoreToPost(postId, scoreDiff);
     }
@@ -75,7 +77,7 @@ public class PostService {
      * @param postId Long id of post
      * @throws KarmaScoreNotFoundException This exception is thrown when KarmaScore entity is not found
      */
-    @Transactional
+    @Transactional(rollbackOn = {KarmaScoreNotFoundException.class, PostNotFoundException.class})
     public void unrate(long postId) throws KarmaScoreNotFoundException, PostNotFoundException {
 
         var authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -96,8 +98,8 @@ public class PostService {
         var optionalPost = repository.findById(postId);
         optionalPost.ifPresentOrElse(
                 post -> {
-                    // Id is lazy loaded
-                    if (!post.getUser().getId().equals(userId)) {
+                    // Id is lazy loaded. User can modify only his own visibility and can't change deleted state.
+                    if (!post.getUser().getId().equals(userId) || post.getVisibility().equals(PostVisibility.DELETED)) {
                         throw new AccessDeniedException("Access denied");
                     }
                     post.setVisibility(visibility);
