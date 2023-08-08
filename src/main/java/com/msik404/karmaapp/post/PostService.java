@@ -1,7 +1,10 @@
 package com.msik404.karmaapp.post;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 
 import com.msik404.karmaapp.karma.KarmaKey;
 import com.msik404.karmaapp.karma.KarmaScoreAlreadyExistsException;
@@ -42,7 +45,14 @@ public class PostService {
 
         try {
             if (image != null && !image.isEmpty()) {
-                newPost.imageData(image.getBytes());
+                // Load the image from the multipart file
+                var bufferedImage = ImageIO.read(image.getInputStream());
+                // Create a ByteArrayOutputStream to hold the compressed image data
+                var byteArrayOutputStream = new ByteArrayOutputStream();
+                // Write the compressed image data to the ByteArrayOutputStream
+                ImageIO.write(bufferedImage, "jpeg", byteArrayOutputStream);
+                // Set the compressed image data to the newPost
+                newPost.imageData(byteArrayOutputStream.toByteArray());
             }
         } catch (IOException ex) {
             throw new FileProcessingException();
