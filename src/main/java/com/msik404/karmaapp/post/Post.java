@@ -42,4 +42,8 @@ public class Post {
     @OneToMany(mappedBy = "post")
     private Set<KarmaScore> karmaScores;
 
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    private byte[] imageData;
+
 }

@@ -1,5 +1,6 @@
 package com.msik404.karmaapp.post;
 
+import java.io.IOException;
 import java.util.List;
 
 import com.msik404.karmaapp.karma.KarmaKey;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -27,17 +29,26 @@ public class PostService {
         return repository.findKeysetPaginated(karmaScore, size);
     }
 
-    public void create(NewPostRequest request) {
+    public void create(NewPostRequest request, MultipartFile image) {
 
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         var userId = (long) authentication.getPrincipal();
 
-        repository.save(Post.builder()
+        var newPost = Post.builder()
                 .text(request.getText())
                 .karmaScore(0L)
                 .visibility(PostVisibility.ACTIVE)
-                .user(userRepository.getReferenceById(userId))
-                .build());
+                .user(userRepository.getReferenceById(userId));
+
+        try {
+            if (image != null && !image.isEmpty()) {
+                newPost.imageData(image.getBytes());
+            }
+        } catch (IOException ex) {
+            throw new FileProcessingException();
+        }
+
+        repository.save(newPost.build());
     }
 
     /**
@@ -46,7 +57,7 @@ public class PostService {
      * 2) modify KarmaScore isPositive field and modify Post entity karma score value, three queries
      * 3) throw exception if required action result is already the current state, single query
      *
-     * @param postId     Long id of post whose score will be changed
+     * @param postId              Long id of post whose score will be changed
      * @param isNewRatingPositive boolean value indicating whether to change to positive or negative
      */
     @Transactional(rollbackOn = {KarmaScoreAlreadyExistsException.class, PostNotFoundException.class})

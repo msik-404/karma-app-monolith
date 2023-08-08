@@ -29,4 +29,10 @@ public class PostControllerAdvice extends ResponseEntityExceptionHandler {
                 HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
+    @ExceptionHandler(FileProcessingException.class)
+    public ProblemDetail fileProcessingException(FileProcessingException ex) {
+        return ProblemDetail.forStatusAndDetail(
+                HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+    }
+
 }

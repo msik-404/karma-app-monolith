@@ -1,5 +1,6 @@
 package com.msik404.karmaapp.post;
 
+import java.io.IOException;
 import java.util.List;
 
 import com.msik404.karmaapp.karma.KarmaScoreAlreadyExistsException;
@@ -9,6 +10,7 @@ import com.msik404.karmaapp.post.dto.PostResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,7 +18,7 @@ public class PostController {
 
     private final PostService postService;
 
-    // TODO: add image support
+    // TODO: Not sure how to return many images data to front using rest
     @GetMapping("guest/posts")
     public List<PostResponse> findKeysetPaginated(
             @RequestParam(value = "karma_score", required = false) Long karmaScore,
@@ -25,10 +27,12 @@ public class PostController {
         return postService.findKeysetPaginated(karmaScore, size);
     }
 
-    // TODO: add image support
     @PostMapping("user/posts")
-    public void create(@RequestBody NewPostRequest request) {
-        postService.create(request);
+    public void create(
+            @RequestPart("jsonData") NewPostRequest jsonData,
+            @RequestPart("image") MultipartFile image) throws IOException {
+
+        postService.create(jsonData, image);
     }
 
     @PostMapping("user/posts/{postId}/rate")
