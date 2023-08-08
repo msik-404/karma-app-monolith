@@ -29,7 +29,7 @@ public class PostService {
         return repository.findKeysetPaginated(karmaScore, size);
     }
 
-    public void create(NewPostRequest request, MultipartFile image) {
+    public void create(NewPostRequest request, MultipartFile image) throws FileProcessingException {
 
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         var userId = (long) authentication.getPrincipal();
