@@ -1,18 +1,18 @@
 package com.msik404.karmaapp.post;
 
 import java.util.List;
-import java.util.Optional;
 
 import com.msik404.karmaapp.post.dto.PostResponse;
 import org.springframework.lang.NonNull;
 
 public interface PostRepositoryCustom {
 
-    List<PostResponse> findKeysetPaginated(Long karmaScore, int size);
+    List<PostResponse> findKeysetPaginated(Long karmaScore, int size) throws InternalServerErrorException;
 
-    void addKarmaScoreToPost(long postId, long value) throws PostNotFoundException;
+    byte[] findImageById(long postId) throws InternalServerErrorException;
 
-    void changeVisibilityById(long postId, @NonNull PostVisibility visibility) throws PostNotFoundException;
+    int addKarmaScoreToPost(long postId, long value);
 
-    Optional<byte[]> findImageByPostId(long postId);
+    int changeVisibilityById(long postId, @NonNull PostVisibility visibility);
+
 }

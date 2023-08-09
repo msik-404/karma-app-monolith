@@ -13,11 +13,11 @@ import com.msik404.karmaapp.karma.KarmaScoreService;
 import com.msik404.karmaapp.post.dto.NewPostRequest;
 import com.msik404.karmaapp.post.dto.PostResponse;
 import com.msik404.karmaapp.user.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -28,10 +28,22 @@ public class PostService {
     private final UserRepository userRepository;
     private final KarmaScoreService karmaScoreService;
 
+    @Transactional(readOnly = true)
     public List<PostResponse> findKeysetPaginated(Long karmaScore, int size) {
         return repository.findKeysetPaginated(karmaScore, size);
     }
 
+    @Transactional(readOnly = true)
+    public byte[] findImageByPostId(Long postId) throws ImageNotFoundException {
+
+        byte[] imageData = repository.findImageById(postId);
+        if (imageData.length == 0) {
+            throw new ImageNotFoundException();
+        }
+        return imageData;
+    }
+
+    @Transactional
     public void create(NewPostRequest request, MultipartFile image) throws FileProcessingException {
 
         var authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -70,7 +82,7 @@ public class PostService {
      * @param postId              Long id of post whose score will be changed
      * @param isNewRatingPositive boolean value indicating whether to change to positive or negative
      */
-    @Transactional(rollbackOn = {KarmaScoreAlreadyExistsException.class, PostNotFoundException.class})
+    @Transactional
     public void rate(long postId, boolean isNewRatingPositive)
             throws KarmaScoreAlreadyExistsException, PostNotFoundException {
 
@@ -91,14 +103,17 @@ public class PostService {
         } catch (KarmaScoreNotFoundException ex) {
             karmaScoreService.create(userId, postId, isNewRatingPositive);
         }
-        repository.addKarmaScoreToPost(postId, scoreDiff);
+        int rowsAffected = repository.addKarmaScoreToPost(postId, scoreDiff);
+        if (rowsAffected == 0) {
+            throw new PostNotFoundException();
+        }
     }
 
     /**
      * @param postId Long id of post
      * @throws KarmaScoreNotFoundException This exception is thrown when KarmaScore entity is not found
      */
-    @Transactional(rollbackOn = {KarmaScoreNotFoundException.class, PostNotFoundException.class})
+    @Transactional
     public void unrate(long postId) throws KarmaScoreNotFoundException, PostNotFoundException {
 
         var authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -106,7 +121,10 @@ public class PostService {
 
         var karmaKey = new KarmaKey(userId, postId);
         var karmaScore = karmaScoreService.findById(karmaKey);
-        repository.addKarmaScoreToPost(postId, karmaScore.getIsPositive() ? -1L : 1L);
+        int rowsAffected = repository.addKarmaScoreToPost(postId, karmaScore.getIsPositive() ? -1L : 1L);
+        if (rowsAffected == 0) {
+            throw new PostNotFoundException();
+        }
         karmaScoreService.deleteById(karmaKey);
     }
 
@@ -131,11 +149,11 @@ public class PostService {
         );
     }
 
+    @Transactional
     public void changeVisibility(long postId, PostVisibility visibility) throws PostNotFoundException {
-        repository.changeVisibilityById(postId, visibility);
-    }
-
-    public byte[] findImageByPostId(Long postId) throws ImageNotFoundException {
-        return repository.findImageByPostId(postId).orElseThrow(ImageNotFoundException::new);
+        int rowsAffected = repository.changeVisibilityById(postId, visibility);
+        if (rowsAffected == 0) {
+            throw new PostNotFoundException();
+        }
     }
 }

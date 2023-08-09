@@ -1,6 +1,7 @@
 package com.msik404.karmaapp.user;
 
 import com.msik404.karmaapp.constraintExceptions.DuplicateEmailException;
+import com.msik404.karmaapp.constraintExceptions.DuplicateUsernameException;
 import com.msik404.karmaapp.constraintExceptions.UndefinedConstraintException;
 import com.msik404.karmaapp.user.dto.UserDtoWithAdminPrivilege;
 import com.msik404.karmaapp.user.dto.UserDtoWithUserPrivilege;
@@ -10,6 +11,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -35,26 +37,34 @@ public class UserService {
         return userId == id;
     }
 
+    @Transactional
     public UserDtoWithUserPrivilege updateWithUserPrivilege(
             long userId,
             @Nonnull UserDtoWithUserPrivilege request)
-            throws AccessDeniedException, DuplicateEmailException, UndefinedConstraintException, UserNotFoundException {
+            throws AccessDeniedException, DuplicateEmailException, DuplicateUsernameException, UndefinedConstraintException, UserNotFoundException {
 
         if (!sameAsAuthenticatedUser(userId)) {
             throw new AccessDeniedException("Access denied");
         }
 
-        userRepository.updateNonNull(userId, request);
+        int rowsAffected = userRepository.updateNonNull(userId, request);
+        if (rowsAffected == 0) {
+            throw new UserNotFoundException();
+        }
 
         return request;
     }
 
+    @Transactional
     public UserDtoWithAdminPrivilege updateWithAdminPrivilege(
             long userId,
             @Nonnull UserDtoWithAdminPrivilege request)
-            throws DuplicateEmailException, UndefinedConstraintException, UserNotFoundException {
+            throws DuplicateEmailException, DuplicateUsernameException, UndefinedConstraintException, UserNotFoundException {
 
-        userRepository.updateNonNull(userId, request);
+        int rowsAffected = userRepository.updateNonNull(userId, request);
+        if (rowsAffected == 0) {
+            throw new UserNotFoundException();
+        }
 
         return request;
     }

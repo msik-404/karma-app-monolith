@@ -1,6 +1,7 @@
 package com.msik404.karmaapp.user;
 
 import com.msik404.karmaapp.constraintExceptions.DuplicateEmailException;
+import com.msik404.karmaapp.constraintExceptions.DuplicateUsernameException;
 import com.msik404.karmaapp.constraintExceptions.UndefinedConstraintException;
 import com.msik404.karmaapp.user.dto.UserDtoWithAdminPrivilege;
 import com.msik404.karmaapp.user.dto.UserDtoWithUserPrivilege;
@@ -32,7 +33,7 @@ public class UserController {
     public ResponseEntity<UserDtoWithAdminPrivilege> updateWithAdminPrivilege(
             @PathVariable Long userId,
             @Valid @RequestBody UserDtoWithAdminPrivilege request)
-            throws DuplicateEmailException, UndefinedConstraintException, UserNotFoundException {
+            throws DuplicateEmailException, DuplicateUsernameException, UndefinedConstraintException, UserNotFoundException {
 
         return ResponseEntity.ok(userService.updateWithAdminPrivilege(userId, request));
     }

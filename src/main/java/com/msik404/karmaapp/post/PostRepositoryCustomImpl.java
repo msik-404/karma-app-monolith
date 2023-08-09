@@ -2,7 +2,6 @@ package com.msik404.karmaapp.post;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import com.msik404.karmaapp.post.dto.PostResponse;
 import jakarta.persistence.EntityManager;
@@ -10,7 +9,6 @@ import jakarta.persistence.NoResultException;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
-import jakarta.transaction.Transactional;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
@@ -26,7 +24,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<PostResponse> findKeysetPaginated(Long karmaScore, int size) {
+    public List<PostResponse> findKeysetPaginated(Long karmaScore, int size) throws InternalServerErrorException {
 
         var criteriaQuery = cb.createQuery(PostResponse.class);
         var postRoot = criteriaQuery.from(Post.class);
@@ -64,41 +62,8 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         }
     }
 
-    public void addKarmaScoreToPost(long postId, long value) throws PostNotFoundException {
-
-        var criteriaUpdate = cb.createCriteriaUpdate(Post.class);
-        var root = criteriaUpdate.getRoot();
-
-        Path<Long> karmaScorePath = root.get("karmaScore");
-
-        criteriaUpdate.set(karmaScorePath, cb.sum(karmaScorePath, value));
-        criteriaUpdate.where(cb.equal(root.get("id"), postId));
-
-        int rowsAffected = entityManager.createQuery(criteriaUpdate).executeUpdate();
-        if (rowsAffected == 0) {
-            throw new PostNotFoundException();
-        }
-    }
-
     @Override
-    public void changeVisibilityById(long postId, @NonNull PostVisibility visibility)
-            throws PostNotFoundException {
-
-        var criteriaUpdate = cb.createCriteriaUpdate(Post.class);
-        var root = criteriaUpdate.getRoot();
-
-        criteriaUpdate.set(root.get("visibility"), visibility);
-        criteriaUpdate.where(cb.equal(root.get("id"), postId));
-
-        int rowsAffected = entityManager.createQuery(criteriaUpdate).executeUpdate();
-        if (rowsAffected == 0) {
-            throw new PostNotFoundException();
-        }
-    }
-
-    @Override
-    @Transactional
-    public Optional<byte[]> findImageByPostId(long postId) {
+    public byte[] findImageById(long postId) throws InternalServerErrorException {
         var criteriaBuilder = entityManager.getCriteriaBuilder();
         var query = criteriaBuilder.createQuery(byte[].class);
         var root = query.from(Post.class);
@@ -110,11 +75,36 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         try {
             result = entityManager.createQuery(query).getSingleResult();
         } catch (NoResultException ex) {
-            result = null;
+            result = new byte[0];
         } catch (RuntimeException ex) {
             throw new InternalServerErrorException("Could not get requested image from database for some reason.");
         }
-        return Optional.ofNullable(result);
+        return result;
+    }
+
+    public int addKarmaScoreToPost(long postId, long value) {
+
+        var criteriaUpdate = cb.createCriteriaUpdate(Post.class);
+        var root = criteriaUpdate.getRoot();
+
+        Path<Long> karmaScorePath = root.get("karmaScore");
+
+        criteriaUpdate.set(karmaScorePath, cb.sum(karmaScorePath, value));
+        criteriaUpdate.where(cb.equal(root.get("id"), postId));
+
+        return entityManager.createQuery(criteriaUpdate).executeUpdate();
+    }
+
+    @Override
+    public int changeVisibilityById(long postId, @NonNull PostVisibility visibility) {
+
+        var criteriaUpdate = cb.createCriteriaUpdate(Post.class);
+        var root = criteriaUpdate.getRoot();
+
+        criteriaUpdate.set(root.get("visibility"), visibility);
+        criteriaUpdate.where(cb.equal(root.get("id"), postId));
+
+        return entityManager.createQuery(criteriaUpdate).executeUpdate();
     }
 
 }
