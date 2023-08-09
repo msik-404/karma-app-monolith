@@ -4,7 +4,10 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class NewPostRequest {
+public class PostCreationRequest {
+
+    @NotNull
+    private String headline;
 
     @NotNull
     private String text;

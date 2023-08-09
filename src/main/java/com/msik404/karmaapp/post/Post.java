@@ -26,6 +26,8 @@ public class Post {
     @GeneratedValue
     private Long id;
 
+    private String headline;
+
     private String text;
 
     // This will be updated in transaction with KarmaScore, so that these values will be kept in sync.

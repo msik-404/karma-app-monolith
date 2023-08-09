@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.msik404.karmaapp.karma.KarmaScoreAlreadyExistsException;
 import com.msik404.karmaapp.karma.KarmaScoreNotFoundException;
-import com.msik404.karmaapp.post.dto.NewPostRequest;
+import com.msik404.karmaapp.post.dto.PostCreationRequest;
 import com.msik404.karmaapp.post.dto.PostResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -40,7 +40,7 @@ public class PostController {
 
     @PostMapping("user/posts")
     public void create(
-            @RequestPart("jsonData") NewPostRequest jsonData,
+            @RequestPart("json_data") PostCreationRequest jsonData,
             @RequestPart("image") MultipartFile image) throws FileProcessingException {
 
         postService.create(jsonData, image);

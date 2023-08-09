@@ -34,6 +34,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                 cb.construct(
                         PostResponse.class,
                         postRoot.get("id"),
+                        postRoot.get("headline"),
                         postRoot.get("text"),
                         postRoot.get("karmaScore"),
                         userJoin.get("username")

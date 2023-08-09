@@ -9,6 +9,8 @@ public class PostResponse {
 
     private final Long id;
 
+    private final String headline;
+
     private final String text;
 
     private final Long karmaScore;

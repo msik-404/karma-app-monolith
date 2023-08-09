@@ -10,7 +10,7 @@ import com.msik404.karmaapp.karma.KarmaKey;
 import com.msik404.karmaapp.karma.KarmaScoreAlreadyExistsException;
 import com.msik404.karmaapp.karma.KarmaScoreNotFoundException;
 import com.msik404.karmaapp.karma.KarmaScoreService;
-import com.msik404.karmaapp.post.dto.NewPostRequest;
+import com.msik404.karmaapp.post.dto.PostCreationRequest;
 import com.msik404.karmaapp.post.dto.PostResponse;
 import com.msik404.karmaapp.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +44,7 @@ public class PostService {
     }
 
     @Transactional
-    public void create(NewPostRequest request, MultipartFile image) throws FileProcessingException {
+    public void create(PostCreationRequest request, MultipartFile image) throws FileProcessingException {
 
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         var userId = (long) authentication.getPrincipal();
