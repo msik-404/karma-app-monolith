@@ -110,6 +110,7 @@ public class PostService {
         karmaScoreService.deleteById(karmaKey);
     }
 
+    @Transactional
     public void changeVisibilityByUser(long postId, PostVisibility visibility)
             throws AccessDeniedException, PostNotFoundException {
 
@@ -134,4 +135,7 @@ public class PostService {
         repository.changeVisibilityById(postId, visibility);
     }
 
+    public byte[] findImageByPostId(Long postId) throws ImageNotFoundException {
+        return repository.findImageByPostId(postId).orElseThrow(ImageNotFoundException::new);
+    }
 }

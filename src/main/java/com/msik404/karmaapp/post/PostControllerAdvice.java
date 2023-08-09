@@ -35,4 +35,16 @@ public class PostControllerAdvice extends ResponseEntityExceptionHandler {
                 HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
     }
 
+    @ExceptionHandler(InternalServerErrorException.class)
+    public ProblemDetail internalServerErrorException(InternalServerErrorException ex) {
+        return ProblemDetail.forStatusAndDetail(
+                HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+    }
+
+    @ExceptionHandler(ImageNotFoundException.class)
+    public ProblemDetail imageNotFoundException(ImageNotFoundException ex) {
+        return ProblemDetail.forStatusAndDetail(
+                HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
 }

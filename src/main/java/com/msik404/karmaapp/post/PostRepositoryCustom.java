@@ -1,6 +1,7 @@
 package com.msik404.karmaapp.post;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.msik404.karmaapp.post.dto.PostResponse;
 import org.springframework.lang.NonNull;
@@ -13,4 +14,5 @@ public interface PostRepositoryCustom {
 
     void changeVisibilityById(long postId, @NonNull PostVisibility visibility) throws PostNotFoundException;
 
+    Optional<byte[]> findImageByPostId(long postId);
 }
