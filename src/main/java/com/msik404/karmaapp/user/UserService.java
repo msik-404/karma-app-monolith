@@ -1,6 +1,7 @@
 package com.msik404.karmaapp.user;
 
 import com.msik404.karmaapp.constraintExceptions.DuplicateEmailException;
+import com.msik404.karmaapp.constraintExceptions.UndefinedConstraintException;
 import com.msik404.karmaapp.user.dto.UserDtoWithAdminPrivilege;
 import com.msik404.karmaapp.user.dto.UserDtoWithUserPrivilege;
 import jakarta.annotation.Nonnull;
@@ -37,7 +38,7 @@ public class UserService {
     public UserDtoWithUserPrivilege updateWithUserPrivilege(
             long userId,
             @Nonnull UserDtoWithUserPrivilege request)
-            throws AccessDeniedException, DuplicateEmailException, UserNotFoundException {
+            throws AccessDeniedException, DuplicateEmailException, UndefinedConstraintException, UserNotFoundException {
 
         if (!sameAsAuthenticatedUser(userId)) {
             throw new AccessDeniedException("Access denied");
@@ -51,7 +52,7 @@ public class UserService {
     public UserDtoWithAdminPrivilege updateWithAdminPrivilege(
             long userId,
             @Nonnull UserDtoWithAdminPrivilege request)
-            throws DuplicateEmailException, UserNotFoundException {
+            throws DuplicateEmailException, UndefinedConstraintException, UserNotFoundException {
 
         userRepository.updateNonNull(userId, request);
 

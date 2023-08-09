@@ -5,10 +5,7 @@ import java.util.Optional;
 import com.msik404.karmaapp.auth.dto.LoginRequest;
 import com.msik404.karmaapp.auth.dto.LoginResponse;
 import com.msik404.karmaapp.auth.dto.RegisterRequest;
-import com.msik404.karmaapp.constraintExceptions.ConstraintExceptionsHandler;
-import com.msik404.karmaapp.constraintExceptions.DataIntegrityViolationExceptionErrorMessageExtractionStrategy;
-import com.msik404.karmaapp.constraintExceptions.DuplicateEmailException;
-import com.msik404.karmaapp.constraintExceptions.RoundBraceErrorMassageParseStrategy;
+import com.msik404.karmaapp.constraintExceptions.*;
 import com.msik404.karmaapp.user.Role;
 import com.msik404.karmaapp.user.User;
 import com.msik404.karmaapp.user.UserRepository;
@@ -34,7 +31,8 @@ public class AuthService {
     private final DataIntegrityViolationExceptionErrorMessageExtractionStrategy extractionStrategy;
     private final RoundBraceErrorMassageParseStrategy parseStrategy;
 
-    public void register(RegisterRequest request) throws DuplicateEmailException {
+    public void register(RegisterRequest request)
+            throws DuplicateEmailException, DuplicateUsernameException, UndefinedConstraintException {
 
         try {
             repository.save(User.builder()

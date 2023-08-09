@@ -1,9 +1,6 @@
 package com.msik404.karmaapp.user;
 
-import com.msik404.karmaapp.constraintExceptions.ConstraintExceptionsHandler;
-import com.msik404.karmaapp.constraintExceptions.ConstraintViolationExceptionErrorMessageExtractionStrategy;
-import com.msik404.karmaapp.constraintExceptions.DuplicateEmailException;
-import com.msik404.karmaapp.constraintExceptions.RoundBraceErrorMassageParseStrategy;
+import com.msik404.karmaapp.constraintExceptions.*;
 import com.msik404.karmaapp.user.dto.UserDtoWithAdminPrivilege;
 import com.msik404.karmaapp.user.dto.UserDtoWithUserPrivilege;
 import jakarta.persistence.EntityManager;
@@ -44,7 +41,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
     @Override
     @Transactional(rollbackOn = DuplicateEmailException.class)
     public void updateNonNull(long userId, UserDtoWithUserPrivilege dto)
-            throws DuplicateEmailException, UserNotFoundException {
+            throws DuplicateEmailException, UndefinedConstraintException, UserNotFoundException {
 
         var criteriaUpdate = cb.createCriteriaUpdate(User.class);
         var root = criteriaUpdate.from(User.class);

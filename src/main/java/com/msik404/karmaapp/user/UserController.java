@@ -1,6 +1,7 @@
 package com.msik404.karmaapp.user;
 
 import com.msik404.karmaapp.constraintExceptions.DuplicateEmailException;
+import com.msik404.karmaapp.constraintExceptions.UndefinedConstraintException;
 import com.msik404.karmaapp.user.dto.UserDtoWithAdminPrivilege;
 import com.msik404.karmaapp.user.dto.UserDtoWithUserPrivilege;
 import jakarta.validation.Valid;
@@ -22,7 +23,7 @@ public class UserController {
     public ResponseEntity<UserDtoWithUserPrivilege> updateWithUserPrivilege(
             @PathVariable Long userId,
             @Valid @RequestBody UserDtoWithUserPrivilege request)
-            throws AccessDeniedException, DuplicateEmailException, UserNotFoundException {
+            throws AccessDeniedException, DuplicateEmailException, UndefinedConstraintException, UserNotFoundException {
 
         return ResponseEntity.ok(userService.updateWithUserPrivilege(userId, request));
     }
@@ -31,7 +32,7 @@ public class UserController {
     public ResponseEntity<UserDtoWithAdminPrivilege> updateWithAdminPrivilege(
             @PathVariable Long userId,
             @Valid @RequestBody UserDtoWithAdminPrivilege request)
-            throws DuplicateEmailException, UserNotFoundException {
+            throws DuplicateEmailException, UndefinedConstraintException, UserNotFoundException {
 
         return ResponseEntity.ok(userService.updateWithAdminPrivilege(userId, request));
     }
