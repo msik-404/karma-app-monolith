@@ -29,13 +29,19 @@ public class PostService {
     private final KarmaScoreService karmaScoreService;
 
     @Transactional(readOnly = true)
-    public List<PostJoinedDto> findKeysetPaginated(Long karmaScore, PostVisibility visibility, int size) {
+    public List<PostJoinedDto> findKeysetPaginated(
+            Long karmaScore,
+            String requestedUsername,
+            List<PostVisibility> visibilities,
+            int size)
+            throws InternalServerErrorException {
+
         final var authentication = SecurityContextHolder.getContext().getAuthentication();
         Long userId = null;
         if (authentication != null) {
             userId = (Long) authentication.getPrincipal();
         }
-        return repository.findKeysetPaginated(karmaScore, userId, visibility, size);
+        return repository.findKeysetPaginated(karmaScore, userId, requestedUsername, visibilities, size);
     }
 
     @Transactional(readOnly = true)

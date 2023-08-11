@@ -7,7 +7,12 @@ import org.springframework.lang.NonNull;
 
 public interface PostRepositoryCustom {
 
-    List<PostJoinedDto> findKeysetPaginated(Long karmaScore, Long userId, PostVisibility visibility, int size)
+    List<PostJoinedDto> findKeysetPaginated(
+            Long karmaScore,
+            Long authenticatedUserId,
+            String requestedUsername,
+            List<PostVisibility> visibilities,
+            int size)
             throws InternalServerErrorException;
 
     byte[] findImageById(long postId) throws InternalServerErrorException;

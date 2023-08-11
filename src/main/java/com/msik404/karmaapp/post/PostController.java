@@ -1,5 +1,6 @@
 package com.msik404.karmaapp.post;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,9 +28,61 @@ public class PostController {
     @GetMapping("guest/posts")
     public List<EntityModel<PostResponse>> findKeysetPaginated(
             @RequestParam(value = "karma_score", required = false) Long karmaScore,
-            @RequestParam(value = "size", defaultValue = "100") int size) {
+            @RequestParam(value = "requested_username", required = false) String requestedUsername,
+            @RequestParam(value = "size", defaultValue = "100") int size)
+            throws InternalServerErrorException {
 
-        return postService.findKeysetPaginated(karmaScore, PostVisibility.ACTIVE, size)
+        return postService.findKeysetPaginated(karmaScore, requestedUsername, List.of(PostVisibility.ACTIVE), size)
+                .stream()
+                .map(assembler::toModel)
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping("mod/posts")
+    public List<EntityModel<PostResponse>> findKeysetPaginatedHidden(
+            @RequestParam(value = "karma_score", required = false) Long karmaScore,
+            @RequestParam(value = "requested_username", required = false) String requestedUsername,
+            @RequestParam(value = "size", defaultValue = "100") int size,
+            @RequestParam(value = "active", defaultValue = "false") boolean active,
+            @RequestParam(value = "hidden", defaultValue = "false") boolean hidden)
+            throws InternalServerErrorException {
+
+        List<PostVisibility> visibilities = new ArrayList<>();
+        if (active) {
+            visibilities.add(PostVisibility.ACTIVE);
+        }
+        if (hidden) {
+            visibilities.add(PostVisibility.HIDDEN);
+        }
+
+        return postService.findKeysetPaginated(karmaScore, requestedUsername, visibilities, size)
+                .stream()
+                .map(assembler::toModel)
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping("admin/posts")
+    public List<EntityModel<PostResponse>> findKeysetPaginatedDeleted(
+            @RequestParam(value = "karma_score", required = false) Long karmaScore,
+            @RequestParam(value = "requested_username", required = false) String requestedUsername,
+            @RequestParam(value = "size", defaultValue = "100") int size,
+            @RequestParam(value = "active", defaultValue = "false") boolean active,
+            @RequestParam(value = "hidden", defaultValue = "false") boolean hidden,
+            @RequestParam(value = "deleted", defaultValue = "false") boolean deleted)
+            throws  InternalServerErrorException {
+
+        List<PostVisibility> visibilities = new ArrayList<>();
+        if (active) {
+            visibilities.add(PostVisibility.ACTIVE);
+        }
+        if (hidden) {
+            visibilities.add(PostVisibility.HIDDEN);
+        }
+        if (deleted) {
+            visibilities.add(PostVisibility.DELETED);
+        }
+
+        return postService.findKeysetPaginated(karmaScore, requestedUsername, visibilities, size)
                 .stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());

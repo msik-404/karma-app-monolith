@@ -21,21 +21,25 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         this.cb = entityManager.getCriteriaBuilder();
     }
 
-    @Override
-    public List<PostJoinedDto> findKeysetPaginated(Long karmaScore, Long userId, PostVisibility visibility, int size)
+    public List<PostJoinedDto> findKeysetPaginated(
+            Long karmaScore,
+            Long authenticatedUserId,
+            String requestedUsername,
+            List<PostVisibility> visibilities,
+            int size)
             throws InternalServerErrorException {
 
         var criteriaQuery = cb.createQuery(PostJoinedDto.class);
         var postRoot = criteriaQuery.from(Post.class);
         var userJoin = postRoot.join("user");
 
-        Expression<Boolean> isPositive = cb.nullLiteral(Boolean.class);
-        if (userId != null) {
+        Expression<Boolean> wasRatedByAuthenticatedUserPositively = cb.nullLiteral(Boolean.class);
+        if (authenticatedUserId != null) {
             var karmaScoreJoin = postRoot.join("karmaScores", JoinType.LEFT);
             karmaScoreJoin.on(
-                    cb.equal(karmaScoreJoin.get("user").get("id"), userId)
+                    cb.equal(karmaScoreJoin.get("user").get("id"), authenticatedUserId)
             );
-            isPositive = karmaScoreJoin.get("isPositive");
+            wasRatedByAuthenticatedUserPositively = karmaScoreJoin.get("isPositive");
         }
 
         criteriaQuery.select(
@@ -47,14 +51,21 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
                         postRoot.get("headline"),
                         postRoot.get("text"),
                         postRoot.get("karmaScore"),
-                        isPositive
+                        postRoot.get("visibility"),
+                        wasRatedByAuthenticatedUserPositively
                 )
         );
 
         var predicates = new ArrayList<Predicate>();
-        predicates.add(cb.equal(postRoot.get("visibility"), visibility));
+
+        if (!visibilities.isEmpty()) {
+            predicates.add(postRoot.get("visibility").in(visibilities));
+        }
         if (karmaScore != null) {
             predicates.add(cb.lessThan(postRoot.get("karmaScore"), karmaScore));
+        }
+        if (requestedUsername != null) {
+            predicates.add(cb.equal(userJoin.get("username"), requestedUsername));
         }
         criteriaQuery.where(cb.and(predicates.toArray(new Predicate[0])));
 

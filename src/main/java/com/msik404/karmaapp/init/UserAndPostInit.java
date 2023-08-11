@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UserAndPostInit implements CommandLineRunner {
 
-    private static final int USER_AMOUNT = 0;
+    private static final int USER_AMOUNT = 777;
     private static final int MAX_SINGLE_INSERT_SIZE = 100;
     private static final int MAX_KARMA_SCORE = 10_000;
     private static final int MAX_POSTS_PER_USER = 10;

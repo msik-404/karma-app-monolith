@@ -30,6 +30,7 @@ public class PostResponseModelAssembler implements RepresentationModelAssembler<
                 .headline(postJoinedDto.getHeadline())
                 .text(postJoinedDto.getText())
                 .karmaScore(postJoinedDto.getKarmaScore())
+                .visibility(postJoinedDto.getVisibility())
                 .build();
     }
 
@@ -67,20 +68,30 @@ public class PostResponseModelAssembler implements RepresentationModelAssembler<
             links.add(linkTo(methodOn(PostController.class).rate(postId, true)).withSelfRel());
         }
 
+        PostVisibility visibility = postJoinedDto.getVisibility();
         if (postJoinedDto.getUserId().equals(userId)) {
-            links.add(linkTo(methodOn(PostController.class).hideByUser(postId)).withSelfRel());
-            links.add(linkTo(methodOn(PostController.class).unhideByUser(postId)).withSelfRel());
-            links.add(linkTo(methodOn(PostController.class).deleteByUser(postId)).withSelfRel());
+            if (visibility == PostVisibility.HIDDEN) {
+                links.add(linkTo(methodOn(PostController.class).unhideByUser(postId)).withSelfRel());
+            } else {
+                links.add(linkTo(methodOn(PostController.class).hideByUser(postId)).withSelfRel());
+            }
+            if (visibility != PostVisibility.DELETED) {
+                links.add(linkTo(methodOn(PostController.class).deleteByUser(postId)).withSelfRel());
+            }
         } else {
-
             if (grantedAuthorities.contains(Role.ADMIN.toString())) {
-                links.add(linkTo(methodOn(PostController.class).activateByAdmin(postId)).withSelfRel());
-                links.add(linkTo(methodOn(PostController.class).deleteByAdmin(postId)).withSelfRel());
+                if (visibility != PostVisibility.ACTIVE) {
+                    links.add(linkTo(methodOn(PostController.class).activateByAdmin(postId)).withSelfRel());
+                }
+                if (visibility != PostVisibility.DELETED) {
+                    links.add(linkTo(methodOn(PostController.class).deleteByAdmin(postId)).withSelfRel());
+                }
             }
             if (grantedAuthorities.contains(Role.MOD.toString()) ||
                     grantedAuthorities.contains(Role.ADMIN.toString())) {
-
-                links.add(linkTo(methodOn(PostController.class).hideByMod(postId)).withSelfRel());
+                if (visibility != PostVisibility.HIDDEN) {
+                    links.add(linkTo(methodOn(PostController.class).hideByMod(postId)).withSelfRel());
+                }
             }
         }
 
