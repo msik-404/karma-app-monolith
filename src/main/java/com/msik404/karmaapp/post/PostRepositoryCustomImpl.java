@@ -3,12 +3,10 @@ package com.msik404.karmaapp.post;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.msik404.karmaapp.post.dto.PostResponse;
+import com.msik404.karmaapp.post.dto.PostJoinedDto;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.Path;
-import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.*;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
@@ -24,25 +22,37 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<PostResponse> findKeysetPaginated(Long karmaScore, int size) throws InternalServerErrorException {
+    public List<PostJoinedDto> findKeysetPaginated(Long karmaScore, Long userId, PostVisibility visibility, int size)
+            throws InternalServerErrorException {
 
-        var criteriaQuery = cb.createQuery(PostResponse.class);
+        var criteriaQuery = cb.createQuery(PostJoinedDto.class);
         var postRoot = criteriaQuery.from(Post.class);
         var userJoin = postRoot.join("user");
 
+        Expression<Boolean> isPositive = cb.nullLiteral(Boolean.class);
+        if (userId != null) {
+            var karmaScoreJoin = postRoot.join("karmaScores", JoinType.LEFT);
+            karmaScoreJoin.on(
+                    cb.equal(karmaScoreJoin.get("user").get("id"), userId)
+            );
+            isPositive = karmaScoreJoin.get("isPositive");
+        }
+
         criteriaQuery.select(
                 cb.construct(
-                        PostResponse.class,
+                        PostJoinedDto.class,
                         postRoot.get("id"),
+                        postRoot.get("user").get("id"),
+                        userJoin.get("username"),
                         postRoot.get("headline"),
                         postRoot.get("text"),
                         postRoot.get("karmaScore"),
-                        userJoin.get("username")
+                        isPositive
                 )
         );
 
         var predicates = new ArrayList<Predicate>();
-        predicates.add(cb.equal(postRoot.get("visibility"), PostVisibility.ACTIVE));
+        predicates.add(cb.equal(postRoot.get("visibility"), visibility));
         if (karmaScore != null) {
             predicates.add(cb.lessThan(postRoot.get("karmaScore"), karmaScore));
         }

@@ -11,7 +11,7 @@ import com.msik404.karmaapp.karma.KarmaScoreAlreadyExistsException;
 import com.msik404.karmaapp.karma.KarmaScoreNotFoundException;
 import com.msik404.karmaapp.karma.KarmaScoreService;
 import com.msik404.karmaapp.post.dto.PostCreationRequest;
-import com.msik404.karmaapp.post.dto.PostResponse;
+import com.msik404.karmaapp.post.dto.PostJoinedDto;
 import com.msik404.karmaapp.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
@@ -29,8 +29,13 @@ public class PostService {
     private final KarmaScoreService karmaScoreService;
 
     @Transactional(readOnly = true)
-    public List<PostResponse> findKeysetPaginated(Long karmaScore, int size) {
-        return repository.findKeysetPaginated(karmaScore, size);
+    public List<PostJoinedDto> findKeysetPaginated(Long karmaScore, PostVisibility visibility, int size) {
+        final var authentication = SecurityContextHolder.getContext().getAuthentication();
+        Long userId = null;
+        if (authentication != null) {
+            userId = (Long) authentication.getPrincipal();
+        }
+        return repository.findKeysetPaginated(karmaScore, userId, visibility, size);
     }
 
     @Transactional(readOnly = true)
@@ -46,10 +51,11 @@ public class PostService {
     @Transactional
     public void create(PostCreationRequest request, MultipartFile image) throws FileProcessingException {
 
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        var userId = (long) authentication.getPrincipal();
+        final var authentication = SecurityContextHolder.getContext().getAuthentication();
+        final var userId = (long) authentication.getPrincipal();
 
         var newPost = Post.builder()
+                .headline(request.getHeadline())
                 .text(request.getText())
                 .karmaScore(0L)
                 .visibility(PostVisibility.ACTIVE)
@@ -86,8 +92,8 @@ public class PostService {
     public void rate(long postId, boolean isNewRatingPositive)
             throws KarmaScoreAlreadyExistsException, PostNotFoundException {
 
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        var userId = (long) authentication.getPrincipal();
+        final var authentication = SecurityContextHolder.getContext().getAuthentication();
+        final var userId = (long) authentication.getPrincipal();
 
         long scoreDiff = isNewRatingPositive ? 1L : -1L;
         try {
@@ -116,8 +122,8 @@ public class PostService {
     @Transactional
     public void unrate(long postId) throws KarmaScoreNotFoundException, PostNotFoundException {
 
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        var userId = (long) authentication.getPrincipal();
+        final var authentication = SecurityContextHolder.getContext().getAuthentication();
+        final var userId = (long) authentication.getPrincipal();
 
         var karmaKey = new KarmaKey(userId, postId);
         var karmaScore = karmaScoreService.findById(karmaKey);
@@ -132,8 +138,8 @@ public class PostService {
     public void changeVisibilityByUser(long postId, PostVisibility visibility)
             throws AccessDeniedException, PostNotFoundException {
 
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        var userId = (long) authentication.getPrincipal();
+        final var authentication = SecurityContextHolder.getContext().getAuthentication();
+        final var userId = (long) authentication.getPrincipal();
 
         var optionalPost = repository.findById(postId);
         optionalPost.ifPresentOrElse(

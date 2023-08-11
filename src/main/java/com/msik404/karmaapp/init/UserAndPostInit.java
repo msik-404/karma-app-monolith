@@ -17,10 +17,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class DataInit implements CommandLineRunner {
+public class UserAndPostInit implements CommandLineRunner {
 
-    private static final int USER_AMOUNT = 100;
-    private static final int MAX_KARMA_SCORE = 10000;
+    private static final int USER_AMOUNT = 0;
+    private static final int MAX_SINGLE_INSERT_SIZE = 100;
+    private static final int MAX_KARMA_SCORE = 10_000;
     private static final int MAX_POSTS_PER_USER = 10;
     private static final int MIN_POSTS_PER_USER = 3;
     private static final PostVisibility[] VISIBILITY_OPTIONS = PostVisibility.class.getEnumConstants();
@@ -49,18 +50,21 @@ public class DataInit implements CommandLineRunner {
 
         var random = new Random();
 
-        for (int t = 0; t < 10; t++) {
-            List<User> usersToSave = new ArrayList<>(USER_AMOUNT);
+        final int insertsAmount = Math.ceilDiv(USER_AMOUNT, MAX_SINGLE_INSERT_SIZE);
+        for (int insertionIdx = 0; insertionIdx < insertsAmount; insertionIdx++) {
+            List<User> usersToSave = new ArrayList<>();
             List<Post> postsToSave = new ArrayList<>();
-
-            for (int i = 0; i < USER_AMOUNT; i++) {
-                var user = userBuilder(String.format("username_%d-%d", t, i));
+            final int currLow = insertionIdx * MAX_SINGLE_INSERT_SIZE;
+            final int currHigh = Math.min((insertionIdx+1) * MAX_SINGLE_INSERT_SIZE, USER_AMOUNT);
+            for (int userId = currLow; userId < currHigh; userId++) {
+                var user = userBuilder(String.format("username_%d", userId));
 
                 var maxPosts = random.nextInt(MAX_POSTS_PER_USER - MIN_POSTS_PER_USER) + MIN_POSTS_PER_USER;
 
-                for (int j = MIN_POSTS_PER_USER; j < maxPosts; j++) {
+                for (int postId = 0; postId < maxPosts; postId++) {
                     var post = Post.builder()
-                            .text(String.format("Example text: (%d, %d, %d)", t, i, j))
+                            .headline(String.format("Example headline: %d of user: %d", postId, userId))
+                            .text(String.format("Example text: %d of user: %d", postId, userId))
                             .karmaScore(random.nextLong(MAX_KARMA_SCORE) - random.nextLong(MAX_KARMA_SCORE))
                             .visibility(VISIBILITY_OPTIONS[random.nextInt(VISIBILITY_OPTIONS.length)])
                             .user(user)

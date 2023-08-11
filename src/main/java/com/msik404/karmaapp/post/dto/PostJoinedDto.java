@@ -5,10 +5,11 @@ import lombok.Data;
 
 @Data
 @Builder
-public class PostResponse {
-
+public class PostJoinedDto {
 
     private final Long id;
+
+    private final Long userId;
 
     private final String username;
 
@@ -17,5 +18,8 @@ public class PostResponse {
     private final String text;
 
     private final Long karmaScore;
+
+    // null means user is unauthenticated
+    private final Boolean wasRatedByAuthenticatedUserPositively;
 
 }

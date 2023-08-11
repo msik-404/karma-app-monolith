@@ -2,12 +2,13 @@ package com.msik404.karmaapp.post;
 
 import java.util.List;
 
-import com.msik404.karmaapp.post.dto.PostResponse;
+import com.msik404.karmaapp.post.dto.PostJoinedDto;
 import org.springframework.lang.NonNull;
 
 public interface PostRepositoryCustom {
 
-    List<PostResponse> findKeysetPaginated(Long karmaScore, int size) throws InternalServerErrorException;
+    List<PostJoinedDto> findKeysetPaginated(Long karmaScore, Long userId, PostVisibility visibility, int size)
+            throws InternalServerErrorException;
 
     byte[] findImageById(long postId) throws InternalServerErrorException;
 
