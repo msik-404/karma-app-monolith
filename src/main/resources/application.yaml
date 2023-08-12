@@ -14,7 +14,7 @@ spring:
 
   data:
     redis:
-      hostname: ${REDIS_HOSTNAME}
+      host: ${REDIS_HOSTNAME}
 
 jwt:
   secret: ${SECRET}
