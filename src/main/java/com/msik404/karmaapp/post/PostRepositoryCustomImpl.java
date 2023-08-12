@@ -24,7 +24,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     public List<PostJoinedDto> findKeysetPaginated(
             Long karmaScore,
             Long authenticatedUserId,
-            String requestedUsername,
+            String username,
             List<PostVisibility> visibilities,
             int size)
             throws InternalServerErrorException {
@@ -64,8 +64,8 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         if (karmaScore != null) {
             predicates.add(cb.lessThan(postRoot.get("karmaScore"), karmaScore));
         }
-        if (requestedUsername != null) {
-            predicates.add(cb.equal(userJoin.get("username"), requestedUsername));
+        if (username != null) {
+            predicates.add(cb.equal(userJoin.get("username"), username));
         }
         criteriaQuery.where(cb.and(predicates.toArray(new Predicate[0])));
 

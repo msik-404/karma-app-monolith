@@ -10,7 +10,7 @@ public interface PostRepositoryCustom {
     List<PostJoinedDto> findKeysetPaginated(
             Long karmaScore,
             Long authenticatedUserId,
-            String requestedUsername,
+            String username,
             List<PostVisibility> visibilities,
             int size)
             throws InternalServerErrorException;

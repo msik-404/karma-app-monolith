@@ -31,7 +31,7 @@ public class PostService {
     @Transactional(readOnly = true)
     public List<PostJoinedDto> findKeysetPaginated(
             Long karmaScore,
-            String requestedUsername,
+            String username,
             List<PostVisibility> visibilities,
             int size)
             throws InternalServerErrorException {
@@ -41,7 +41,7 @@ public class PostService {
         if (authentication != null) {
             userId = (Long) authentication.getPrincipal();
         }
-        return repository.findKeysetPaginated(karmaScore, userId, requestedUsername, visibilities, size);
+        return repository.findKeysetPaginated(karmaScore, userId, username, visibilities, size);
     }
 
     @Transactional(readOnly = true)

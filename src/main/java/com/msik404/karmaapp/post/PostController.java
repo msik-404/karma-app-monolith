@@ -28,11 +28,11 @@ public class PostController {
     @GetMapping("guest/posts")
     public List<EntityModel<PostResponse>> findKeysetPaginated(
             @RequestParam(value = "karma_score", required = false) Long karmaScore,
-            @RequestParam(value = "requested_username", required = false) String requestedUsername,
+            @RequestParam(value = "username", required = false) String username,
             @RequestParam(value = "size", defaultValue = "100") int size)
             throws InternalServerErrorException {
 
-        return postService.findKeysetPaginated(karmaScore, requestedUsername, List.of(PostVisibility.ACTIVE), size)
+        return postService.findKeysetPaginated(karmaScore, username, List.of(PostVisibility.ACTIVE), size)
                 .stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
@@ -41,7 +41,7 @@ public class PostController {
     @GetMapping("mod/posts")
     public List<EntityModel<PostResponse>> findKeysetPaginatedHidden(
             @RequestParam(value = "karma_score", required = false) Long karmaScore,
-            @RequestParam(value = "requested_username", required = false) String requestedUsername,
+            @RequestParam(value = "username", required = false) String username,
             @RequestParam(value = "size", defaultValue = "100") int size,
             @RequestParam(value = "active", defaultValue = "false") boolean active,
             @RequestParam(value = "hidden", defaultValue = "false") boolean hidden)
@@ -55,7 +55,7 @@ public class PostController {
             visibilities.add(PostVisibility.HIDDEN);
         }
 
-        return postService.findKeysetPaginated(karmaScore, requestedUsername, visibilities, size)
+        return postService.findKeysetPaginated(karmaScore, username, visibilities, size)
                 .stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
@@ -64,7 +64,7 @@ public class PostController {
     @GetMapping("admin/posts")
     public List<EntityModel<PostResponse>> findKeysetPaginatedDeleted(
             @RequestParam(value = "karma_score", required = false) Long karmaScore,
-            @RequestParam(value = "requested_username", required = false) String requestedUsername,
+            @RequestParam(value = "username", required = false) String username,
             @RequestParam(value = "size", defaultValue = "100") int size,
             @RequestParam(value = "active", defaultValue = "false") boolean active,
             @RequestParam(value = "hidden", defaultValue = "false") boolean hidden,
@@ -82,7 +82,7 @@ public class PostController {
             visibilities.add(PostVisibility.DELETED);
         }
 
-        return postService.findKeysetPaginated(karmaScore, requestedUsername, visibilities, size)
+        return postService.findKeysetPaginated(karmaScore, username, visibilities, size)
                 .stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
