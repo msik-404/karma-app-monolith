@@ -11,9 +11,7 @@ public class DuplicateEmailExceptionHandler extends BaseExceptionHandler {
         if (request.first().equals("email")) {
             throw new DuplicateEmailException(request.second());
         }
-        if (super.nextHandler != null) {
-            super.nextHandler.handle(request);
-        }
+        super.nextHandler.ifPresent(handler -> handler.handle(request));
     }
 
 }

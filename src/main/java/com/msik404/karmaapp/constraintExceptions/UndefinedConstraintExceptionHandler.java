@@ -18,7 +18,7 @@ public class UndefinedConstraintExceptionHandler extends BaseExceptionHandler {
     @Override
     public void handle(@NonNull Pair<String, String> request) throws RuntimeException {
 
-        if (super.nextHandler == null) {
+        if (super.nextHandler.isEmpty()) {
             throw new UndefinedConstraintException(getErrorMessage(request.first(), request.second()));
         }
     }

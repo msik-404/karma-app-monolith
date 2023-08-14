@@ -11,9 +11,7 @@ public class DuplicateUsernameExceptionHandler extends BaseExceptionHandler {
         if (request.first().equals("username")) {
             throw new DuplicateUsernameException(request.second());
         }
-        if (super.nextHandler != null) {
-            super.nextHandler.handle(request);
-        }
+        super.nextHandler.ifPresent(handler -> handler.handle(request));
     }
 
 }
