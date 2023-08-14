@@ -12,6 +12,7 @@ import com.msik404.karmaapp.user.User;
 import com.msik404.karmaapp.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.lang.NonNull;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UserAndPostInit implements CommandLineRunner {
 
-    private static final int USER_AMOUNT = 777;
+    private static final int USER_AMOUNT = 7;
     private static final int MAX_SINGLE_INSERT_SIZE = 100;
     private static final int MAX_KARMA_SCORE = 10_000;
     private static final int MAX_POSTS_PER_USER = 10;
@@ -30,7 +31,7 @@ public class UserAndPostInit implements CommandLineRunner {
     private final PostRepository postRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    User userBuilder(String username) {
+    User userBuilder(@NonNull String username) {
         return User.builder()
                 .username(username)
                 .email(String.format("karma-app.%s@gmail.com", username))

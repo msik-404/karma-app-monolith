@@ -5,13 +5,14 @@ import java.util.regex.Pattern;
 
 import com.msik404.karmaapp.pair.Pair;
 import com.msik404.karmaapp.strategy.Strategy;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 @Component
 public class RoundBraceErrorMassageParseStrategy implements Strategy<String, Pair<String, String>> {
 
     @Override
-    public Pair<String, String> execute(String errorMessage) {
+    public Pair<String, String> execute(@NonNull String errorMessage) {
 
         Pattern pattern = Pattern.compile("\\((.*?)\\)");
         Matcher matcher = pattern.matcher(errorMessage);

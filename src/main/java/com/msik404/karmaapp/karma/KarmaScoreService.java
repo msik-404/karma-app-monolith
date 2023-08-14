@@ -4,6 +4,7 @@ import com.msik404.karmaapp.post.Post;
 import com.msik404.karmaapp.user.User;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,7 +14,7 @@ public class KarmaScoreService {
     private final KarmaScoreRepository repository;
     private final EntityManager entityManager;
 
-    public KarmaScore findById(KarmaKey id) throws KarmaScoreNotFoundException {
+    public KarmaScore findById(@NonNull KarmaKey id) throws KarmaScoreNotFoundException {
         return repository.findById(id).orElseThrow(KarmaScoreNotFoundException::new);
     }
 
@@ -28,7 +29,7 @@ public class KarmaScoreService {
         return repository.save(karmaScore);
     }
 
-    public void deleteById(KarmaKey karmaKey) {
+    public void deleteById(@NonNull KarmaKey karmaKey) {
         repository.deleteById(karmaKey);
     }
 }

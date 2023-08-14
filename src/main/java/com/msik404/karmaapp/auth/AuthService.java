@@ -12,6 +12,7 @@ import com.msik404.karmaapp.user.UserRepository;
 import com.msik404.karmaapp.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -31,7 +32,7 @@ public class AuthService {
     private final DataIntegrityViolationExceptionErrorMessageExtractionStrategy extractionStrategy;
     private final RoundBraceErrorMassageParseStrategy parseStrategy;
 
-    public void register(RegisterRequest request)
+    public void register(@NonNull RegisterRequest request)
             throws DuplicateEmailException, DuplicateUsernameException, UndefinedConstraintException {
 
         try {
@@ -54,7 +55,7 @@ public class AuthService {
         }
     }
 
-    public LoginResponse login(LoginRequest request) throws AuthenticationException {
+    public LoginResponse login(@NonNull LoginRequest request) throws AuthenticationException {
 
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 

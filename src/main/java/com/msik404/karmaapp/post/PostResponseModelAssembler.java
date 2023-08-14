@@ -35,7 +35,7 @@ public class PostResponseModelAssembler implements RepresentationModelAssembler<
     }
 
     @Override
-    public EntityModel<PostResponse> toModel(PostJoinedDto postJoinedDto) {
+    public EntityModel<PostResponse> toModel(@NonNull PostJoinedDto postJoinedDto) {
 
         final Long postId = postJoinedDto.getId();
         final var postResponse = postResponseBuilder(postJoinedDto);

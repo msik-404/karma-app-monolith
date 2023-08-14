@@ -4,6 +4,7 @@ import com.msik404.karmaapp.user.dto.UserDtoWithAdminPrivilege;
 import com.msik404.karmaapp.user.dto.UserDtoWithUserPrivilege;
 import jakarta.persistence.criteria.CriteriaUpdate;
 import jakarta.persistence.criteria.Root;
+import org.springframework.lang.NonNull;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -11,10 +12,10 @@ import org.springframework.stereotype.Component;
 public class UserCriteriaUpdater {
 
     public void updateUserCriteria(
-            UserDtoWithUserPrivilege dto,
-            BCryptPasswordEncoder passwordEncoder,
-            Root<User> root,
-            CriteriaUpdate<User> criteriaUpdate) {
+            @NonNull UserDtoWithUserPrivilege dto,
+            @NonNull BCryptPasswordEncoder passwordEncoder,
+            @NonNull Root<User> root,
+            @NonNull CriteriaUpdate<User> criteriaUpdate) {
 
         if (dto.getFirstName() != null) {
             criteriaUpdate.set(root.get("firstName"), dto.getFirstName());
@@ -34,9 +35,9 @@ public class UserCriteriaUpdater {
     }
 
     public void updateAdminCriteria(
-            UserDtoWithAdminPrivilege dto,
-            Root<User> root,
-            CriteriaUpdate<User> criteriaUpdate) {
+            @NonNull UserDtoWithAdminPrivilege dto,
+            @NonNull Root<User> root,
+            @NonNull CriteriaUpdate<User> criteriaUpdate) {
 
         if (dto.getRole() != null) {
             criteriaUpdate.set(root.get("role"), dto.getRole());

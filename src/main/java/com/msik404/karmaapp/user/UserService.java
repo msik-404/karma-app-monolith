@@ -5,8 +5,8 @@ import com.msik404.karmaapp.constraintExceptions.DuplicateUsernameException;
 import com.msik404.karmaapp.constraintExceptions.UndefinedConstraintException;
 import com.msik404.karmaapp.user.dto.UserDtoWithAdminPrivilege;
 import com.msik404.karmaapp.user.dto.UserDtoWithUserPrivilege;
-import jakarta.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.lang.NonNull;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -24,7 +24,7 @@ public class UserService {
         return userRepository.findById(id).orElseThrow(UserNotFoundException::new);
     }
 
-    public User findByUsername(String username) throws UsernameNotFoundException {
+    public User findByUsername(@NonNull String username) throws UsernameNotFoundException {
 
         return userRepository.findByUsername(username).orElseThrow(
                 () -> new UsernameNotFoundException("User with that username was not found"));
@@ -40,7 +40,7 @@ public class UserService {
     @Transactional
     public UserDtoWithUserPrivilege updateWithUserPrivilege(
             long userId,
-            @Nonnull UserDtoWithUserPrivilege request)
+            @NonNull UserDtoWithUserPrivilege request)
             throws AccessDeniedException, DuplicateEmailException, DuplicateUsernameException, UndefinedConstraintException, UserNotFoundException {
 
         if (!sameAsAuthenticatedUser(userId)) {
@@ -58,7 +58,7 @@ public class UserService {
     @Transactional
     public UserDtoWithAdminPrivilege updateWithAdminPrivilege(
             long userId,
-            @Nonnull UserDtoWithAdminPrivilege request)
+            @NonNull UserDtoWithAdminPrivilege request)
             throws DuplicateEmailException, DuplicateUsernameException, UndefinedConstraintException, UserNotFoundException {
 
         int rowsAffected = userRepository.updateNonNull(userId, request);

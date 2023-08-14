@@ -8,6 +8,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.criteria.*;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -22,10 +23,10 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     public List<PostJoinedDto> findKeysetPaginated(
-            Long karmaScore,
-            Long authenticatedUserId,
-            String username,
-            List<PostVisibility> visibilities,
+            @Nullable Long karmaScore,
+            @Nullable Long authenticatedUserId,
+            @Nullable String username,
+            @NonNull List<PostVisibility> visibilities,
             int size)
             throws InternalServerErrorException {
 

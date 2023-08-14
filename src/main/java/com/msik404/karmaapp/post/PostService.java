@@ -14,6 +14,8 @@ import com.msik404.karmaapp.post.dto.PostCreationRequest;
 import com.msik404.karmaapp.post.dto.PostJoinedDto;
 import com.msik404.karmaapp.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -30,9 +32,9 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public List<PostJoinedDto> findKeysetPaginated(
-            Long karmaScore,
-            String username,
-            List<PostVisibility> visibilities,
+            @Nullable Long karmaScore,
+            @Nullable String username,
+            @NonNull List<PostVisibility> visibilities,
             int size)
             throws InternalServerErrorException {
 
@@ -45,7 +47,7 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public byte[] findImageByPostId(Long postId) throws ImageNotFoundException {
+    public byte[] findImageByPostId(long postId) throws ImageNotFoundException {
 
         byte[] imageData = repository.findImageById(postId);
         if (imageData.length == 0) {
@@ -55,7 +57,7 @@ public class PostService {
     }
 
     @Transactional
-    public void create(PostCreationRequest request, MultipartFile image) throws FileProcessingException {
+    public void create(@NonNull PostCreationRequest request, @NonNull MultipartFile image) throws FileProcessingException {
 
         final var authentication = SecurityContextHolder.getContext().getAuthentication();
         final var userId = (long) authentication.getPrincipal();
@@ -141,7 +143,7 @@ public class PostService {
     }
 
     @Transactional
-    public void changeVisibilityByUser(long postId, PostVisibility visibility)
+    public void changeVisibilityByUser(long postId, @NonNull PostVisibility visibility)
             throws AccessDeniedException, PostNotFoundException {
 
         final var authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -162,7 +164,7 @@ public class PostService {
     }
 
     @Transactional
-    public void changeVisibility(long postId, PostVisibility visibility) throws PostNotFoundException {
+    public void changeVisibility(long postId, @NonNull PostVisibility visibility) throws PostNotFoundException {
         int rowsAffected = repository.changeVisibilityById(postId, visibility);
         if (rowsAffected == 0) {
             throw new PostNotFoundException();

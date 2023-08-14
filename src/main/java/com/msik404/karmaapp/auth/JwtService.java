@@ -44,7 +44,7 @@ public class JwtService {
                 .compact();
     }
 
-    public Claims extractAllClaims(String jwt)
+    public Claims extractAllClaims(@NonNull String jwt)
             throws ExpiredJwtException, UnsupportedJwtException, MalformedJwtException, SignatureException, IllegalArgumentException {
 
         return Jwts.parserBuilder()

@@ -5,6 +5,7 @@ import com.msik404.karmaapp.user.User;
 import com.msik404.karmaapp.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.lang.NonNull;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +19,7 @@ public class StaffUserInit implements CommandLineRunner {
     private final UserRepository repository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    User staffBuilder(String username, Role role) {
+    User staffBuilder(@NonNull String username, @NonNull Role role) {
         return User.builder()
                 .username(username)
                 .email(String.format("karma-app.%s@gmail.com", username))
