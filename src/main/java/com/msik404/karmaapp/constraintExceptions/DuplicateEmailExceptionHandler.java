@@ -1,17 +1,16 @@
 package com.msik404.karmaapp.constraintExceptions;
 
-import com.msik404.karmaapp.pair.Pair;
 import org.springframework.lang.NonNull;
 
 public class DuplicateEmailExceptionHandler extends BaseExceptionHandler {
 
     @Override
-    public void handle(@NonNull Pair<String, String> request) throws RuntimeException {
+    public void handle(@NonNull String fieldName, @NonNull String errorMessage) throws RuntimeException {
 
-        if (request.first().equals("email")) {
-            throw new DuplicateEmailException(request.second());
+        if (fieldName.equals("email")) {
+            throw new DuplicateEmailException(errorMessage);
         }
-        super.nextHandler.ifPresent(handler -> handler.handle(request));
+        super.nextHandler.ifPresent(handler -> handler.handle(fieldName, errorMessage));
     }
 
 }

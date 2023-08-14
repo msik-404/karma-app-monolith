@@ -2,16 +2,14 @@ package com.msik404.karmaapp.constraintExceptions;
 
 import java.util.Optional;
 
-import com.msik404.karmaapp.chainHandler.ChainHandler;
-import com.msik404.karmaapp.pair.Pair;
-import lombok.NonNull;
+import org.springframework.lang.NonNull;
 
-public abstract class BaseExceptionHandler implements ChainHandler<Pair<String, String>> {
+public abstract class BaseExceptionHandler implements ChainExceptionHandler {
 
-    protected Optional<ChainHandler<Pair<String, String>>> nextHandler;
+    protected Optional<ChainExceptionHandler> nextHandler;
 
     @Override
-    public void setNext(@NonNull ChainHandler<Pair<String, String>> handler) {
+    public void setNext(@NonNull ChainExceptionHandler handler) {
         this.nextHandler = Optional.of(handler);
     }
 

@@ -1,6 +1,5 @@
 package com.msik404.karmaapp.constraintExceptions;
 
-import com.msik404.karmaapp.pair.Pair;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
@@ -16,10 +15,10 @@ public class UndefinedConstraintExceptionHandler extends BaseExceptionHandler {
     }
 
     @Override
-    public void handle(@NonNull Pair<String, String> request) throws RuntimeException {
+    public void handle(@NonNull String fieldName, @NonNull String errorMessage) throws RuntimeException {
 
         if (super.nextHandler.isEmpty()) {
-            throw new UndefinedConstraintException(getErrorMessage(request.first(), request.second()));
+            throw new UndefinedConstraintException(getErrorMessage(fieldName, errorMessage));
         }
     }
 

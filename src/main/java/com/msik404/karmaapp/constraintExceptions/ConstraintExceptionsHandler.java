@@ -17,13 +17,16 @@ public class ConstraintExceptionsHandler {
             throws DuplicateEmailException, DuplicateUsernameException, UndefinedConstraintException {
 
         String errorMessage = extractionStrategy.execute(ex);
-        Pair<String, String> request = parseStrategy.execute(errorMessage);
+        Pair<String, String> parsedResults = parseStrategy.execute(errorMessage);
 
         var emailExceptionHandler = new DuplicateEmailExceptionHandler();
         var usernameExceptionHandler = new DuplicateUsernameExceptionHandler();
         emailExceptionHandler.setNext(usernameExceptionHandler);
         usernameExceptionHandler.setNext(new UndefinedConstraintExceptionHandler());
-        emailExceptionHandler.handle(request);
+
+        String fieldName = parsedResults.first();
+        String parsedErrorMessage = parsedResults.second();
+        emailExceptionHandler.handle(fieldName, parsedErrorMessage);
     }
 
 }
