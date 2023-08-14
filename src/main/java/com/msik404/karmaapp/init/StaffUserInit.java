@@ -2,7 +2,7 @@ package com.msik404.karmaapp.init;
 
 import com.msik404.karmaapp.user.Role;
 import com.msik404.karmaapp.user.User;
-import com.msik404.karmaapp.user.UserRepository;
+import com.msik404.karmaapp.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.lang.NonNull;

@@ -1,4 +1,4 @@
-package com.msik404.karmaapp.user;
+package com.msik404.karmaapp.user.exception;
 
 public class UserNotFoundException extends RuntimeException {
 

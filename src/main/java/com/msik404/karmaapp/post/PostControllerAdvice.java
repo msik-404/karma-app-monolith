@@ -2,6 +2,10 @@ package com.msik404.karmaapp.post;
 
 import com.msik404.karmaapp.karma.KarmaScoreAlreadyExistsException;
 import com.msik404.karmaapp.karma.KarmaScoreNotFoundException;
+import com.msik404.karmaapp.post.exception.FileProcessingException;
+import com.msik404.karmaapp.post.exception.ImageNotFoundException;
+import com.msik404.karmaapp.post.exception.InternalServerErrorException;
+import com.msik404.karmaapp.post.exception.PostNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;

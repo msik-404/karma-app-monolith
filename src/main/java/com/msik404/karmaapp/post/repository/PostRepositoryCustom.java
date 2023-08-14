@@ -1,13 +1,16 @@
-package com.msik404.karmaapp.post;
+package com.msik404.karmaapp.post.repository;
 
 import java.util.List;
 
+import com.msik404.karmaapp.post.PostVisibility;
 import com.msik404.karmaapp.post.dto.PostJoinedDto;
+import com.msik404.karmaapp.post.exception.InternalServerErrorException;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
 public interface PostRepositoryCustom {
 
+    // TODO: maybe try to refactor to get rid of potential null values
     List<PostJoinedDto> findKeysetPaginated(
             @Nullable Long karmaScore,
             @Nullable Long authenticatedUserId,

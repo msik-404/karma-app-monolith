@@ -1,5 +1,6 @@
-package com.msik404.karmaapp.user;
+package com.msik404.karmaapp.user.repository;
 
+import com.msik404.karmaapp.user.User;
 import com.msik404.karmaapp.user.dto.UserDtoWithAdminPrivilege;
 import com.msik404.karmaapp.user.dto.UserDtoWithUserPrivilege;
 import jakarta.persistence.criteria.CriteriaUpdate;

@@ -1,4 +1,4 @@
-package com.msik404.karmaapp.post;
+package com.msik404.karmaapp.post.exception;
 
 public class ImageNotFoundException extends RuntimeException {
 

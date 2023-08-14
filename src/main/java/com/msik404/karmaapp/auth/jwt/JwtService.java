@@ -1,4 +1,4 @@
-package com.msik404.karmaapp.auth;
+package com.msik404.karmaapp.auth.jwt;
 
 import java.util.Date;
 import java.util.Map;

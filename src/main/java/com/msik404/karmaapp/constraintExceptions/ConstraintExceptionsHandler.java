@@ -1,5 +1,11 @@
 package com.msik404.karmaapp.constraintExceptions;
 
+import com.msik404.karmaapp.constraintExceptions.chain.DuplicateEmailExceptionHandler;
+import com.msik404.karmaapp.constraintExceptions.chain.DuplicateUsernameExceptionHandler;
+import com.msik404.karmaapp.constraintExceptions.chain.UndefinedConstraintExceptionHandler;
+import com.msik404.karmaapp.constraintExceptions.exception.DuplicateEmailException;
+import com.msik404.karmaapp.constraintExceptions.exception.DuplicateUsernameException;
+import com.msik404.karmaapp.constraintExceptions.exception.UndefinedConstraintException;
 import com.msik404.karmaapp.pair.Pair;
 import com.msik404.karmaapp.strategy.Strategy;
 import lombok.RequiredArgsConstructor;

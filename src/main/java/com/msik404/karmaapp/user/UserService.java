@@ -1,10 +1,12 @@
 package com.msik404.karmaapp.user;
 
-import com.msik404.karmaapp.constraintExceptions.DuplicateEmailException;
-import com.msik404.karmaapp.constraintExceptions.DuplicateUsernameException;
-import com.msik404.karmaapp.constraintExceptions.UndefinedConstraintException;
+import com.msik404.karmaapp.constraintExceptions.exception.DuplicateEmailException;
+import com.msik404.karmaapp.constraintExceptions.exception.DuplicateUsernameException;
+import com.msik404.karmaapp.constraintExceptions.exception.UndefinedConstraintException;
 import com.msik404.karmaapp.user.dto.UserDtoWithAdminPrivilege;
 import com.msik404.karmaapp.user.dto.UserDtoWithUserPrivilege;
+import com.msik404.karmaapp.user.exception.UserNotFoundException;
+import com.msik404.karmaapp.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.security.access.AccessDeniedException;

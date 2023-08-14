@@ -1,4 +1,4 @@
-package com.msik404.karmaapp.constraintExceptions;
+package com.msik404.karmaapp.constraintExceptions.exception;
 
 public class DuplicateEmailException extends RuntimeException {
 

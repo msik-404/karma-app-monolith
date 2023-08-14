@@ -1,4 +1,4 @@
-package com.msik404.karmaapp.constraintExceptions;
+package com.msik404.karmaapp.constraintExceptions.strategy;
 
 import com.msik404.karmaapp.strategy.Strategy;
 import org.springframework.dao.DataIntegrityViolationException;

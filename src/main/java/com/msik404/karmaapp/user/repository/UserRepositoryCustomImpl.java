@@ -1,6 +1,12 @@
-package com.msik404.karmaapp.user;
+package com.msik404.karmaapp.user.repository;
 
 import com.msik404.karmaapp.constraintExceptions.*;
+import com.msik404.karmaapp.constraintExceptions.exception.DuplicateEmailException;
+import com.msik404.karmaapp.constraintExceptions.exception.DuplicateUsernameException;
+import com.msik404.karmaapp.constraintExceptions.exception.UndefinedConstraintException;
+import com.msik404.karmaapp.constraintExceptions.strategy.ConstraintViolationExceptionErrorMessageExtractionStrategy;
+import com.msik404.karmaapp.constraintExceptions.strategy.RoundBraceErrorMassageParseStrategy;
+import com.msik404.karmaapp.user.User;
 import com.msik404.karmaapp.user.dto.UserDtoWithAdminPrivilege;
 import com.msik404.karmaapp.user.dto.UserDtoWithUserPrivilege;
 import jakarta.persistence.EntityManager;

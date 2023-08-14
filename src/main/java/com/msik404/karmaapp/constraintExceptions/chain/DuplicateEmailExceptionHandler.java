@@ -1,5 +1,6 @@
-package com.msik404.karmaapp.constraintExceptions;
+package com.msik404.karmaapp.constraintExceptions.chain;
 
+import com.msik404.karmaapp.constraintExceptions.exception.DuplicateEmailException;
 import org.springframework.lang.NonNull;
 
 public class DuplicateEmailExceptionHandler extends BaseExceptionHandler {

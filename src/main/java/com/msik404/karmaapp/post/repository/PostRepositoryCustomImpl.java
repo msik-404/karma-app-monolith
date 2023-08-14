@@ -1,9 +1,12 @@
-package com.msik404.karmaapp.post;
+package com.msik404.karmaapp.post.repository;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import com.msik404.karmaapp.post.Post;
+import com.msik404.karmaapp.post.PostVisibility;
 import com.msik404.karmaapp.post.dto.PostJoinedDto;
+import com.msik404.karmaapp.post.exception.InternalServerErrorException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.criteria.*;
@@ -22,6 +25,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         this.cb = entityManager.getCriteriaBuilder();
     }
 
+    // TODO: maybe try to refactor to get rid of potential null values
     public List<PostJoinedDto> findKeysetPaginated(
             @Nullable Long karmaScore,
             @Nullable Long authenticatedUserId,

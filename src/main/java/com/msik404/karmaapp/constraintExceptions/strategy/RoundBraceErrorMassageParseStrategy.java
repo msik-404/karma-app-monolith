@@ -1,4 +1,4 @@
-package com.msik404.karmaapp.constraintExceptions;
+package com.msik404.karmaapp.constraintExceptions.strategy;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.Random;
 
 import com.msik404.karmaapp.post.Post;
-import com.msik404.karmaapp.post.PostRepository;
+import com.msik404.karmaapp.post.repository.PostRepository;
 import com.msik404.karmaapp.post.PostVisibility;
 import com.msik404.karmaapp.user.Role;
 import com.msik404.karmaapp.user.User;
-import com.msik404.karmaapp.user.UserRepository;
+import com.msik404.karmaapp.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.lang.NonNull;

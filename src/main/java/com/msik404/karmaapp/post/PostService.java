@@ -12,7 +12,12 @@ import com.msik404.karmaapp.karma.KarmaScoreNotFoundException;
 import com.msik404.karmaapp.karma.KarmaScoreService;
 import com.msik404.karmaapp.post.dto.PostCreationRequest;
 import com.msik404.karmaapp.post.dto.PostJoinedDto;
-import com.msik404.karmaapp.user.UserRepository;
+import com.msik404.karmaapp.post.exception.FileProcessingException;
+import com.msik404.karmaapp.post.exception.ImageNotFoundException;
+import com.msik404.karmaapp.post.exception.InternalServerErrorException;
+import com.msik404.karmaapp.post.exception.PostNotFoundException;
+import com.msik404.karmaapp.post.repository.PostRepository;
+import com.msik404.karmaapp.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -30,6 +35,7 @@ public class PostService {
     private final UserRepository userRepository;
     private final KarmaScoreService karmaScoreService;
 
+    // TODO: maybe try to refactor to get rid of potential null values
     @Transactional(readOnly = true)
     public List<PostJoinedDto> findKeysetPaginated(
             @Nullable Long karmaScore,

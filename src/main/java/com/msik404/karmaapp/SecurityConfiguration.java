@@ -1,6 +1,6 @@
 package com.msik404.karmaapp;
 
-import com.msik404.karmaapp.auth.JwtAuthenticationFilter;
+import com.msik404.karmaapp.auth.jwt.JwtAuthenticationFilter;
 import com.msik404.karmaapp.user.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

@@ -1,8 +1,8 @@
-package com.msik404.karmaapp.auth;
+package com.msik404.karmaapp.auth.jwt;
 
 import java.io.IOException;
 
-import com.msik404.karmaapp.user.UserNotFoundException;
+import com.msik404.karmaapp.user.exception.UserNotFoundException;
 import com.msik404.karmaapp.user.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
