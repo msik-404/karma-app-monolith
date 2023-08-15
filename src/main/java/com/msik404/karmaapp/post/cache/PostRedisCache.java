@@ -13,7 +13,10 @@ import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
@@ -28,10 +31,6 @@ public class PostRedisCache {
 
     private static String getPostsHashKey(@NonNull String postId) {
         return String.format("%s:%s", POSTS_HASH_KEY, postId);
-    }
-
-    public static String getPostsHashKey(@NonNull String postsHashKey, @NonNull String postId) {
-        return String.format("%s:%s", postsHashKey, postId);
     }
 
     private final ObjectMapper objectMapper;
@@ -86,18 +85,31 @@ public class PostRedisCache {
         initPostsAsHashes(posts, removedPostIdKeys);
     }
 
-    public Optional<List<PostJoinedDto>> getTopNCachedPosts(long size) {
+    public Optional<List<PostJoinedDto>> getCachedPosts(long size, @Nullable Long karmaScore) {
 
-        var postsRetriever = new TopNCachedPostsRetriever(
-                POSTS_HASH_KEY, objectMapper, redisTemplate, KARMA_SCORE_ZSET_KEY);
-        return postsRetriever.getPostsFromCache(size);
-    }
+        Set<String> postIdKeySet;
+        if (karmaScore != null) {
+            postIdKeySet = redisTemplate.opsForZSet().rangeByScore(
+                    KARMA_SCORE_ZSET_KEY, Double.NEGATIVE_INFINITY, karmaScore, 0, size - 1);
+        } else {
+            postIdKeySet = redisTemplate.opsForZSet().reverseRange(KARMA_SCORE_ZSET_KEY, 0, size - 1);
+        }
 
-    public Optional<List<PostJoinedDto>> getTopNByScoreCachedPosts(long karmaScore, long size) {
+        List<String> postIdKeyList = null;
+        if (postIdKeySet != null && postIdKeySet.size() == size) {
+            postIdKeyList = postIdKeySet.stream()
+                    .map(PostRedisCache::getPostsHashKey)
+                    .toList();
+        }
 
-        var postsRetriever = new TopNByScoreCachedPostsRetriever(
-                POSTS_HASH_KEY, objectMapper, redisTemplate, KARMA_SCORE_ZSET_KEY, karmaScore);
-        return postsRetriever.getPostsFromCache(size);
+        List<PostJoinedDto> results = null;
+        if (postIdKeyList != null) {
+            HashOperations<String, String, String> hashOps = redisTemplate.opsForHash();
+            List<String> serializedResults = hashOps.multiGet(POSTS_HASH_KEY, postIdKeyList);
+            results = serializedResults.stream().map(this::deserialize).collect(toList());
+        }
+
+        return Optional.ofNullable(results);
     }
 
     public boolean zSetContains(long postId) {
@@ -132,4 +144,12 @@ public class PostRedisCache {
         }
     }
 
+    private PostJoinedDto deserialize(@NonNull String json) {
+
+        try {
+            return objectMapper.readValue(json, PostJoinedDto.class);
+        } catch (Exception e) {
+            throw new RuntimeException("Error deserializing JSON to PostJoinedDto", e);
+        }
+    }
 }
