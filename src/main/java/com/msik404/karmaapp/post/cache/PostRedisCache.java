@@ -85,6 +85,13 @@ public class PostRedisCache {
         initPostsAsHashes(posts, removedPostIdKeys);
     }
 
+    /**
+     * @param size       Amount for posts that should be returned from cache.
+     * @param karmaScore if not null, acts as pagination criterion,
+     *                   results contain 'size' amount of posts with score lower than karmaScore.
+     *                   if null, results contain top 'size' amount of posts based on karma score.
+     * @return list of paginated posts, which are not stale.
+     */
     public Optional<List<PostJoinedDto>> getCachedPosts(long size, @Nullable Long karmaScore) {
 
         Set<String> postIdKeySet;
