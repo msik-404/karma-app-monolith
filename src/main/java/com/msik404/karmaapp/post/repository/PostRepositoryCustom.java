@@ -10,13 +10,12 @@ import org.springframework.lang.Nullable;
 
 public interface PostRepositoryCustom {
 
-    // TODO: maybe try to refactor to get rid of potential null values
     List<PostJoinedDto> findKeysetPaginated(
+            int size,
             @Nullable Long karmaScore,
             @Nullable Long authenticatedUserId,
             @Nullable String username,
-            @NonNull List<PostVisibility> visibilities,
-            int size)
+            @NonNull List<PostVisibility> visibilities)
             throws InternalServerErrorException;
 
     byte[] findImageById(long postId) throws InternalServerErrorException;

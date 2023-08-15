@@ -36,7 +36,7 @@ public class PostController {
             @RequestParam(value = "size", defaultValue = "100") int size)
             throws InternalServerErrorException {
 
-        return postService.findKeysetPaginated(karmaScore, username, List.of(PostVisibility.ACTIVE), size)
+        return postService.findKeysetPaginated(size, karmaScore, username, List.of(PostVisibility.ACTIVE))
                 .stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
@@ -59,7 +59,7 @@ public class PostController {
             visibilities.add(PostVisibility.HIDDEN);
         }
 
-        return postService.findKeysetPaginated(karmaScore, username, visibilities, size)
+        return postService.findKeysetPaginated(size, karmaScore, username, visibilities)
                 .stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
@@ -86,7 +86,7 @@ public class PostController {
             visibilities.add(PostVisibility.DELETED);
         }
 
-        return postService.findKeysetPaginated(karmaScore, username, visibilities, size)
+        return postService.findKeysetPaginated(size, karmaScore, username, visibilities)
                 .stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());

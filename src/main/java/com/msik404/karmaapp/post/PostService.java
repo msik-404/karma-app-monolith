@@ -35,13 +35,12 @@ public class PostService {
     private final UserRepository userRepository;
     private final KarmaScoreService karmaScoreService;
 
-    // TODO: maybe try to refactor to get rid of potential null values
     @Transactional(readOnly = true)
     public List<PostJoinedDto> findKeysetPaginated(
+            int size,
             @Nullable Long karmaScore,
             @Nullable String username,
-            @NonNull List<PostVisibility> visibilities,
-            int size)
+            @NonNull List<PostVisibility> visibilities)
             throws InternalServerErrorException {
 
         final var authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -49,7 +48,7 @@ public class PostService {
         if (authentication != null) {
             userId = (Long) authentication.getPrincipal();
         }
-        return repository.findKeysetPaginated(karmaScore, userId, username, visibilities, size);
+        return repository.findKeysetPaginated(size, karmaScore, userId, username, visibilities);
     }
 
     @Transactional(readOnly = true)

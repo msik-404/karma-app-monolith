@@ -25,13 +25,26 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         this.cb = entityManager.getCriteriaBuilder();
     }
 
-    // TODO: maybe try to refactor to get rid of potential null values
+    /**
+     * @param size                Amount of posts that should be returned from db.
+     * @param karmaScore          If not null, acts as pagination criterion,
+     *                            results contain 'size' amount of posts with karma score lower than karmaScore.
+     *                            If null, results contain top 'size' amount of posts based on karma score.
+     * @param authenticatedUserId If not null, result contains information about which posts has been rated by authenticated user.
+     *                            if null, field for this information is null.
+     * @param username            if not null, results will contain only posts by user with this username.
+     *                            if null, posts by all users are in results.
+     * @param visibilities        if not empty, results will contain posts with visibilities present in visibilities.
+     *                            if empty, posts with all visibilities will be in results.
+     * @return list of paginated posts
+     * @throws InternalServerErrorException is thrown when query could not be performed
+     */
     public List<PostJoinedDto> findKeysetPaginated(
+            int size,
             @Nullable Long karmaScore,
             @Nullable Long authenticatedUserId,
             @Nullable String username,
-            @NonNull List<PostVisibility> visibilities,
-            int size)
+            @NonNull List<PostVisibility> visibilities)
             throws InternalServerErrorException {
 
         var criteriaQuery = cb.createQuery(PostJoinedDto.class);
