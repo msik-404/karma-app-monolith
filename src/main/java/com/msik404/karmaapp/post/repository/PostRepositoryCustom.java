@@ -3,20 +3,64 @@ package com.msik404.karmaapp.post.repository;
 import java.util.List;
 
 import com.msik404.karmaapp.post.PostVisibility;
-import com.msik404.karmaapp.post.dto.PostJoinedDto;
+import com.msik404.karmaapp.post.dto.PostJoined;
+import com.msik404.karmaapp.post.dto.PostRatingResponse;
 import com.msik404.karmaapp.post.exception.InternalServerErrorException;
 import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 
 public interface PostRepositoryCustom {
 
-    List<PostJoinedDto> findKeysetPaginated(
+    List<PostJoined> findTopN(
             int size,
-            @Nullable Long karmaScore,
-            @Nullable Long authenticatedUserId,
-            @Nullable String username,
-            @NonNull List<PostVisibility> visibilities)
-            throws InternalServerErrorException;
+            @NonNull List<PostVisibility> visibilities
+            ) throws InternalServerErrorException;
+
+    List<PostJoined> findNextN(
+            int size,
+            @NonNull List<PostVisibility> visibilities,
+            long karmaScore
+            ) throws InternalServerErrorException;
+
+    List<PostJoined> findTopNWithUsername(
+            int size,
+            @NonNull List<PostVisibility> visibilities,
+            @NonNull String username
+    ) throws InternalServerErrorException;
+
+    List<PostJoined> findNextNWithUsername(
+            int size,
+            @NonNull List<PostVisibility> visibilities,
+            long karmaScore,
+            @NonNull String username
+    ) throws InternalServerErrorException;
+
+    List<PostRatingResponse> findTopN(
+            int size,
+            @NonNull List<PostVisibility> visibilities,
+            long userId
+    ) throws InternalServerErrorException;
+
+    List<PostRatingResponse> findNextN(
+            int size,
+            @NonNull List<PostVisibility> visibilities,
+            long userId,
+            long karmaScore
+    ) throws InternalServerErrorException;
+
+    List<PostRatingResponse> findTopNWithUsername(
+            int size,
+            @NonNull List<PostVisibility> visibilities,
+            long userId,
+            @NonNull String username
+    ) throws InternalServerErrorException;
+
+    List<PostRatingResponse> findNextNWithUsername(
+            int size,
+            @NonNull List<PostVisibility> visibilities,
+            long userId,
+            long karmaScore,
+            @NonNull String username
+    ) throws InternalServerErrorException;
 
     byte[] findImageById(long postId) throws InternalServerErrorException;
 

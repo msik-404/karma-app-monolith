@@ -7,8 +7,8 @@ import com.msik404.karmaapp.constraintExceptions.exception.UndefinedConstraintEx
 import com.msik404.karmaapp.constraintExceptions.strategy.ConstraintViolationExceptionErrorMessageExtractionStrategy;
 import com.msik404.karmaapp.constraintExceptions.strategy.RoundBraceErrorMassageParseStrategy;
 import com.msik404.karmaapp.user.User;
-import com.msik404.karmaapp.user.dto.UserDtoWithAdminPrivilege;
-import com.msik404.karmaapp.user.dto.UserDtoWithUserPrivilege;
+import com.msik404.karmaapp.user.dto.UserUpdateRequestWithAdminPrivilege;
+import com.msik404.karmaapp.user.dto.UserUpdateRequestWithUserPrivilege;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import org.hibernate.exception.ConstraintViolationException;
@@ -45,15 +45,15 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
     }
 
     @Override
-    public int updateNonNull(long userId, @NonNull UserDtoWithUserPrivilege dto)
+    public int updateNonNull(long userId, @NonNull UserUpdateRequestWithUserPrivilege dto)
             throws DuplicateEmailException, DuplicateUsernameException, UndefinedConstraintException {
 
         var criteriaUpdate = cb.createCriteriaUpdate(User.class);
         var root = criteriaUpdate.from(User.class);
 
         userCriteriaUpdater.updateUserCriteria(dto, bCryptPasswordEncoder, root, criteriaUpdate);
-        if (dto instanceof UserDtoWithAdminPrivilege) {
-            userCriteriaUpdater.updateAdminCriteria((UserDtoWithAdminPrivilege) dto, root, criteriaUpdate);
+        if (dto instanceof UserUpdateRequestWithAdminPrivilege) {
+            userCriteriaUpdater.updateAdminCriteria((UserUpdateRequestWithAdminPrivilege) dto, root, criteriaUpdate);
         }
         criteriaUpdate.where(cb.equal(root.get("id"), userId));
 

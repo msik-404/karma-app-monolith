@@ -1,8 +1,8 @@
 package com.msik404.karmaapp.user.repository;
 
 import com.msik404.karmaapp.user.User;
-import com.msik404.karmaapp.user.dto.UserDtoWithAdminPrivilege;
-import com.msik404.karmaapp.user.dto.UserDtoWithUserPrivilege;
+import com.msik404.karmaapp.user.dto.UserUpdateRequestWithAdminPrivilege;
+import com.msik404.karmaapp.user.dto.UserUpdateRequestWithUserPrivilege;
 import jakarta.persistence.criteria.CriteriaUpdate;
 import jakarta.persistence.criteria.Root;
 import org.springframework.lang.NonNull;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 public class UserCriteriaUpdater {
 
     public void updateUserCriteria(
-            @NonNull UserDtoWithUserPrivilege dto,
+            @NonNull UserUpdateRequestWithUserPrivilege dto,
             @NonNull BCryptPasswordEncoder passwordEncoder,
             @NonNull Root<User> root,
             @NonNull CriteriaUpdate<User> criteriaUpdate) {
@@ -36,7 +36,7 @@ public class UserCriteriaUpdater {
     }
 
     public void updateAdminCriteria(
-            @NonNull UserDtoWithAdminPrivilege dto,
+            @NonNull UserUpdateRequestWithAdminPrivilege dto,
             @NonNull Root<User> root,
             @NonNull CriteriaUpdate<User> criteriaUpdate) {
 

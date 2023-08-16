@@ -3,8 +3,8 @@ package com.msik404.karmaapp.user;
 import com.msik404.karmaapp.constraintExceptions.exception.DuplicateEmailException;
 import com.msik404.karmaapp.constraintExceptions.exception.DuplicateUsernameException;
 import com.msik404.karmaapp.constraintExceptions.exception.UndefinedConstraintException;
-import com.msik404.karmaapp.user.dto.UserDtoWithAdminPrivilege;
-import com.msik404.karmaapp.user.dto.UserDtoWithUserPrivilege;
+import com.msik404.karmaapp.user.dto.UserUpdateRequestWithAdminPrivilege;
+import com.msik404.karmaapp.user.dto.UserUpdateRequestWithUserPrivilege;
 import com.msik404.karmaapp.user.exception.UserNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,18 +22,18 @@ public class UserController {
     private final UserService userService;
 
     @PutMapping("user/users/{userId}")
-    public ResponseEntity<UserDtoWithUserPrivilege> updateWithUserPrivilege(
+    public ResponseEntity<UserUpdateRequestWithUserPrivilege> updateWithUserPrivilege(
             @PathVariable Long userId,
-            @Valid @RequestBody UserDtoWithUserPrivilege request)
+            @Valid @RequestBody UserUpdateRequestWithUserPrivilege request)
             throws AccessDeniedException, DuplicateEmailException, UndefinedConstraintException, UserNotFoundException {
 
         return ResponseEntity.ok(userService.updateWithUserPrivilege(userId, request));
     }
 
     @PutMapping("admin/users/{userId}")
-    public ResponseEntity<UserDtoWithAdminPrivilege> updateWithAdminPrivilege(
+    public ResponseEntity<UserUpdateRequestWithAdminPrivilege> updateWithAdminPrivilege(
             @PathVariable Long userId,
-            @Valid @RequestBody UserDtoWithAdminPrivilege request)
+            @Valid @RequestBody UserUpdateRequestWithAdminPrivilege request)
             throws DuplicateEmailException, DuplicateUsernameException, UndefinedConstraintException, UserNotFoundException {
 
         return ResponseEntity.ok(userService.updateWithAdminPrivilege(userId, request));

@@ -30,28 +30,33 @@ public class PostController {
     private final PostResponseModelAssembler assembler;
 
     @GetMapping("guest/posts")
-    public List<EntityModel<PostResponse>> findKeysetPaginated(
+    public List<EntityModel<PostResponse>> findPaginatedPosts(
+            @RequestParam(value = "size", defaultValue = "100") int size,
             @RequestParam(value = "karma_score", required = false) Long karmaScore,
-            @RequestParam(value = "username", required = false) String username,
-            @RequestParam(value = "size", defaultValue = "100") int size)
+            @RequestParam(value = "username", required = false) String username)
             throws InternalServerErrorException {
 
-        return postService.findKeysetPaginated(size, karmaScore, username, List.of(PostVisibility.ACTIVE))
+        return postService.findPaginatedPosts(size, List.of(PostVisibility.ACTIVE), karmaScore, username)
                 .stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
     }
 
+    // TODO: there should be endpoint in which users can see all their hidden posts
+
+    // TODO: there should be endpoint to get information about liked posts
+
     @GetMapping("mod/posts")
-    public List<EntityModel<PostResponse>> findKeysetPaginatedHidden(
-            @RequestParam(value = "karma_score", required = false) Long karmaScore,
-            @RequestParam(value = "username", required = false) String username,
+    public List<EntityModel<PostResponse>> findPaginatedPosts(
             @RequestParam(value = "size", defaultValue = "100") int size,
             @RequestParam(value = "active", defaultValue = "false") boolean active,
-            @RequestParam(value = "hidden", defaultValue = "false") boolean hidden)
+            @RequestParam(value = "hidden", defaultValue = "false") boolean hidden,
+            @RequestParam(value = "karma_score", required = false) Long karmaScore,
+            @RequestParam(value = "username", required = false) String username)
             throws InternalServerErrorException {
 
         List<PostVisibility> visibilities = new ArrayList<>();
+
         if (active) {
             visibilities.add(PostVisibility.ACTIVE);
         }
@@ -59,23 +64,24 @@ public class PostController {
             visibilities.add(PostVisibility.HIDDEN);
         }
 
-        return postService.findKeysetPaginated(size, karmaScore, username, visibilities)
+        return postService.findPaginatedPosts(size, visibilities, karmaScore, username)
                 .stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
     }
 
     @GetMapping("admin/posts")
-    public List<EntityModel<PostResponse>> findKeysetPaginatedDeleted(
-            @RequestParam(value = "karma_score", required = false) Long karmaScore,
-            @RequestParam(value = "username", required = false) String username,
+    public List<EntityModel<PostResponse>> findPaginatedPosts(
             @RequestParam(value = "size", defaultValue = "100") int size,
             @RequestParam(value = "active", defaultValue = "false") boolean active,
             @RequestParam(value = "hidden", defaultValue = "false") boolean hidden,
-            @RequestParam(value = "deleted", defaultValue = "false") boolean deleted)
+            @RequestParam(value = "deleted", defaultValue = "false") boolean deleted,
+            @RequestParam(value = "karma_score", required = false) Long karmaScore,
+            @RequestParam(value = "username", required = false) String username)
             throws  InternalServerErrorException {
 
         List<PostVisibility> visibilities = new ArrayList<>();
+
         if (active) {
             visibilities.add(PostVisibility.ACTIVE);
         }
@@ -86,7 +92,7 @@ public class PostController {
             visibilities.add(PostVisibility.DELETED);
         }
 
-        return postService.findKeysetPaginated(size, karmaScore, username, visibilities)
+        return postService.findPaginatedPosts(size, visibilities, karmaScore, username)
                 .stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());

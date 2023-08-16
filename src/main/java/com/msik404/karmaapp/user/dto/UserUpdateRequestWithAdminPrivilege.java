@@ -9,9 +9,9 @@ import lombok.ToString;
 @ToString
 @Setter
 @Getter
-public class UserDtoWithAdminPrivilege extends UserDtoWithUserPrivilege {
+public class UserUpdateRequestWithAdminPrivilege extends UserUpdateRequestWithUserPrivilege {
 
-    public UserDtoWithAdminPrivilege(
+    public UserUpdateRequestWithAdminPrivilege(
             String firstName,
             String lastName,
             String username,

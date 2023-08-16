@@ -10,7 +10,7 @@ import lombok.ToString;
 @ToString
 @Setter
 @Getter
-public class UserDtoWithUserPrivilege {
+public class UserUpdateRequestWithUserPrivilege {
 
     private final String firstName;
     private final String lastName;

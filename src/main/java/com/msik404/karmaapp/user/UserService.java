@@ -3,8 +3,8 @@ package com.msik404.karmaapp.user;
 import com.msik404.karmaapp.constraintExceptions.exception.DuplicateEmailException;
 import com.msik404.karmaapp.constraintExceptions.exception.DuplicateUsernameException;
 import com.msik404.karmaapp.constraintExceptions.exception.UndefinedConstraintException;
-import com.msik404.karmaapp.user.dto.UserDtoWithAdminPrivilege;
-import com.msik404.karmaapp.user.dto.UserDtoWithUserPrivilege;
+import com.msik404.karmaapp.user.dto.UserUpdateRequestWithAdminPrivilege;
+import com.msik404.karmaapp.user.dto.UserUpdateRequestWithUserPrivilege;
 import com.msik404.karmaapp.user.exception.UserNotFoundException;
 import com.msik404.karmaapp.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -40,9 +40,9 @@ public class UserService {
     }
 
     @Transactional
-    public UserDtoWithUserPrivilege updateWithUserPrivilege(
+    public UserUpdateRequestWithUserPrivilege updateWithUserPrivilege(
             long userId,
-            @NonNull UserDtoWithUserPrivilege request)
+            @NonNull UserUpdateRequestWithUserPrivilege request)
             throws AccessDeniedException, DuplicateEmailException, DuplicateUsernameException, UndefinedConstraintException, UserNotFoundException {
 
         if (!sameAsAuthenticatedUser(userId)) {
@@ -58,9 +58,9 @@ public class UserService {
     }
 
     @Transactional
-    public UserDtoWithAdminPrivilege updateWithAdminPrivilege(
+    public UserUpdateRequestWithAdminPrivilege updateWithAdminPrivilege(
             long userId,
-            @NonNull UserDtoWithAdminPrivilege request)
+            @NonNull UserUpdateRequestWithAdminPrivilege request)
             throws DuplicateEmailException, DuplicateUsernameException, UndefinedConstraintException, UserNotFoundException {
 
         int rowsAffected = userRepository.updateNonNull(userId, request);

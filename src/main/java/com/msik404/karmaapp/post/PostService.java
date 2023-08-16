@@ -10,8 +10,10 @@ import com.msik404.karmaapp.karma.KarmaKey;
 import com.msik404.karmaapp.karma.KarmaScoreAlreadyExistsException;
 import com.msik404.karmaapp.karma.KarmaScoreNotFoundException;
 import com.msik404.karmaapp.karma.KarmaScoreService;
+import com.msik404.karmaapp.post.cache.PostRedisCache;
 import com.msik404.karmaapp.post.dto.PostCreationRequest;
-import com.msik404.karmaapp.post.dto.PostJoinedDto;
+import com.msik404.karmaapp.post.dto.PostJoined;
+import com.msik404.karmaapp.post.dto.PostRatingResponse;
 import com.msik404.karmaapp.post.exception.FileProcessingException;
 import com.msik404.karmaapp.post.exception.ImageNotFoundException;
 import com.msik404.karmaapp.post.exception.InternalServerErrorException;
@@ -34,21 +36,55 @@ public class PostService {
     private final PostRepository repository;
     private final UserRepository userRepository;
     private final KarmaScoreService karmaScoreService;
+    private final PostRedisCache cache;
 
     @Transactional(readOnly = true)
-    public List<PostJoinedDto> findKeysetPaginated(
+    public List<PostJoined> findPaginatedPosts(
             int size,
+            @NonNull List<PostVisibility> visibilities,
             @Nullable Long karmaScore,
-            @Nullable String username,
-            @NonNull List<PostVisibility> visibilities)
+            @Nullable String username)
+            throws InternalServerErrorException {
+
+        List<PostJoined> results;
+
+        if (karmaScore == null && username == null) {
+            results = repository.findTopN(size, visibilities);
+        } else if (karmaScore != null && username != null) {
+            results = repository.findNextNWithUsername(size, visibilities, karmaScore, username);
+        } else if (karmaScore != null) { // username == null
+            results = repository.findNextN(size, visibilities, karmaScore);
+        } else { // username != null and karmaScore == null
+            results = repository.findTopNWithUsername(size, visibilities, username);
+        }
+
+        return results;
+    }
+
+    @Transactional(readOnly = true)
+    public List<PostRatingResponse> findPaginatedPostRatings(
+            int size,
+            @NonNull List<PostVisibility> visibilities,
+            @Nullable Long karmaScore,
+            @Nullable String username)
             throws InternalServerErrorException {
 
         final var authentication = SecurityContextHolder.getContext().getAuthentication();
-        Long userId = null;
-        if (authentication != null) {
-            userId = (Long) authentication.getPrincipal();
+        final var userId = (long) authentication.getPrincipal();
+
+        List<PostRatingResponse> results;
+
+        if (karmaScore == null && username == null) {
+            results = repository.findTopN(size, visibilities, userId);
+        } else if (karmaScore != null && username != null) {
+            results = repository.findNextNWithUsername(size, visibilities, userId, karmaScore, username);
+        } else if (karmaScore != null) { // username == null
+            results = repository.findNextN(size, visibilities, userId, karmaScore);
+        } else { // username != null and karmaScore == null
+            results = repository.findTopNWithUsername(size, visibilities, userId, username);
         }
-        return repository.findKeysetPaginated(size, karmaScore, userId, username, visibilities);
+
+        return results;
     }
 
     @Transactional(readOnly = true)

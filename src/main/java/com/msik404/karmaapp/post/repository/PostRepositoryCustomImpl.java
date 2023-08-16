@@ -1,17 +1,17 @@
 package com.msik404.karmaapp.post.repository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.msik404.karmaapp.post.Post;
 import com.msik404.karmaapp.post.PostVisibility;
-import com.msik404.karmaapp.post.dto.PostJoinedDto;
+import com.msik404.karmaapp.post.dto.PostJoined;
+import com.msik404.karmaapp.post.dto.PostRatingResponse;
 import com.msik404.karmaapp.post.exception.InternalServerErrorException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
-import jakarta.persistence.criteria.*;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Path;
 import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -25,81 +25,122 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         this.cb = entityManager.getCriteriaBuilder();
     }
 
-    /**
-     * @param size                Amount of posts that should be returned from db.
-     * @param karmaScore          If not null, acts as pagination criterion,
-     *                            results contain 'size' amount of posts with karma score lower than karmaScore.
-     *                            If null, results contain top 'size' amount of posts based on karma score.
-     * @param authenticatedUserId If not null, result contains information about which posts has been rated by authenticated user.
-     *                            if null, field for this information is null.
-     * @param username            if not null, results will contain only posts by user with this username.
-     *                            if null, posts by all users are in results.
-     * @param visibilities        if not empty, results will contain posts with visibilities present in visibilities.
-     *                            if empty, posts with all visibilities will be in results.
-     * @return list of paginated posts
-     * @throws InternalServerErrorException is thrown when query could not be performed
-     */
-    public List<PostJoinedDto> findKeysetPaginated(
+    @Override
+    public List<PostJoined> findTopN(
             int size,
-            @Nullable Long karmaScore,
-            @Nullable Long authenticatedUserId,
-            @Nullable String username,
             @NonNull List<PostVisibility> visibilities)
             throws InternalServerErrorException {
 
-        var criteriaQuery = cb.createQuery(PostJoinedDto.class);
-        var postRoot = criteriaQuery.from(Post.class);
-        var userJoin = postRoot.join("user");
-
-        Expression<Boolean> wasRatedByAuthenticatedUserPositively = cb.nullLiteral(Boolean.class);
-        if (authenticatedUserId != null) {
-            var karmaScoreJoin = postRoot.join("karmaScores", JoinType.LEFT);
-            karmaScoreJoin.on(
-                    cb.equal(karmaScoreJoin.get("user").get("id"), authenticatedUserId)
-            );
-            wasRatedByAuthenticatedUserPositively = karmaScoreJoin.get("isPositive");
-        }
-
-        criteriaQuery.select(
-                cb.construct(
-                        PostJoinedDto.class,
-                        postRoot.get("id"),
-                        postRoot.get("user").get("id"),
-                        userJoin.get("username"),
-                        postRoot.get("headline"),
-                        postRoot.get("text"),
-                        postRoot.get("karmaScore"),
-                        postRoot.get("visibility"),
-                        wasRatedByAuthenticatedUserPositively
-                )
-        );
-
-        var predicates = new ArrayList<Predicate>();
-
+        var finder = new FindNPostJoined(entityManager, cb);
         if (!visibilities.isEmpty()) {
-            predicates.add(postRoot.get("visibility").in(visibilities));
+            finder.setVisibilitiesIn(visibilities);
         }
-        if (karmaScore != null) {
-            predicates.add(cb.lessThan(postRoot.get("karmaScore"), karmaScore));
-        }
-        if (username != null) {
-            predicates.add(cb.equal(userJoin.get("username"), username));
-        }
-        criteriaQuery.where(cb.and(predicates.toArray(new Predicate[0])));
+        return finder.execute(size);
+    }
 
-        criteriaQuery.orderBy(
-                cb.desc(postRoot.get("karmaScore")),
-                cb.asc(postRoot.get("id")));
+    @Override
+    public List<PostJoined> findNextN(
+            int size,
+            @NonNull List<PostVisibility> visibilities, long karmaScore
+            ) throws InternalServerErrorException {
 
-        final int offset = 0;
-        try {
-            return entityManager.createQuery(criteriaQuery)
-                    .setFirstResult(offset)
-                    .setMaxResults(size)
-                    .getResultList();
-        } catch (RuntimeException ex) {
-            throw new InternalServerErrorException("Could not get posts from database for some reason.");
+        var finder = new FindNPostJoined(entityManager, cb);
+        if (!visibilities.isEmpty()) {
+            finder.setVisibilitiesIn(visibilities);
         }
+        finder.setKarmaScoreLessThan(karmaScore);
+        return finder.execute(size);
+    }
+
+    @Override
+    public List<PostJoined> findTopNWithUsername(
+            int size,
+            @NonNull List<PostVisibility> visibilities,
+            @NonNull String username)
+            throws InternalServerErrorException {
+
+        var finder = new FindNPostJoined(entityManager, cb);
+        if (!visibilities.isEmpty()) {
+            finder.setVisibilitiesIn(visibilities);
+        }
+        finder.setUsernameEqual(username);
+        return finder.execute(size);
+    }
+
+    @Override
+    public List<PostJoined> findNextNWithUsername(
+            int size,
+            @NonNull List<PostVisibility> visibilities, long karmaScore,
+            @NonNull String username)
+            throws InternalServerErrorException {
+
+        var finder = new FindNPostJoined(entityManager, cb);
+        if (!visibilities.isEmpty()) {
+            finder.setVisibilitiesIn(visibilities);
+        }
+        finder.setKarmaScoreLessThan(karmaScore);
+        finder.setUsernameEqual(username);
+        return finder.execute(size);
+    }
+
+    @Override
+    public List<PostRatingResponse> findTopN(
+            int size,
+            @NonNull List<PostVisibility> visibilities, long userId)
+            throws InternalServerErrorException {
+
+        var finder = new FindNPostRating(entityManager, cb, userId);
+        if (!visibilities.isEmpty()) {
+            finder.setVisibilitiesIn(visibilities);
+        }
+        return finder.execute(size);
+    }
+
+    @Override
+    public List<PostRatingResponse> findNextN(
+            int size,
+            @NonNull List<PostVisibility> visibilities, long userId,
+            long karmaScore)
+            throws InternalServerErrorException {
+
+        var finder = new FindNPostRating(entityManager, cb, userId);
+        if (!visibilities.isEmpty()) {
+            finder.setVisibilitiesIn(visibilities);
+        }
+        finder.setKarmaScoreLessThan(karmaScore);
+        return finder.execute(size);
+    }
+
+    @Override
+    public List<PostRatingResponse> findTopNWithUsername(
+            int size,
+            @NonNull List<PostVisibility> visibilities, long userId,
+            @NonNull String username)
+            throws InternalServerErrorException {
+
+        var finder = new FindNPostRating(entityManager, cb, userId);
+        if (!visibilities.isEmpty()) {
+            finder.setVisibilitiesIn(visibilities);
+        }
+        finder.setUsernameEqual(username);
+        return finder.execute(size);
+    }
+
+    @Override
+    public List<PostRatingResponse> findNextNWithUsername(
+            int size,
+            @NonNull List<PostVisibility> visibilities, long userId,
+            long karmaScore,
+            @NonNull String username)
+            throws InternalServerErrorException {
+
+        var finder = new FindNPostRating(entityManager, cb, userId);
+        if (!visibilities.isEmpty()) {
+            finder.setVisibilitiesIn(visibilities);
+        }
+        finder.setKarmaScoreLessThan(karmaScore);
+        finder.setUsernameEqual(username);
+        return finder.execute(size);
     }
 
     @Override
@@ -122,6 +163,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         return result;
     }
 
+    @Override
     public int addKarmaScoreToPost(long postId, long value) {
 
         var criteriaUpdate = cb.createCriteriaUpdate(Post.class);
