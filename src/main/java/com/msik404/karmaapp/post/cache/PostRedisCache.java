@@ -105,15 +105,13 @@ public class PostRedisCache {
         }
 
         HashOperations<String, String, String> hashOps = redisTemplate.opsForHash();
-        List<String> serializedResults = hashOps.multiGet(POST_PREFIX, postIdKeyList);
-        if (serializedResults.size() != size) {
-            return Optional.empty();
-        }
+        List<String> serializedResults = hashOps.multiGet(POST_HASH_KEY, postIdKeyList);
 
         List<PostJoined> results = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
             PostJoined postJoinedDto = deserialize(serializedResults.get(i));
             postJoinedDto.setKarmaScore(postScoreList.get(i).longValue());
+            results.add(postJoinedDto);
         }
 
         return Optional.of(results);
@@ -122,7 +120,7 @@ public class PostRedisCache {
     public Optional<List<PostJoined>> findTopNCached(int size) {
 
         Set<ZSetOperations.TypedTuple<String>> postIdKeySetWithScores = redisTemplate.opsForZSet()
-                .reverseRangeWithScores(KARMA_SCORE_ZSET_KEY, 0, size - 1);
+                .reverseRangeWithScores(KARMA_SCORE_ZSET_KEY, 0, size-1);
 
         if (postIdKeySetWithScores == null || postIdKeySetWithScores.size() != size) {
             return Optional.empty();
@@ -133,9 +131,11 @@ public class PostRedisCache {
 
     public Optional<List<PostJoined>> findNextNCached(int size, long karmaScore) {
 
+        // offset is one because we have to skip first element with karmaScore, otherwise we will have duplicates
+        // in pagination
         Set<ZSetOperations.TypedTuple<String>> postIdKeySetWithScores = redisTemplate.opsForZSet()
                 .reverseRangeByScoreWithScores(
-                        KARMA_SCORE_ZSET_KEY, Double.NEGATIVE_INFINITY, karmaScore, 0, size - 1);
+                        KARMA_SCORE_ZSET_KEY, Double.NEGATIVE_INFINITY, karmaScore, 1, size);
 
         if (postIdKeySetWithScores == null || postIdKeySetWithScores.size() != size) {
             return Optional.empty();
