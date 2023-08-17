@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Random;
 
 import com.msik404.karmaapp.post.Post;
-import com.msik404.karmaapp.post.repository.PostRepository;
 import com.msik404.karmaapp.post.PostVisibility;
+import com.msik404.karmaapp.post.repository.PostRepository;
 import com.msik404.karmaapp.user.Role;
 import com.msik404.karmaapp.user.User;
 import com.msik404.karmaapp.user.repository.UserRepository;
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UserAndPostInit implements CommandLineRunner {
 
-    private static final int USER_AMOUNT = 7;
+    private static final int USER_AMOUNT = 3_000;
     private static final int MAX_SINGLE_INSERT_SIZE = 100;
     private static final int MAX_KARMA_SCORE = 10_000;
     private static final int MAX_POSTS_PER_USER = 10;

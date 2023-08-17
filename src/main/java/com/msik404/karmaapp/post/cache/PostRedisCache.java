@@ -6,7 +6,10 @@ import java.util.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.msik404.karmaapp.post.dto.PostJoined;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.connection.DefaultStringTuple;
+import org.springframework.data.redis.connection.StringRedisConnection;
 import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.lang.NonNull;
@@ -17,59 +20,76 @@ import org.springframework.stereotype.Service;
 public class PostRedisCache {
 
     private static final String KARMA_SCORE_ZSET_KEY = "karma-score-zset";
-    private static final String POST_HASH_PREFIX = "karma-score-post-hash";
+    private static final String POST_HASH_KEY = "posts-hash";
+    private static final String POST_PREFIX = "post";
 
     private static final Duration TIMEOUT = Duration.ofSeconds(3600);
 
-    private static String getPostsHashKey(long postId) {
-        return String.format("%s:%d", POST_HASH_PREFIX, postId);
+    private static String getPostKey(long postId) {
+        return String.format("%s:%d", POST_PREFIX, postId);
     }
 
-    private static String getPostsHashKey(@NonNull String postId) {
-        return String.format("%s:%s", POST_HASH_PREFIX, postId);
+    private static String getPostKey(@NonNull String postId) {
+        return String.format("%s:%s", POST_PREFIX, postId);
     }
 
     private final ObjectMapper objectMapper;
 
     private final StringRedisTemplate redisTemplate;
 
-    private void clearKarmaScoreZSet() {
-        redisTemplate.delete(KARMA_SCORE_ZSET_KEY);
-    }
+    /**
+     * Method caches posts in redis. It uses ZSet with key: KARMA_SCORE_ZSET_KEY for keeping the order of post
+     * for data retrieval. Posts as stored in Hash with key: POST_HASH_KEY in a form of string key, value pairs,
+     * values are serialized as json strings. Values are first computed to a format compatible with redis pipeline
+     * API, and then pipelined for maximum performance.
+     *
+     * @param posts Collection of posts which should be placed in a cache.
+     */
+    public void reinitializeCache(@NonNull Collection<PostJoined> posts) {
 
-    private void populateKarmaScoreZSet(@NonNull Iterable<PostJoined> posts) {
-
-        ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
+        Set<StringRedisConnection.StringTuple> tuplesToAdd = new HashSet<>(posts.size());
         for (PostJoined post : posts) {
-            zSetOps.add(KARMA_SCORE_ZSET_KEY, post.getId().toString(), post.getKarmaScore());
+            var tuple = new DefaultStringTuple(post.getId().toString(), post.getKarmaScore().doubleValue());
+            tuplesToAdd.add(tuple);
         }
-        redisTemplate.expire(KARMA_SCORE_ZSET_KEY, TIMEOUT);
-    }
 
-    public Boolean zSetIsEmpty() {
-        return redisTemplate.hasKey(KARMA_SCORE_ZSET_KEY);
-    }
-
-    private Set<String> getAllPostHashKeys() {
-        return redisTemplate.keys(POST_HASH_PREFIX + "*");
-    }
-
-    private void clearPostHashes(@NonNull Iterable<String> postHashKeys) {
-
-        for (String postHashKey : postHashKeys) {
-            redisTemplate.delete(postHashKey);
-        }
-    }
-
-    private void populateCacheWithHashes(@NonNull Iterable<PostJoined> posts) {
-
-        HashOperations<String, String, String> hashOps = redisTemplate.opsForHash();
+        Map<String, String> valuesMap = new HashMap<>(posts.size());
         for (PostJoined post : posts) {
-            Long postId = post.getId();
-            String postHashKey = getPostsHashKey(postId);
-            hashOps.put(postHashKey, postId.toString(), serialize(post));
-            redisTemplate.expire(postHashKey, TIMEOUT);
+            valuesMap.put(getPostKey(post.getId()), serialize(post));
         }
+
+        redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
+
+            StringRedisConnection stringRedisConn = (StringRedisConnection) connection;
+
+            stringRedisConn.del(KARMA_SCORE_ZSET_KEY);
+            stringRedisConn.del(POST_HASH_KEY);
+
+            stringRedisConn.zAdd(KARMA_SCORE_ZSET_KEY, tuplesToAdd);
+            stringRedisConn.expire(KARMA_SCORE_ZSET_KEY, TIMEOUT.getSeconds());
+
+            stringRedisConn.hMSet(POST_HASH_KEY, valuesMap);
+            stringRedisConn.expire(POST_HASH_KEY, TIMEOUT.getSeconds());
+
+            return null;
+        });
+    }
+
+    /**
+     * @return true if both zSet with post scores and hash with post contents are present in cache else false
+     */
+    public boolean isEmpty() {
+
+        List<Object> results = redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
+            StringRedisConnection stringRedisConn = (StringRedisConnection) connection;
+
+            stringRedisConn.exists(KARMA_SCORE_ZSET_KEY);
+            stringRedisConn.exists(POST_HASH_KEY);
+
+            return null;
+        });
+
+        return results.size() == 2 && !(Boolean) results.get(0) && !(Boolean) results.get(1);
     }
 
     private Optional<List<PostJoined>> findCachedByZSet(
@@ -80,12 +100,12 @@ public class PostRedisCache {
         List<String> postIdKeyList = new ArrayList<>(size);
         List<Double> postScoreList = new ArrayList<>(size);
         for (ZSetOperations.TypedTuple<String> tuple : postIdKeySetWithScores) {
-            postIdKeyList.add(getPostsHashKey(Objects.requireNonNull(tuple.getValue())));
+            postIdKeyList.add(getPostKey(Objects.requireNonNull(tuple.getValue())));
             postScoreList.add(tuple.getScore());
         }
 
         HashOperations<String, String, String> hashOps = redisTemplate.opsForHash();
-        List<String> serializedResults = hashOps.multiGet(POST_HASH_PREFIX, postIdKeyList);
+        List<String> serializedResults = hashOps.multiGet(POST_PREFIX, postIdKeyList);
         if (serializedResults.size() != size) {
             return Optional.empty();
         }
@@ -114,7 +134,8 @@ public class PostRedisCache {
     public Optional<List<PostJoined>> findNextNCached(int size, long karmaScore) {
 
         Set<ZSetOperations.TypedTuple<String>> postIdKeySetWithScores = redisTemplate.opsForZSet()
-                .rangeByScoreWithScores(KARMA_SCORE_ZSET_KEY, Double.NEGATIVE_INFINITY, karmaScore, 0, size - 1);
+                .reverseRangeByScoreWithScores(
+                        KARMA_SCORE_ZSET_KEY, Double.NEGATIVE_INFINITY, karmaScore, 0, size - 1);
 
         if (postIdKeySetWithScores == null || postIdKeySetWithScores.size() != size) {
             return Optional.empty();
@@ -123,14 +144,15 @@ public class PostRedisCache {
         return findCachedByZSet(postIdKeySetWithScores);
     }
 
-    public boolean zSetContains(long postId) {
-        return redisTemplate.opsForZSet().score(KARMA_SCORE_ZSET_KEY, postId) != null;
-    }
+    public OptionalDouble updateKarmaScoreIfPresent(long postId, Double delta) {
 
-    public OptionalDouble updateKarmaScore(long postId, boolean isPositive) {
+        ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
 
-        Double newScore = redisTemplate.opsForZSet()
-                .incrementScore(KARMA_SCORE_ZSET_KEY, String.valueOf(postId), isPositive ? 1 : -1);
+        if (zSetOps.score(KARMA_SCORE_ZSET_KEY, postId) == null) {
+            return  OptionalDouble.empty();
+        }
+
+        Double newScore = zSetOps.incrementScore(KARMA_SCORE_ZSET_KEY, String.valueOf(postId), delta);
 
         if (newScore == null) {
             return OptionalDouble.empty();
@@ -138,30 +160,18 @@ public class PostRedisCache {
         return OptionalDouble.of(newScore);
     }
 
-    public boolean shouldKarmaScoreBeInZSet(long score) {
+    public boolean deleteFromCache(long postId) {
 
-        Set<String> lowestScore = redisTemplate.opsForZSet().range(KARMA_SCORE_ZSET_KEY, 0, 0);
+        List<Object> results = redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
+            StringRedisConnection stringRedisConn = (StringRedisConnection) connection;
 
-        if (lowestScore == null || lowestScore.isEmpty()) {
-            return true;
-        }
+            stringRedisConn.zRem(KARMA_SCORE_ZSET_KEY, String.valueOf(postId));
+            stringRedisConn.hDel(POST_HASH_KEY, getPostKey(postId));
 
-        var minScore = Double.parseDouble(lowestScore.iterator().next());
-        return minScore < score;
-    }
+            return null;
+        });
 
-    public Optional<Boolean> deleteKeyFromZSet(long postId) {
-
-        Long removedKeysCount = redisTemplate.opsForZSet().remove(KARMA_SCORE_ZSET_KEY, postId);
-
-        if (removedKeysCount == null) {
-            return Optional.empty();
-        }
-        return Optional.of(removedKeysCount == 1L);
-    }
-
-    public boolean deleteHash(long postId) {
-        return Boolean.TRUE.equals(redisTemplate.delete(getPostsHashKey(postId)));
+        return results.size() == 2 && (Long) results.get(0) == 1 && (Long) results.get(1) == 1;
     }
 
     private String serialize(@NonNull PostJoined post) {

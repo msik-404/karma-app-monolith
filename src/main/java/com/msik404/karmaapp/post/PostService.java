@@ -33,10 +33,67 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class PostService {
 
+    private static final int CACHED_POSTS_AMOUNT = 10_000;
+
     private final PostRepository repository;
     private final UserRepository userRepository;
     private final KarmaScoreService karmaScoreService;
     private final PostRedisCache cache;
+
+    private static boolean isOnlyActive (@NonNull List<PostVisibility> visibilities) {
+        return visibilities.size() == 1 && visibilities.contains(PostVisibility.ACTIVE);
+    }
+
+    private List<PostJoined> updateCache() {
+        List<PostJoined> newValuesForCache = repository.findTopN(CACHED_POSTS_AMOUNT, List.of(PostVisibility.ACTIVE));
+        cache.reinitializeCache(newValuesForCache);
+        return newValuesForCache;
+    }
+
+    private List<PostJoined> findTopNHandler(int size, List<PostVisibility> visibilities) {
+
+        List<PostJoined> results;
+
+        if (isOnlyActive(visibilities)) {
+            if (cache.isEmpty()) {
+                List<PostJoined> newValuesForCache = updateCache();
+                results = newValuesForCache.subList(0, size);
+            } else {
+                results = cache.findTopNCached(size).orElseGet(() -> repository.findTopN(size, visibilities));
+            }
+        } else {
+            results = repository.findTopN(size, visibilities);
+        }
+
+        return results;
+    }
+
+    private List<PostJoined> findNextNHandler(int size, List<PostVisibility> visibilities, long karmaScore) {
+
+        List<PostJoined> results;
+
+        if (isOnlyActive(visibilities)) {
+            if (cache.isEmpty()) {
+                List<PostJoined> newValuesForCache = updateCache();
+                int firstSmallerElementIdx = 0;
+                for (int i = 0; i < newValuesForCache.size(); i++) {
+                    if (newValuesForCache.get(i).getKarmaScore() < karmaScore) {
+                        firstSmallerElementIdx = i;
+                        break;
+                    }
+                }
+                results = newValuesForCache.subList(firstSmallerElementIdx, size);
+            } else {
+                results = cache.findNextNCached(size, karmaScore).orElseGet(
+                        () -> repository.findNextN(size, visibilities, karmaScore));
+            }
+
+        } else {
+            results = repository.findNextN(size, visibilities, karmaScore);
+        }
+
+        return results;
+    }
 
     @Transactional(readOnly = true)
     public List<PostJoined> findPaginatedPosts(
@@ -49,11 +106,11 @@ public class PostService {
         List<PostJoined> results;
 
         if (karmaScore == null && username == null) {
-            results = repository.findTopN(size, visibilities);
+            results = findTopNHandler(size, visibilities);
         } else if (karmaScore != null && username != null) {
             results = repository.findNextNWithUsername(size, visibilities, karmaScore, username);
         } else if (karmaScore != null) { // username == null
-            results = repository.findNextN(size, visibilities, karmaScore);
+            results = findNextNHandler(size, visibilities, karmaScore);
         } else { // username != null and karmaScore == null
             results = repository.findTopNWithUsername(size, visibilities, username);
         }
@@ -111,7 +168,7 @@ public class PostService {
                 .user(userRepository.getReferenceById(userId));
 
         try {
-            if (image != null && !image.isEmpty()) {
+            if (!image.isEmpty()) {
                 // Load the image from the multipart file
                 var bufferedImage = ImageIO.read(image.getInputStream());
                 // Create a ByteArrayOutputStream to hold the compressed image data
@@ -144,7 +201,7 @@ public class PostService {
         final var authentication = SecurityContextHolder.getContext().getAuthentication();
         final var userId = (long) authentication.getPrincipal();
 
-        long scoreDiff = isNewRatingPositive ? 1L : -1L;
+        long delta = isNewRatingPositive ? 1L : -1L;
         try {
             var karmaScore = karmaScoreService.findById(new KarmaKey(userId, postId));
             boolean isOldRatingPositive = karmaScore.getIsPositive();
@@ -154,14 +211,17 @@ public class PostService {
                         isNewRatingPositive ? "positively" : "negatively"));
             }
             karmaScore.setIsPositive(isNewRatingPositive);
-            scoreDiff = isOldRatingPositive ? -2L : 2L;
+            delta = isOldRatingPositive ? -2L : 2L;
         } catch (KarmaScoreNotFoundException ex) {
             karmaScoreService.create(userId, postId, isNewRatingPositive);
         }
-        int rowsAffected = repository.addKarmaScoreToPost(postId, scoreDiff);
+
+        int rowsAffected = repository.addKarmaScoreToPost(postId, delta);
         if (rowsAffected == 0) {
             throw new PostNotFoundException();
         }
+
+        cache.updateKarmaScoreIfPresent(postId, (double) delta);
     }
 
     /**
@@ -176,11 +236,17 @@ public class PostService {
 
         var karmaKey = new KarmaKey(userId, postId);
         var karmaScore = karmaScoreService.findById(karmaKey);
-        int rowsAffected = repository.addKarmaScoreToPost(postId, karmaScore.getIsPositive() ? -1L : 1L);
+
+        long delta = karmaScore.getIsPositive() ? -1L : 1L;
+
+        int rowsAffected = repository.addKarmaScoreToPost(postId, delta);
         if (rowsAffected == 0) {
             throw new PostNotFoundException();
         }
+
         karmaScoreService.deleteById(karmaKey);
+
+        cache.updateKarmaScoreIfPresent(postId, (double) delta);
     }
 
     @Transactional
@@ -202,6 +268,9 @@ public class PostService {
                 },
                 PostNotFoundException::new
         );
+        if (!visibility.equals(PostVisibility.ACTIVE)) {
+            cache.deleteFromCache(postId);
+        }
     }
 
     @Transactional
@@ -209,6 +278,9 @@ public class PostService {
         int rowsAffected = repository.changeVisibilityById(postId, visibility);
         if (rowsAffected == 0) {
             throw new PostNotFoundException();
+        }
+        if (!visibility.equals(PostVisibility.ACTIVE)) {
+            cache.deleteFromCache(postId);
         }
     }
 }
