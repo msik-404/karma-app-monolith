@@ -29,6 +29,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+// TODO: Images for top posts should be cached.
+//  Cache should be updated with images when user
+//  request image and it is not present in cache.
 @Service
 @RequiredArgsConstructor
 public class PostService {
