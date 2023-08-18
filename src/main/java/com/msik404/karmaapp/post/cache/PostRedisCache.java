@@ -29,10 +29,6 @@ public class PostRedisCache {
         return String.format("%s:%d", POST_PREFIX, postId);
     }
 
-    private static String getPostKey(@NonNull String postId) {
-        return String.format("%s:%s", POST_PREFIX, postId);
-    }
-
     private final ObjectMapper objectMapper;
 
     private final StringRedisTemplate redisTemplate;
@@ -49,7 +45,7 @@ public class PostRedisCache {
 
         Set<StringRedisConnection.StringTuple> tuplesToAdd = new HashSet<>(posts.size());
         for (PostJoined post : posts) {
-            var tuple = new DefaultStringTuple(post.getId().toString(), post.getKarmaScore().doubleValue());
+            var tuple = new DefaultStringTuple(getPostKey(post.getId()), post.getKarmaScore().doubleValue());
             tuplesToAdd.add(tuple);
         }
 
@@ -100,7 +96,7 @@ public class PostRedisCache {
         List<String> postIdKeyList = new ArrayList<>(size);
         List<Double> postScoreList = new ArrayList<>(size);
         for (ZSetOperations.TypedTuple<String> tuple : postIdKeySetWithScores) {
-            postIdKeyList.add(getPostKey(Objects.requireNonNull(tuple.getValue())));
+            postIdKeyList.add(Objects.requireNonNull(tuple.getValue()));
             postScoreList.add(tuple.getScore());
         }
 
@@ -147,12 +143,13 @@ public class PostRedisCache {
     public OptionalDouble updateKarmaScoreIfPresent(long postId, Double delta) {
 
         ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
+        final String postIdKey = getPostKey(postId);
 
-        if (zSetOps.score(KARMA_SCORE_ZSET_KEY, postId) == null) {
+        if (zSetOps.score(KARMA_SCORE_ZSET_KEY, postIdKey) == null) {
             return  OptionalDouble.empty();
         }
 
-        Double newScore = zSetOps.incrementScore(KARMA_SCORE_ZSET_KEY, String.valueOf(postId), delta);
+        Double newScore = zSetOps.incrementScore(KARMA_SCORE_ZSET_KEY, postIdKey, delta);
 
         if (newScore == null) {
             return OptionalDouble.empty();
@@ -162,11 +159,13 @@ public class PostRedisCache {
 
     public boolean deleteFromCache(long postId) {
 
+        final String postIdKey = getPostKey(postId);
+
         List<Object> results = redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
             StringRedisConnection stringRedisConn = (StringRedisConnection) connection;
 
-            stringRedisConn.zRem(KARMA_SCORE_ZSET_KEY, String.valueOf(postId));
-            stringRedisConn.hDel(POST_HASH_KEY, getPostKey(postId));
+            stringRedisConn.zRem(KARMA_SCORE_ZSET_KEY, postIdKey);
+            stringRedisConn.hDel(POST_HASH_KEY, postIdKey);
 
             return null;
         });
