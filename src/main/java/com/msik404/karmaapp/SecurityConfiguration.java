@@ -49,9 +49,9 @@ public class SecurityConfiguration {
                 .exceptionHandling(handler -> handler.authenticationEntryPoint(entryPoint))
 
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/admin/**").hasAuthority(Role.ADMIN.toString())
-                        .requestMatchers("/mod/**").hasAuthority(Role.MOD.toString())
-                        .requestMatchers("/user/**").hasAuthority(Role.USER.toString())
+                        .requestMatchers("/admin/**").hasAuthority(Role.ADMIN.name())
+                        .requestMatchers("/mod/**").hasAnyAuthority(Role.ADMIN.name(), Role.MOD.name())
+                        .requestMatchers("/user/**").hasAnyAuthority(Role.ADMIN.name(), Role.MOD.name(), Role.USER.name())
                         .requestMatchers("/register", "/login", "/static/**", "guest/**").permitAll()
                         .anyRequest().authenticated())
 
