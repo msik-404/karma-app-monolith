@@ -68,4 +68,11 @@ public interface PostRepositoryCustom {
 
     int changeVisibilityById(long postId, @NonNull PostVisibility visibility);
 
+    List<PostJoined> findTopNWithUserId(int size, @NonNull List<PostVisibility> visibilities, long userId);
+
+    List<PostJoined> findNextNWithUserId(
+            int size,
+            @NonNull List<PostVisibility> visibilities,
+            long userId,
+            long karmaScore);
 }

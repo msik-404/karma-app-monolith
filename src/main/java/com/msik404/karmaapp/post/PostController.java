@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import com.msik404.karmaapp.karma.KarmaScoreAlreadyExistsException;
 import com.msik404.karmaapp.karma.KarmaScoreNotFoundException;
 import com.msik404.karmaapp.post.dto.PostCreationRequest;
+import com.msik404.karmaapp.post.dto.PostRatingResponse;
 import com.msik404.karmaapp.post.dto.PostResponse;
 import com.msik404.karmaapp.post.exception.FileProcessingException;
 import com.msik404.karmaapp.post.exception.ImageNotFoundException;
@@ -42,43 +43,33 @@ public class PostController {
                 .collect(Collectors.toList());
     }
 
-    // TODO: there should be endpoint in which users can see all their hidden posts
-
-    // TODO: there should be endpoint to get information about liked posts
-
-    @GetMapping("mod/posts")
+    @GetMapping("user/posts")
     public List<EntityModel<PostResponse>> findPaginatedPosts(
             @RequestParam(value = "size", defaultValue = "100") int size,
             @RequestParam(value = "active", defaultValue = "false") boolean active,
             @RequestParam(value = "hidden", defaultValue = "false") boolean hidden,
-            @RequestParam(value = "karma_score", required = false) Long karmaScore,
-            @RequestParam(value = "username", required = false) String username)
+            @RequestParam(value = "karma_score", required = false) Long karmaScore)
             throws InternalServerErrorException {
 
-        List<PostVisibility> visibilities = new ArrayList<>();
+        List<PostVisibility> visibilities = createVisibilityList(active, hidden, false);
 
-        if (active) {
-            visibilities.add(PostVisibility.ACTIVE);
-        }
-        if (hidden) {
-            visibilities.add(PostVisibility.HIDDEN);
-        }
-
-        return postService.findPaginatedPosts(size, visibilities, karmaScore, username)
+        return postService.findPaginatedOwnedPosts(size, visibilities, karmaScore)
                 .stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
     }
 
-    @GetMapping("admin/posts")
-    public List<EntityModel<PostResponse>> findPaginatedPosts(
+    @GetMapping("user/posts/ratings")
+    public List<PostRatingResponse> findPersonalPostRatings(
             @RequestParam(value = "size", defaultValue = "100") int size,
-            @RequestParam(value = "active", defaultValue = "false") boolean active,
-            @RequestParam(value = "hidden", defaultValue = "false") boolean hidden,
-            @RequestParam(value = "deleted", defaultValue = "false") boolean deleted,
             @RequestParam(value = "karma_score", required = false) Long karmaScore,
             @RequestParam(value = "username", required = false) String username)
-            throws  InternalServerErrorException {
+        throws InternalServerErrorException {
+
+        return postService.findPaginatedPostRatings(size, List.of(PostVisibility.ACTIVE), karmaScore, username);
+    }
+
+    private List<PostVisibility> createVisibilityList(boolean active, boolean hidden, boolean deleted) {
 
         List<PostVisibility> visibilities = new ArrayList<>();
 
@@ -91,11 +82,71 @@ public class PostController {
         if (deleted) {
             visibilities.add(PostVisibility.DELETED);
         }
+        return visibilities;
+    }
+
+    @GetMapping("mod/posts")
+    public List<EntityModel<PostResponse>> findPaginatedPosts(
+            @RequestParam(value = "size", defaultValue = "100") int size,
+            @RequestParam(value = "active", defaultValue = "false") boolean active,
+            @RequestParam(value = "hidden", defaultValue = "false") boolean hidden,
+            @RequestParam(value = "karma_score", required = false) Long karmaScore,
+            @RequestParam(value = "username", required = false) String username)
+            throws InternalServerErrorException {
+
+        List<PostVisibility> visibilities = createVisibilityList(active, hidden, false);
 
         return postService.findPaginatedPosts(size, visibilities, karmaScore, username)
                 .stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
+    }
+
+    @GetMapping("mod/posts/ratings")
+    public List<PostRatingResponse> findPersonalPostRatings(
+            @RequestParam(value = "size", defaultValue = "100") int size,
+            @RequestParam(value = "active", defaultValue = "false") boolean active,
+            @RequestParam(value = "hidden", defaultValue = "false") boolean hidden,
+            @RequestParam(value = "karma_score", required = false) Long karmaScore,
+            @RequestParam(value = "username", required = false) String username)
+            throws InternalServerErrorException {
+
+        List<PostVisibility> visibilities = createVisibilityList(active, hidden, false);
+
+        return postService.findPaginatedPostRatings(size, visibilities, karmaScore, username);
+    }
+
+    @GetMapping("admin/posts")
+    public List<EntityModel<PostResponse>> findPaginatedPosts(
+            @RequestParam(value = "size", defaultValue = "100") int size,
+            @RequestParam(value = "active", defaultValue = "false") boolean active,
+            @RequestParam(value = "hidden", defaultValue = "false") boolean hidden,
+            @RequestParam(value = "deleted", defaultValue = "false") boolean deleted,
+            @RequestParam(value = "karma_score", required = false) Long karmaScore,
+            @RequestParam(value = "username", required = false) String username)
+            throws  InternalServerErrorException {
+
+        List<PostVisibility> visibilities = createVisibilityList(active, hidden, deleted);
+
+        return postService.findPaginatedPosts(size, visibilities, karmaScore, username)
+                .stream()
+                .map(assembler::toModel)
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping("admin/posts/ratings")
+    public List<PostRatingResponse> findPersonalPostRatings(
+            @RequestParam(value = "size", defaultValue = "100") int size,
+            @RequestParam(value = "active", defaultValue = "false") boolean active,
+            @RequestParam(value = "hidden", defaultValue = "false") boolean hidden,
+            @RequestParam(value = "deleted", defaultValue = "false") boolean deleted,
+            @RequestParam(value = "karma_score", required = false) Long karmaScore,
+            @RequestParam(value = "username", required = false) String username)
+            throws InternalServerErrorException {
+
+        List<PostVisibility> visibilities = createVisibilityList(active, hidden, deleted);
+
+        return postService.findPaginatedPostRatings(size, visibilities, karmaScore, username);
     }
 
     @GetMapping("guest/posts/{postId}/image")
@@ -134,14 +185,14 @@ public class PostController {
     @PostMapping("user/posts/{postId}/hide")
     public ResponseEntity<Void> hideByUser(@PathVariable Long postId) throws AccessDeniedException, PostNotFoundException {
 
-        postService.changeVisibilityByUser(postId, PostVisibility.HIDDEN);
+        postService.changeOwnedPostVisibility(postId, PostVisibility.HIDDEN);
         return ResponseEntity.ok(null);
     }
 
     @PostMapping("user/posts/{postId}/unhide")
     public ResponseEntity<Void> unhideByUser(@PathVariable Long postId) throws AccessDeniedException, PostNotFoundException {
 
-        postService.changeVisibilityByUser(postId, PostVisibility.ACTIVE);
+        postService.changeOwnedPostVisibility(postId, PostVisibility.ACTIVE);
         return ResponseEntity.ok(null);
     }
 
@@ -155,7 +206,7 @@ public class PostController {
     @PostMapping("user/posts/{postId}/delete")
     public ResponseEntity<Void> deleteByUser(@PathVariable Long postId) throws AccessDeniedException, PostNotFoundException {
 
-        postService.changeVisibilityByUser(postId, PostVisibility.DELETED);
+        postService.changeOwnedPostVisibility(postId, PostVisibility.DELETED);
         return ResponseEntity.ok(null);
     }
 

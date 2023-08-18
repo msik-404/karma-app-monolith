@@ -38,6 +38,10 @@ public abstract class FindNPostPaginated<T> extends FindTemplate<T>{
         wherePredicateMap.put("usernamePredicate", cb.equal(userJoin.get("username"), username));
     }
 
+    public void setUserIdEqual(@NonNull long userId) {
+        wherePredicateMap.put("userIdPredicate", cb.equal(postRoot.get("user").get("id"), userId));
+    }
+
     @Override
     void whereMethod(CriteriaBuilder cb, CriteriaQuery<T> criteriaQuery) {
 

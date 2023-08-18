@@ -28,7 +28,7 @@ public class FindNPostRating extends FindNPostPaginated<PostRatingResponse> {
         criteriaQuery.select(
                 cb.construct(
                         PostRatingResponse.class,
-                        postRoot.get("user").get("id"),
+                        postRoot.get("id"),
                         karmaScoreJoin.get("isPositive")
                 )
         );

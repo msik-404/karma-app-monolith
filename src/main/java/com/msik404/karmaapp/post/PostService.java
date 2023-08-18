@@ -119,6 +119,27 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
+    public List<PostJoined> findPaginatedOwnedPosts(
+            int size,
+            @NonNull List<PostVisibility> visibilities,
+            @Nullable Long karmaScore)
+            throws InternalServerErrorException {
+
+        final var authentication = SecurityContextHolder.getContext().getAuthentication();
+        final var userId = (long) authentication.getPrincipal();
+
+        List<PostJoined> results;
+
+        if (karmaScore == null) {
+            results = repository.findTopNWithUserId(size, visibilities, userId);
+        } else {
+            results = repository.findNextNWithUserId(size, visibilities, userId, karmaScore);
+        }
+
+        return results;
+    }
+
+    @Transactional(readOnly = true)
     public List<PostRatingResponse> findPaginatedPostRatings(
             int size,
             @NonNull List<PostVisibility> visibilities,
@@ -250,7 +271,7 @@ public class PostService {
     }
 
     @Transactional
-    public void changeVisibilityByUser(long postId, @NonNull PostVisibility visibility)
+    public void changeOwnedPostVisibility(long postId, @NonNull PostVisibility visibility)
             throws AccessDeniedException, PostNotFoundException {
 
         final var authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -265,12 +286,12 @@ public class PostService {
                     }
                     post.setVisibility(visibility);
                     repository.save(post);
+                    if (!visibility.equals(PostVisibility.ACTIVE)) {
+                        cache.deleteFromCache(postId);
+                    }
                 },
                 PostNotFoundException::new
         );
-        if (!visibility.equals(PostVisibility.ACTIVE)) {
-            cache.deleteFromCache(postId);
-        }
     }
 
     @Transactional

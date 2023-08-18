@@ -41,7 +41,8 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     @Override
     public List<PostJoined> findNextN(
             int size,
-            @NonNull List<PostVisibility> visibilities, long karmaScore
+            @NonNull List<PostVisibility> visibilities,
+            long karmaScore
             ) throws InternalServerErrorException {
 
         var finder = new FindNPostJoined(entityManager, cb);
@@ -70,7 +71,8 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     @Override
     public List<PostJoined> findNextNWithUsername(
             int size,
-            @NonNull List<PostVisibility> visibilities, long karmaScore,
+            @NonNull List<PostVisibility> visibilities,
+            long karmaScore,
             @NonNull String username)
             throws InternalServerErrorException {
 
@@ -99,7 +101,8 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     @Override
     public List<PostRatingResponse> findNextN(
             int size,
-            @NonNull List<PostVisibility> visibilities, long userId,
+            @NonNull List<PostVisibility> visibilities,
+            long userId,
             long karmaScore)
             throws InternalServerErrorException {
 
@@ -114,7 +117,8 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     @Override
     public List<PostRatingResponse> findTopNWithUsername(
             int size,
-            @NonNull List<PostVisibility> visibilities, long userId,
+            @NonNull List<PostVisibility> visibilities,
+            long userId,
             @NonNull String username)
             throws InternalServerErrorException {
 
@@ -129,7 +133,8 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     @Override
     public List<PostRatingResponse> findNextNWithUsername(
             int size,
-            @NonNull List<PostVisibility> visibilities, long userId,
+            @NonNull List<PostVisibility> visibilities,
+            long userId,
             long karmaScore,
             @NonNull String username)
             throws InternalServerErrorException {
@@ -187,6 +192,31 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         criteriaUpdate.where(cb.equal(root.get("id"), postId));
 
         return entityManager.createQuery(criteriaUpdate).executeUpdate();
+    }
+
+    @Override
+    public List<PostJoined> findTopNWithUserId(int size, @NonNull List<PostVisibility> visibilities, long userId) {
+
+        var finder = new FindNPostJoined(entityManager, cb);
+        finder.setVisibilitiesIn(visibilities);
+        finder.setUserIdEqual(userId);
+
+        return finder.execute(size);
+    }
+
+    @Override
+    public List<PostJoined> findNextNWithUserId(
+            int size,
+            @NonNull List<PostVisibility> visibilities,
+            long userId,
+            long karmaScore) {
+
+        var finder = new FindNPostJoined(entityManager, cb);
+        finder.setVisibilitiesIn(visibilities);
+        finder.setUserIdEqual(userId);
+        finder.setKarmaScoreLessThan(karmaScore);
+
+        return finder.execute(size);
     }
 
 }
