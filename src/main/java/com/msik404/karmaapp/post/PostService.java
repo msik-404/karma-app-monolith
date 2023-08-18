@@ -40,7 +40,7 @@ public class PostService {
     private final KarmaScoreService karmaScoreService;
     private final PostRedisCache cache;
 
-    private static boolean isOnlyActive (@NonNull List<PostVisibility> visibilities) {
+    private static boolean isOnlyActive(@NonNull List<PostVisibility> visibilities) {
         return visibilities.size() == 1 && visibilities.contains(PostVisibility.ACTIVE);
     }
 
