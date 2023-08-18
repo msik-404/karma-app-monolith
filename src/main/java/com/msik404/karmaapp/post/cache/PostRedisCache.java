@@ -8,10 +8,7 @@ import com.msik404.karmaapp.post.dto.PostJoined;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.connection.DefaultStringTuple;
 import org.springframework.data.redis.connection.StringRedisConnection;
-import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.data.redis.core.*;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -29,9 +26,15 @@ public class PostRedisCache {
         return String.format("%s:%d", POST_PREFIX, postId);
     }
 
+    private static String getPostImageKey(long postId) {
+        return getPostKey(postId) + ":image";
+    }
+
     private final ObjectMapper objectMapper;
 
     private final StringRedisTemplate redisTemplate;
+
+    private final RedisTemplate<String, byte[]> byteRedisTemplate;
 
     /**
      * Method caches posts in redis. It uses ZSet with key: KARMA_SCORE_ZSET_KEY for keeping the order of post
@@ -86,6 +89,14 @@ public class PostRedisCache {
         });
 
         return results.size() == 2 && !(Boolean) results.get(0) && !(Boolean) results.get(1);
+    }
+
+    public void cacheImage(long postId, byte[] imageData) {
+        byteRedisTemplate.opsForValue().setIfAbsent(getPostImageKey(postId), imageData, TIMEOUT);
+    }
+
+    public Optional<byte[]> getCachedImage(long postId) {
+        return Optional.ofNullable(byteRedisTemplate.opsForValue().getAndExpire(getPostImageKey(postId), TIMEOUT));
     }
 
     private Optional<List<PostJoined>> findCachedByZSet(
@@ -166,6 +177,7 @@ public class PostRedisCache {
 
             stringRedisConn.zRem(KARMA_SCORE_ZSET_KEY, postIdKey);
             stringRedisConn.hDel(POST_HASH_KEY, postIdKey);
+            stringRedisConn.del(getPostImageKey(postId));
 
             return null;
         });

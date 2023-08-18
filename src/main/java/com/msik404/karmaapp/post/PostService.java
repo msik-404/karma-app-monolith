@@ -29,9 +29,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-// TODO: Images for top posts should be cached.
-//  Cache should be updated with images when user
-//  request image and it is not present in cache.
 @Service
 @RequiredArgsConstructor
 public class PostService {
@@ -171,11 +168,14 @@ public class PostService {
     @Transactional(readOnly = true)
     public byte[] findImageByPostId(long postId) throws ImageNotFoundException {
 
-        byte[] imageData = repository.findImageById(postId);
-        if (imageData.length == 0) {
-            throw new ImageNotFoundException();
-        }
-        return imageData;
+        return cache.getCachedImage(postId).orElseGet(() -> {
+            byte[] imageData = repository.findImageById(postId);
+            if (imageData.length == 0) {
+                throw new ImageNotFoundException();
+            }
+            cache.cacheImage(postId, imageData);
+            return imageData;
+        });
     }
 
     @Transactional
@@ -206,7 +206,8 @@ public class PostService {
             throw new FileProcessingException();
         }
 
-        repository.save(newPost.build());
+        Post persistedPost = repository.save(newPost.build());
+        cache.cacheImage(persistedPost.getId(), persistedPost.getImageData());
     }
 
     /**
