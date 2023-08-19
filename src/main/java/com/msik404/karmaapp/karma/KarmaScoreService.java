@@ -1,5 +1,6 @@
 package com.msik404.karmaapp.karma;
 
+import com.msik404.karmaapp.karma.exception.KarmaScoreNotFoundException;
 import com.msik404.karmaapp.post.Post;
 import com.msik404.karmaapp.user.User;
 import jakarta.persistence.EntityManager;

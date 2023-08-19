@@ -1,7 +1,7 @@
 package com.msik404.karmaapp.post;
 
-import com.msik404.karmaapp.karma.KarmaScoreAlreadyExistsException;
-import com.msik404.karmaapp.karma.KarmaScoreNotFoundException;
+import com.msik404.karmaapp.karma.exception.KarmaScoreAlreadyExistsException;
+import com.msik404.karmaapp.karma.exception.KarmaScoreNotFoundException;
 import com.msik404.karmaapp.post.exception.FileProcessingException;
 import com.msik404.karmaapp.post.exception.ImageNotFoundException;
 import com.msik404.karmaapp.post.exception.InternalServerErrorException;

@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.msik404.karmaapp.karma.KarmaScoreAlreadyExistsException;
-import com.msik404.karmaapp.karma.KarmaScoreNotFoundException;
+import com.msik404.karmaapp.karma.exception.KarmaScoreAlreadyExistsException;
+import com.msik404.karmaapp.karma.exception.KarmaScoreNotFoundException;
 import com.msik404.karmaapp.post.dto.PostCreationRequest;
 import com.msik404.karmaapp.post.dto.PostRatingResponse;
 import com.msik404.karmaapp.post.dto.PostResponse;

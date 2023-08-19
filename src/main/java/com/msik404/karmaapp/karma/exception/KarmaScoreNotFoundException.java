@@ -1,4 +1,4 @@
-package com.msik404.karmaapp.karma;
+package com.msik404.karmaapp.karma.exception;
 
 public class KarmaScoreNotFoundException extends RuntimeException {
 
