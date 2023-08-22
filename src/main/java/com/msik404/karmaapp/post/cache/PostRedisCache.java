@@ -12,6 +12,7 @@ import org.springframework.data.redis.core.*;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
+// TODO: Write tests using embedded redis server
 @Service
 @RequiredArgsConstructor
 public class PostRedisCache {
