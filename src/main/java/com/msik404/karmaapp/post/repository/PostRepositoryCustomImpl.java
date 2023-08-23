@@ -149,6 +149,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         return finder.execute(size);
     }
 
+    // TODO: this method could be done using simple JPA repository
     @Override
     public byte[] findImageById(long postId) throws InternalServerErrorException {
         var criteriaBuilder = entityManager.getCriteriaBuilder();
