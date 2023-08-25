@@ -19,6 +19,7 @@ public class StaffUserInit implements CommandLineRunner {
     private final UserRepository repository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    // TODO: change name from builder to getStaffForInserting
     User staffBuilder(@NonNull String username, @NonNull Role role) {
         return User.builder()
                 .username(username)

@@ -31,6 +31,7 @@ public class UserAndPostInit implements CommandLineRunner {
     private final PostRepository postRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    // TODO: change name from builder to getUsersForInserting
     User userBuilder(@NonNull String username) {
         return User.builder()
                 .username(username)
