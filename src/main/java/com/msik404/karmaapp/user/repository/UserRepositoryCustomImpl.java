@@ -1,6 +1,6 @@
 package com.msik404.karmaapp.user.repository;
 
-import com.msik404.karmaapp.constraintExceptions.*;
+import com.msik404.karmaapp.constraintExceptions.ConstraintExceptionsHandler;
 import com.msik404.karmaapp.constraintExceptions.exception.DuplicateEmailException;
 import com.msik404.karmaapp.constraintExceptions.exception.DuplicateUsernameException;
 import com.msik404.karmaapp.constraintExceptions.exception.UndefinedConstraintException;
