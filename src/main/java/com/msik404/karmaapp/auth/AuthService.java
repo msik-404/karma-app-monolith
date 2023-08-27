@@ -6,7 +6,7 @@ import com.msik404.karmaapp.auth.dto.LoginRequest;
 import com.msik404.karmaapp.auth.dto.LoginResponse;
 import com.msik404.karmaapp.auth.dto.RegisterRequest;
 import com.msik404.karmaapp.auth.jwt.JwtService;
-import com.msik404.karmaapp.constraintExceptions.*;
+import com.msik404.karmaapp.constraintExceptions.ConstraintExceptionsHandler;
 import com.msik404.karmaapp.constraintExceptions.exception.DuplicateEmailException;
 import com.msik404.karmaapp.constraintExceptions.exception.DuplicateUsernameException;
 import com.msik404.karmaapp.constraintExceptions.exception.UndefinedConstraintException;
@@ -14,8 +14,8 @@ import com.msik404.karmaapp.constraintExceptions.strategy.DataIntegrityViolation
 import com.msik404.karmaapp.constraintExceptions.strategy.RoundBraceErrorMassageParseStrategy;
 import com.msik404.karmaapp.user.Role;
 import com.msik404.karmaapp.user.User;
-import com.msik404.karmaapp.user.repository.UserRepository;
 import com.msik404.karmaapp.user.UserService;
+import com.msik404.karmaapp.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.lang.NonNull;
@@ -63,9 +63,10 @@ public class AuthService {
 
     public LoginResponse login(@NonNull LoginRequest request) throws AuthenticationException {
 
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+        var authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 
-        var user = userService.findByUsername(request.getUsername());
+        var user = (User) authentication.getPrincipal();
 
         return new LoginResponse(jwtService.generateJwt(user, Optional.empty()));
     }
