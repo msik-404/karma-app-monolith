@@ -31,8 +31,7 @@ public class UserAndPostInit implements CommandLineRunner {
     private final PostRepository postRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    // TODO: change name from builder to getUsersForInserting
-    User userBuilder(@NonNull String username) {
+    User getUserForInserting(@NonNull String username) {
         return User.builder()
                 .username(username)
                 .email(String.format("karma-app.%s@gmail.com", username))
@@ -59,7 +58,7 @@ public class UserAndPostInit implements CommandLineRunner {
             final int currLow = insertionIdx * MAX_SINGLE_INSERT_SIZE;
             final int currHigh = Math.min((insertionIdx+1) * MAX_SINGLE_INSERT_SIZE, USER_AMOUNT);
             for (int userId = currLow; userId < currHigh; userId++) {
-                var user = userBuilder(String.format("username_%d", userId));
+                var user = getUserForInserting(String.format("username_%d", userId));
 
                 var maxPosts = random.nextInt(MAX_POSTS_PER_USER - MIN_POSTS_PER_USER) + MIN_POSTS_PER_USER;
 

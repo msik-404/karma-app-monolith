@@ -19,8 +19,7 @@ public class StaffUserInit implements CommandLineRunner {
     private final UserRepository repository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    // TODO: change name from builder to getStaffForInserting
-    User staffBuilder(@NonNull String username, @NonNull Role role) {
+    User getUserForInserting(@NonNull String username, @NonNull Role role) {
         return User.builder()
                 .username(username)
                 .email(String.format("karma-app.%s@gmail.com", username))
@@ -39,10 +38,10 @@ public class StaffUserInit implements CommandLineRunner {
     public void run(String... args) throws Exception {
 
         if (repository.findByUsername(ADMIN_USERNAME).isEmpty()) {
-            repository.save(staffBuilder(ADMIN_USERNAME, Role.ADMIN));
+            repository.save(getUserForInserting(ADMIN_USERNAME, Role.ADMIN));
         }
         if (repository.findByUsername(MOD_USERNAME).isEmpty()) {
-            repository.save(staffBuilder(MOD_USERNAME, Role.MOD));
+            repository.save(getUserForInserting(MOD_USERNAME, Role.MOD));
         }
     }
 }
