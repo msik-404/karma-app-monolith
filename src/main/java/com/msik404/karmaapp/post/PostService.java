@@ -3,13 +3,14 @@ package com.msik404.karmaapp.post;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import javax.imageio.ImageIO;
 
 import com.msik404.karmaapp.karma.KarmaKey;
+import com.msik404.karmaapp.karma.KarmaScoreService;
 import com.msik404.karmaapp.karma.exception.KarmaScoreAlreadyExistsException;
 import com.msik404.karmaapp.karma.exception.KarmaScoreNotFoundException;
-import com.msik404.karmaapp.karma.KarmaScoreService;
 import com.msik404.karmaapp.post.cache.PostRedisCache;
 import com.msik404.karmaapp.post.dto.PostCreationRequest;
 import com.msik404.karmaapp.post.dto.PostJoined;
@@ -169,7 +170,13 @@ public class PostService {
     public byte[] findImageByPostId(long postId) throws ImageNotFoundException {
 
         return cache.getCachedImage(postId).orElseGet(() -> {
-            byte[] imageData = repository.findImageById(postId);
+
+            Optional<PostImageDataProjection> optionalPostImageDataProjection = repository.findImageById(postId);
+
+            PostImageDataProjection postImageDataProjection = optionalPostImageDataProjection
+                    .orElseThrow(ImageNotFoundException::new);
+
+            byte[] imageData = postImageDataProjection.getImageData();
             if (imageData.length == 0) {
                 throw new ImageNotFoundException();
             }

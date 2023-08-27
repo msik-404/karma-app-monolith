@@ -8,7 +8,6 @@ import com.msik404.karmaapp.post.dto.PostJoined;
 import com.msik404.karmaapp.post.dto.PostRatingResponse;
 import com.msik404.karmaapp.post.exception.InternalServerErrorException;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.NoResultException;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Path;
 import org.springframework.lang.NonNull;
@@ -147,27 +146,6 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         finder.setKarmaScoreLessThan(karmaScore);
         finder.setUsernameEqual(username);
         return finder.execute(size);
-    }
-
-    // TODO: this method could be done using simple JPA repository
-    @Override
-    public byte[] findImageById(long postId) throws InternalServerErrorException {
-        var criteriaBuilder = entityManager.getCriteriaBuilder();
-        var query = criteriaBuilder.createQuery(byte[].class);
-        var root = query.from(Post.class);
-
-        query.select(root.get("imageData"))
-                .where(criteriaBuilder.equal(root.get("id"), postId));
-
-        byte[] result;
-        try {
-            result = entityManager.createQuery(query).getSingleResult();
-        } catch (NoResultException ex) {
-            result = new byte[0];
-        } catch (RuntimeException ex) {
-            throw new InternalServerErrorException("Could not get requested image from database for some reason.");
-        }
-        return result;
     }
 
     @Override

@@ -62,8 +62,6 @@ public interface PostRepositoryCustom {
             @NonNull String username
     ) throws InternalServerErrorException;
 
-    byte[] findImageById(long postId) throws InternalServerErrorException;
-
     int addKarmaScoreToPost(long postId, long value);
 
     int changeVisibilityById(long postId, @NonNull PostVisibility visibility);
