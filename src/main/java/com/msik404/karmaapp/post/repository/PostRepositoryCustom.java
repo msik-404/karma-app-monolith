@@ -10,51 +10,51 @@ import org.springframework.lang.NonNull;
 
 public interface PostRepositoryCustom {
 
-    List<PostDto> findTopN(
+    List<PostDto> findTopNPosts(
             int size,
             @NonNull List<PostVisibility> visibilities
             ) throws InternalServerErrorException;
 
-    List<PostDto> findNextN(
+    List<PostDto> findNextNPosts(
             int size,
             @NonNull List<PostVisibility> visibilities,
             long karmaScore
             ) throws InternalServerErrorException;
 
-    List<PostDto> findTopNWithUsername(
+    List<PostDto> findTopNPostsWithUsername(
             int size,
             @NonNull List<PostVisibility> visibilities,
             @NonNull String username
     ) throws InternalServerErrorException;
 
-    List<PostDto> findNextNWithUsername(
+    List<PostDto> findNextNPostsWithUsername(
             int size,
             @NonNull List<PostVisibility> visibilities,
             long karmaScore,
             @NonNull String username
     ) throws InternalServerErrorException;
 
-    List<PostRatingResponse> findTopN(
+    List<PostRatingResponse> findTopNRatings(
             int size,
             @NonNull List<PostVisibility> visibilities,
             long userId
     ) throws InternalServerErrorException;
 
-    List<PostRatingResponse> findNextN(
+    List<PostRatingResponse> findNextNRatings(
             int size,
             @NonNull List<PostVisibility> visibilities,
             long userId,
             long karmaScore
     ) throws InternalServerErrorException;
 
-    List<PostRatingResponse> findTopNWithUsername(
+    List<PostRatingResponse> findTopNRatingsWithUsername(
             int size,
             @NonNull List<PostVisibility> visibilities,
             long userId,
             @NonNull String username
     ) throws InternalServerErrorException;
 
-    List<PostRatingResponse> findNextNWithUsername(
+    List<PostRatingResponse> findNextNRatingsWithUsername(
             int size,
             @NonNull List<PostVisibility> visibilities,
             long userId,

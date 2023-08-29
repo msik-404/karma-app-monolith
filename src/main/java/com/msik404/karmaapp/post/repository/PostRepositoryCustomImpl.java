@@ -26,7 +26,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<PostDto> findTopN(
+    public List<PostDto> findTopNPosts(
             int size,
             @NonNull List<PostVisibility> visibilities)
             throws InternalServerErrorException {
@@ -39,7 +39,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<PostDto> findNextN(
+    public List<PostDto> findNextNPosts(
             int size,
             @NonNull List<PostVisibility> visibilities,
             long karmaScore
@@ -54,7 +54,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<PostDto> findTopNWithUsername(
+    public List<PostDto> findTopNPostsWithUsername(
             int size,
             @NonNull List<PostVisibility> visibilities,
             @NonNull String username)
@@ -69,7 +69,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<PostDto> findNextNWithUsername(
+    public List<PostDto> findNextNPostsWithUsername(
             int size,
             @NonNull List<PostVisibility> visibilities,
             long karmaScore,
@@ -86,7 +86,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<PostRatingResponse> findTopN(
+    public List<PostRatingResponse> findTopNRatings(
             int size,
             @NonNull List<PostVisibility> visibilities, long userId)
             throws InternalServerErrorException {
@@ -99,7 +99,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<PostRatingResponse> findNextN(
+    public List<PostRatingResponse> findNextNRatings(
             int size,
             @NonNull List<PostVisibility> visibilities,
             long userId,
@@ -115,7 +115,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<PostRatingResponse> findTopNWithUsername(
+    public List<PostRatingResponse> findTopNRatingsWithUsername(
             int size,
             @NonNull List<PostVisibility> visibilities,
             long userId,
@@ -131,7 +131,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<PostRatingResponse> findNextNWithUsername(
+    public List<PostRatingResponse> findNextNRatingsWithUsername(
             int size,
             @NonNull List<PostVisibility> visibilities,
             long userId,

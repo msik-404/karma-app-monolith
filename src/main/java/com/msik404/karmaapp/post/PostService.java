@@ -46,7 +46,7 @@ public class PostService {
     }
 
     private List<PostDto> updateCache() {
-        List<PostDto> newValuesForCache = repository.findTopN(CACHED_POSTS_AMOUNT, List.of(PostVisibility.ACTIVE));
+        List<PostDto> newValuesForCache = repository.findTopNPosts(CACHED_POSTS_AMOUNT, List.of(PostVisibility.ACTIVE));
         cache.reinitializeCache(newValuesForCache);
         return newValuesForCache;
     }
@@ -60,10 +60,10 @@ public class PostService {
                 List<PostDto> newValuesForCache = updateCache();
                 results = newValuesForCache.subList(0, size);
             } else {
-                results = cache.findTopNCached(size).orElseGet(() -> repository.findTopN(size, visibilities));
+                results = cache.findTopNCached(size).orElseGet(() -> repository.findTopNPosts(size, visibilities));
             }
         } else {
-            results = repository.findTopN(size, visibilities);
+            results = repository.findTopNPosts(size, visibilities);
         }
 
         return results;
@@ -86,11 +86,11 @@ public class PostService {
                 results = newValuesForCache.subList(firstSmallerElementIdx, size);
             } else {
                 results = cache.findNextNCached(size, karmaScore).orElseGet(
-                        () -> repository.findNextN(size, visibilities, karmaScore));
+                        () -> repository.findNextNPosts(size, visibilities, karmaScore));
             }
 
         } else {
-            results = repository.findNextN(size, visibilities, karmaScore);
+            results = repository.findNextNPosts(size, visibilities, karmaScore);
         }
 
         return results;
@@ -109,11 +109,11 @@ public class PostService {
         if (karmaScore == null && username == null) {
             results = findTopNHandler(size, visibilities);
         } else if (karmaScore != null && username != null) {
-            results = repository.findNextNWithUsername(size, visibilities, karmaScore, username);
+            results = repository.findNextNPostsWithUsername(size, visibilities, karmaScore, username);
         } else if (karmaScore != null) { // username == null
             results = findNextNHandler(size, visibilities, karmaScore);
         } else { // username != null and karmaScore == null
-            results = repository.findTopNWithUsername(size, visibilities, username);
+            results = repository.findTopNPostsWithUsername(size, visibilities, username);
         }
 
         return results;
@@ -154,13 +154,13 @@ public class PostService {
         List<PostRatingResponse> results;
 
         if (karmaScore == null && username == null) {
-            results = repository.findTopN(size, visibilities, userId);
+            results = repository.findTopNRatings(size, visibilities, userId);
         } else if (karmaScore != null && username != null) {
-            results = repository.findNextNWithUsername(size, visibilities, userId, karmaScore, username);
+            results = repository.findNextNRatingsWithUsername(size, visibilities, userId, karmaScore, username);
         } else if (karmaScore != null) { // username == null
-            results = repository.findNextN(size, visibilities, userId, karmaScore);
+            results = repository.findNextNRatings(size, visibilities, userId, karmaScore);
         } else { // username != null and karmaScore == null
-            results = repository.findTopNWithUsername(size, visibilities, userId, username);
+            results = repository.findTopNRatingsWithUsername(size, visibilities, userId, username);
         }
 
         return results;

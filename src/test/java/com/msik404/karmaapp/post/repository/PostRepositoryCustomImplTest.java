@@ -67,7 +67,7 @@ class PostRepositoryCustomImplTest {
 
         final int size = 10;
         final List<PostVisibility> visibilities = List.of(PostVisibility.ACTIVE);
-        final List<PostDto> results = postRepository.findTopN(size, visibilities);
+        final List<PostDto> results = postRepository.findTopNPosts(size, visibilities);
 
         assertEquals(8, results.size());
 
@@ -86,7 +86,7 @@ class PostRepositoryCustomImplTest {
 
         final int size = 5;
         final List<PostVisibility> visibilities = List.of(PostVisibility.ACTIVE);
-        final List<PostDto> results = postRepository.findTopN(size, visibilities);
+        final List<PostDto> results = postRepository.findTopNPosts(size, visibilities);
 
         assertEquals(5, results.size());
 
@@ -105,7 +105,7 @@ class PostRepositoryCustomImplTest {
 
         final int size = 1;
         final List<PostVisibility> visibilities = List.of(PostVisibility.ACTIVE);
-        final List<PostDto> results = postRepository.findTopN(size, visibilities);
+        final List<PostDto> results = postRepository.findTopNPosts(size, visibilities);
 
         assertEquals(1, results.size());
 
@@ -120,7 +120,7 @@ class PostRepositoryCustomImplTest {
 
         final int size = 0;
         final List<PostVisibility> visibilities = List.of(PostVisibility.ACTIVE);
-        final List<PostDto> results = postRepository.findTopN(size, visibilities);
+        final List<PostDto> results = postRepository.findTopNPosts(size, visibilities);
 
         assertEquals(0, results.size());
     }
@@ -134,7 +134,7 @@ class PostRepositoryCustomImplTest {
 
         final int topSize = 2;
         final List<PostVisibility> visibilities = List.of(PostVisibility.ACTIVE);
-        final List<PostDto> topResults = postRepository.findTopN(topSize, visibilities);
+        final List<PostDto> topResults = postRepository.findTopNPosts(topSize, visibilities);
 
         assertEquals(2, topResults.size());
 
@@ -147,7 +147,7 @@ class PostRepositoryCustomImplTest {
 
         final int nextSize = 2;
 
-        final List<PostDto> nextResults = postRepository.findNextN(nextSize, visibilities, lastPostScore);
+        final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, lastPostScore);
 
         assertEquals(2, nextResults.size());
 
@@ -169,7 +169,7 @@ class PostRepositoryCustomImplTest {
 
         final int topSize = 2;
         final List<PostVisibility> visibilities = List.of(PostVisibility.ACTIVE);
-        final List<PostDto> topResults = postRepository.findTopN(topSize, visibilities);
+        final List<PostDto> topResults = postRepository.findTopNPosts(topSize, visibilities);
 
         assertEquals(2, topResults.size());
 
@@ -182,7 +182,7 @@ class PostRepositoryCustomImplTest {
 
         final int nextSize = 0;
 
-        final List<PostDto> nextResults = postRepository.findNextN(nextSize, visibilities, lastPostScore);
+        final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, lastPostScore);
 
         assertEquals(0, nextResults.size());
     }
@@ -196,7 +196,7 @@ class PostRepositoryCustomImplTest {
 
         final int topSize = 5;
         final List<PostVisibility> visibilities = List.of(PostVisibility.ACTIVE);
-        final List<PostDto> topResults = postRepository.findTopN(topSize, visibilities);
+        final List<PostDto> topResults = postRepository.findTopNPosts(topSize, visibilities);
 
         assertEquals(5, topResults.size());
 
@@ -209,7 +209,7 @@ class PostRepositoryCustomImplTest {
 
         final int nextSize = 3;
 
-        final List<PostDto> nextResults = postRepository.findNextN(nextSize, visibilities, lastPostScore);
+        final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, lastPostScore);
 
         assertEquals(3, nextResults.size());
 
@@ -231,7 +231,7 @@ class PostRepositoryCustomImplTest {
 
         final int topSize = 6;
         final List<PostVisibility> visibilities = List.of(PostVisibility.ACTIVE);
-        final List<PostDto> topResults = postRepository.findTopN(topSize, visibilities);
+        final List<PostDto> topResults = postRepository.findTopNPosts(topSize, visibilities);
 
         assertEquals(6, topResults.size());
 
@@ -244,7 +244,7 @@ class PostRepositoryCustomImplTest {
 
         final int nextSize = 3;
 
-        final List<PostDto> nextResults = postRepository.findNextN(nextSize, visibilities, lastPostScore);
+        final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, lastPostScore);
 
         assertEquals(2, nextResults.size());
 
@@ -266,7 +266,7 @@ class PostRepositoryCustomImplTest {
 
         final int topSize = 7;
         final List<PostVisibility> visibilities = List.of(PostVisibility.ACTIVE);
-        final List<PostDto> topResults = postRepository.findTopN(topSize, visibilities);
+        final List<PostDto> topResults = postRepository.findTopNPosts(topSize, visibilities);
 
         assertEquals(7, topResults.size());
 
@@ -279,7 +279,7 @@ class PostRepositoryCustomImplTest {
 
         final int nextSize = 3;
 
-        final List<PostDto> nextResults = postRepository.findNextN(nextSize, visibilities, lastPostScore);
+        final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, lastPostScore);
 
         assertEquals(1, nextResults.size());
 
@@ -301,7 +301,7 @@ class PostRepositoryCustomImplTest {
 
         final int size = 10;
         final List<PostVisibility> visibilities = List.of(PostVisibility.ACTIVE);
-        final List<PostDto> topResults = postRepository.findTopN(size, visibilities);
+        final List<PostDto> topResults = postRepository.findTopNPosts(size, visibilities);
 
         assertEquals(8, topResults.size());
 
@@ -311,7 +311,7 @@ class PostRepositoryCustomImplTest {
         }
 
         final long lastPostScore = topResults.get(topResults.size()-1).getKarmaScore();
-        final List<PostDto> nextResults = postRepository.findNextN(size, visibilities, lastPostScore);
+        final List<PostDto> nextResults = postRepository.findNextNPosts(size, visibilities, lastPostScore);
 
         assertEquals(0, nextResults.size());
     }
@@ -326,7 +326,7 @@ class PostRepositoryCustomImplTest {
         final int size = 3;
         final List<PostVisibility> visibilities = List.of(PostVisibility.ACTIVE);
 
-        final List<PostDto> results = postRepository.findTopNWithUsername(
+        final List<PostDto> results = postRepository.findTopNPostsWithUsername(
                 size, visibilities, dataCreator.getTestingUsername(1));
 
         assertEquals(3, results.size());
@@ -347,7 +347,7 @@ class PostRepositoryCustomImplTest {
         final int size = 5;
         final List<PostVisibility> visibilities = List.of(PostVisibility.ACTIVE);
 
-        final List<PostDto> results = postRepository.findTopNWithUsername(
+        final List<PostDto> results = postRepository.findTopNPostsWithUsername(
                 size, visibilities, dataCreator.getTestingUsername(1));
 
         assertEquals(3, results.size());
@@ -368,7 +368,7 @@ class PostRepositoryCustomImplTest {
         final int size = 2;
         final List<PostVisibility> visibilities = List.of(PostVisibility.ACTIVE);
 
-        final List<PostDto> results = postRepository.findTopNWithUsername(
+        final List<PostDto> results = postRepository.findTopNPostsWithUsername(
                 size, visibilities, dataCreator.getTestingUsername(1));
 
         assertEquals(2, results.size());
@@ -385,7 +385,7 @@ class PostRepositoryCustomImplTest {
         final int size = 0;
         final List<PostVisibility> visibilities = List.of(PostVisibility.ACTIVE);
 
-        final List<PostDto> results = postRepository.findTopNWithUsername(
+        final List<PostDto> results = postRepository.findTopNPostsWithUsername(
                 size, visibilities, dataCreator.getTestingUsername(1));
 
         assertEquals(0, results.size());
@@ -397,7 +397,7 @@ class PostRepositoryCustomImplTest {
         final int size = 2;
         final List<PostVisibility> visibilities = List.of(PostVisibility.ACTIVE);
 
-        final List<PostDto> results = postRepository.findTopNWithUsername(
+        final List<PostDto> results = postRepository.findTopNPostsWithUsername(
                 size, visibilities, dataCreator.getTestingUsername(404));
 
         assertEquals(0, results.size());
@@ -414,7 +414,7 @@ class PostRepositoryCustomImplTest {
         final List<PostVisibility> visibilities = List.of(PostVisibility.ACTIVE);
         final String username = dataCreator.getTestingUsername(1);
 
-        final List<PostDto> topResults = postRepository.findTopNWithUsername(
+        final List<PostDto> topResults = postRepository.findTopNPostsWithUsername(
                 topSize, visibilities, username);
 
         assertEquals(1, topResults.size());
@@ -425,7 +425,7 @@ class PostRepositoryCustomImplTest {
         final int nextSize = 2;
 
         final long lastPostScore = topResults.get(0).getKarmaScore();
-        final List<PostDto> nextResults = postRepository.findNextNWithUsername(
+        final List<PostDto> nextResults = postRepository.findNextNPostsWithUsername(
                 nextSize, visibilities, lastPostScore, username);
 
         final int endBound = Math.min(topSize + nextSize, allTopPersistedPostsOfUserOne.size());
