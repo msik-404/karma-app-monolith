@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import com.msik404.karmaapp.post.Post;
-import com.msik404.karmaapp.post.PostVisibility;
+import com.msik404.karmaapp.post.Visibility;
 import com.msik404.karmaapp.post.repository.PostRepository;
 import com.msik404.karmaapp.user.Role;
 import com.msik404.karmaapp.user.User;
@@ -25,7 +25,7 @@ public class UserAndPostInit implements CommandLineRunner {
     private static final int MAX_KARMA_SCORE = 10_000;
     private static final int MAX_POSTS_PER_USER = 10;
     private static final int MIN_POSTS_PER_USER = 3;
-    private static final PostVisibility[] VISIBILITY_OPTIONS = PostVisibility.class.getEnumConstants();
+    private static final Visibility[] VISIBILITY_OPTIONS = Visibility.class.getEnumConstants();
 
     private final UserRepository userRepository;
     private final PostRepository postRepository;

@@ -41,17 +41,17 @@ public class PostService {
     private final KarmaScoreService karmaScoreService;
     private final PostRedisCache cache;
 
-    private static boolean isOnlyActive(@NonNull List<PostVisibility> visibilities) {
-        return visibilities.size() == 1 && visibilities.contains(PostVisibility.ACTIVE);
+    private static boolean isOnlyActive(@NonNull List<Visibility> visibilities) {
+        return visibilities.size() == 1 && visibilities.contains(Visibility.ACTIVE);
     }
 
     private List<PostDto> updateCache() {
-        List<PostDto> newValuesForCache = repository.findTopNPosts(CACHED_POSTS_AMOUNT, List.of(PostVisibility.ACTIVE));
+        List<PostDto> newValuesForCache = repository.findTopNPosts(CACHED_POSTS_AMOUNT, List.of(Visibility.ACTIVE));
         cache.reinitializeCache(newValuesForCache);
         return newValuesForCache;
     }
 
-    private List<PostDto> findTopNHandler(int size, List<PostVisibility> visibilities) {
+    private List<PostDto> findTopNHandler(int size, List<Visibility> visibilities) {
 
         List<PostDto> results;
 
@@ -69,7 +69,7 @@ public class PostService {
         return results;
     }
 
-    private List<PostDto> findNextNHandler(int size, List<PostVisibility> visibilities, long karmaScore) {
+    private List<PostDto> findNextNHandler(int size, List<Visibility> visibilities, long karmaScore) {
 
         List<PostDto> results;
 
@@ -99,7 +99,7 @@ public class PostService {
     @Transactional(readOnly = true)
     public List<PostDto> findPaginatedPosts(
             int size,
-            @NonNull List<PostVisibility> visibilities,
+            @NonNull List<Visibility> visibilities,
             @Nullable Long karmaScore,
             @Nullable String username)
             throws InternalServerErrorException {
@@ -122,7 +122,7 @@ public class PostService {
     @Transactional(readOnly = true)
     public List<PostDto> findPaginatedOwnedPosts(
             int size,
-            @NonNull List<PostVisibility> visibilities,
+            @NonNull List<Visibility> visibilities,
             @Nullable Long karmaScore)
             throws InternalServerErrorException {
 
@@ -143,7 +143,7 @@ public class PostService {
     @Transactional(readOnly = true)
     public List<PostRatingResponse> findPaginatedPostRatings(
             int size,
-            @NonNull List<PostVisibility> visibilities,
+            @NonNull List<Visibility> visibilities,
             @Nullable Long karmaScore,
             @Nullable String username)
             throws InternalServerErrorException {
@@ -195,7 +195,7 @@ public class PostService {
                 .headline(request.getHeadline())
                 .text(request.getText())
                 .karmaScore(0L)
-                .visibility(PostVisibility.ACTIVE)
+                .visibility(Visibility.ACTIVE)
                 .user(userRepository.getReferenceById(userId));
 
         try {
@@ -282,7 +282,7 @@ public class PostService {
     }
 
     @Transactional
-    public void changeOwnedPostVisibility(long postId, @NonNull PostVisibility visibility)
+    public void changeOwnedPostVisibility(long postId, @NonNull Visibility visibility)
             throws AccessDeniedException, PostNotFoundException {
 
         final var authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -292,12 +292,12 @@ public class PostService {
         optionalPost.ifPresentOrElse(
                 post -> {
                     // Id is lazy loaded. User can modify only his own visibility and can't change deleted state.
-                    if (!post.getUser().getId().equals(userId) || post.getVisibility().equals(PostVisibility.DELETED)) {
+                    if (!post.getUser().getId().equals(userId) || post.getVisibility().equals(Visibility.DELETED)) {
                         throw new AccessDeniedException("Access denied");
                     }
                     post.setVisibility(visibility);
                     repository.save(post);
-                    if (!visibility.equals(PostVisibility.ACTIVE)) {
+                    if (!visibility.equals(Visibility.ACTIVE)) {
                         cache.deleteFromCache(postId);
                     }
                 },
@@ -306,12 +306,12 @@ public class PostService {
     }
 
     @Transactional
-    public void changeVisibility(long postId, @NonNull PostVisibility visibility) throws PostNotFoundException {
+    public void changeVisibility(long postId, @NonNull Visibility visibility) throws PostNotFoundException {
         int rowsAffected = repository.changeVisibilityById(postId, visibility);
         if (rowsAffected == 0) {
             throw new PostNotFoundException();
         }
-        if (!visibility.equals(PostVisibility.ACTIVE)) {
+        if (!visibility.equals(Visibility.ACTIVE)) {
             cache.deleteFromCache(postId);
         }
     }

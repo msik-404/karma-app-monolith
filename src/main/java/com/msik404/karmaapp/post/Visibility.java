@@ -1,6 +1,6 @@
 package com.msik404.karmaapp.post;
 
-public enum PostVisibility {
+public enum Visibility {
     ACTIVE,
     HIDDEN,
     DELETED

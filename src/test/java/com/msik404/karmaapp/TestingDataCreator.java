@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.msik404.karmaapp.post.Post;
-import com.msik404.karmaapp.post.PostVisibility;
+import com.msik404.karmaapp.post.Visibility;
 import com.msik404.karmaapp.user.Role;
 import com.msik404.karmaapp.user.User;
 import lombok.Getter;
@@ -46,7 +46,7 @@ public class TestingDataCreator {
         this.createFirstAdminData();
     }
 
-    public List<Post> getTopPosts(@NonNull List<Post> posts, @NonNull Set<PostVisibility> visibilities) {
+    public List<Post> getTopPosts(@NonNull List<Post> posts, @NonNull Set<Visibility> visibilities) {
 
         return posts.stream()
                 .filter(post -> visibilities.contains(post.getVisibility()))
@@ -54,7 +54,7 @@ public class TestingDataCreator {
                 .collect(Collectors.toList());
     }
 
-    public List<Post> getTopUsersPosts(@NonNull List<Post> posts, long userId, @NonNull Set<PostVisibility> visibilities) {
+    public List<Post> getTopUsersPosts(@NonNull List<Post> posts, long userId, @NonNull Set<Visibility> visibilities) {
 
         return posts.stream()
                 .filter(post -> post.getUser().getUsername().equals(getTestingUsername(userId)))
@@ -71,7 +71,7 @@ public class TestingDataCreator {
         return String.format("%s@mail.com", username);
     }
 
-    private Post getPostForTesting(@NonNull PostVisibility visibility, long karmaScore, User user) {
+    private Post getPostForTesting(@NonNull Visibility visibility, long karmaScore, User user) {
 
         // I ignore fields which will not be useful for query testing.
         return Post.builder()
@@ -103,13 +103,13 @@ public class TestingDataCreator {
 
         usersForTesting.add(user);
 
-        postsForTesting.add(getPostForTesting(PostVisibility.ACTIVE, 11, user));
-        postsForTesting.add(getPostForTesting(PostVisibility.ACTIVE, 11, user));
-        postsForTesting.add(getPostForTesting(PostVisibility.ACTIVE, 10, user));
+        postsForTesting.add(getPostForTesting(Visibility.ACTIVE, 11, user));
+        postsForTesting.add(getPostForTesting(Visibility.ACTIVE, 11, user));
+        postsForTesting.add(getPostForTesting(Visibility.ACTIVE, 10, user));
 
-        postsForTesting.add(getPostForTesting(PostVisibility.HIDDEN, -11, user));
+        postsForTesting.add(getPostForTesting(Visibility.HIDDEN, -11, user));
 
-        postsForTesting.add(getPostForTesting(PostVisibility.DELETED, -100, user));
+        postsForTesting.add(getPostForTesting(Visibility.DELETED, -100, user));
     }
 
     private void createSecondUserData() {
@@ -118,9 +118,9 @@ public class TestingDataCreator {
 
         usersForTesting.add(user);
 
-        postsForTesting.add(getPostForTesting(PostVisibility.ACTIVE, 100, user));
+        postsForTesting.add(getPostForTesting(Visibility.ACTIVE, 100, user));
 
-        postsForTesting.add(getPostForTesting(PostVisibility.ACTIVE, 111, user));
+        postsForTesting.add(getPostForTesting(Visibility.ACTIVE, 111, user));
     }
 
     private void createThirdUserData() {
@@ -129,13 +129,13 @@ public class TestingDataCreator {
 
         usersForTesting.add(user);
 
-        postsForTesting.add(getPostForTesting(PostVisibility.ACTIVE, 30, user));
+        postsForTesting.add(getPostForTesting(Visibility.ACTIVE, 30, user));
 
-        postsForTesting.add(getPostForTesting(PostVisibility.HIDDEN, -11, user));
-        postsForTesting.add(getPostForTesting(PostVisibility.HIDDEN, -31, user));
-        postsForTesting.add(getPostForTesting(PostVisibility.HIDDEN, -43, user));
+        postsForTesting.add(getPostForTesting(Visibility.HIDDEN, -11, user));
+        postsForTesting.add(getPostForTesting(Visibility.HIDDEN, -31, user));
+        postsForTesting.add(getPostForTesting(Visibility.HIDDEN, -43, user));
 
-        postsForTesting.add(getPostForTesting(PostVisibility.DELETED, -58, user));
+        postsForTesting.add(getPostForTesting(Visibility.DELETED, -58, user));
     }
 
     private void createFirstModData() {
@@ -144,11 +144,11 @@ public class TestingDataCreator {
 
         usersForTesting.add(user);
 
-        postsForTesting.add(getPostForTesting(PostVisibility.ACTIVE, 77, user));
+        postsForTesting.add(getPostForTesting(Visibility.ACTIVE, 77, user));
 
-        postsForTesting.add(getPostForTesting(PostVisibility.HIDDEN, -23, user));
+        postsForTesting.add(getPostForTesting(Visibility.HIDDEN, -23, user));
 
-        postsForTesting.add(getPostForTesting(PostVisibility.DELETED, -4, user));
+        postsForTesting.add(getPostForTesting(Visibility.DELETED, -4, user));
     }
 
     private void createFirstAdminData() {
@@ -157,10 +157,10 @@ public class TestingDataCreator {
 
         usersForTesting.add(user);
 
-        postsForTesting.add(getPostForTesting(PostVisibility.ACTIVE, 777, user));
+        postsForTesting.add(getPostForTesting(Visibility.ACTIVE, 777, user));
 
-        postsForTesting.add(getPostForTesting(PostVisibility.HIDDEN, -83, user));
+        postsForTesting.add(getPostForTesting(Visibility.HIDDEN, -83, user));
 
-        postsForTesting.add(getPostForTesting(PostVisibility.DELETED, -9, user));
+        postsForTesting.add(getPostForTesting(Visibility.DELETED, -9, user));
     }
 }

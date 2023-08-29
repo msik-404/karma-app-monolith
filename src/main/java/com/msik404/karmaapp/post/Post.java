@@ -35,7 +35,7 @@ public class Post {
     private Long karmaScore;
 
     @Enumerated(EnumType.STRING)
-    private PostVisibility visibility;
+    private Visibility visibility;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

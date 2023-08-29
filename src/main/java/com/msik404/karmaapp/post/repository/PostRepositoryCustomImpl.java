@@ -3,7 +3,7 @@ package com.msik404.karmaapp.post.repository;
 import java.util.List;
 
 import com.msik404.karmaapp.post.Post;
-import com.msik404.karmaapp.post.PostVisibility;
+import com.msik404.karmaapp.post.Visibility;
 import com.msik404.karmaapp.post.dto.PostDto;
 import com.msik404.karmaapp.post.dto.PostRatingResponse;
 import com.msik404.karmaapp.post.exception.InternalServerErrorException;
@@ -28,7 +28,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     @Override
     public List<PostDto> findTopNPosts(
             int size,
-            @NonNull List<PostVisibility> visibilities)
+            @NonNull List<Visibility> visibilities)
             throws InternalServerErrorException {
 
         var finder = new FindNPostJoined(entityManager, cb);
@@ -41,7 +41,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     @Override
     public List<PostDto> findNextNPosts(
             int size,
-            @NonNull List<PostVisibility> visibilities,
+            @NonNull List<Visibility> visibilities,
             long karmaScore
             ) throws InternalServerErrorException {
 
@@ -56,7 +56,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     @Override
     public List<PostDto> findTopNPostsWithUsername(
             int size,
-            @NonNull List<PostVisibility> visibilities,
+            @NonNull List<Visibility> visibilities,
             @NonNull String username)
             throws InternalServerErrorException {
 
@@ -71,7 +71,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     @Override
     public List<PostDto> findNextNPostsWithUsername(
             int size,
-            @NonNull List<PostVisibility> visibilities,
+            @NonNull List<Visibility> visibilities,
             long karmaScore,
             @NonNull String username)
             throws InternalServerErrorException {
@@ -88,7 +88,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     @Override
     public List<PostRatingResponse> findTopNRatings(
             int size,
-            @NonNull List<PostVisibility> visibilities, long userId)
+            @NonNull List<Visibility> visibilities, long userId)
             throws InternalServerErrorException {
 
         var finder = new FindNPostRating(entityManager, cb, userId);
@@ -101,7 +101,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     @Override
     public List<PostRatingResponse> findNextNRatings(
             int size,
-            @NonNull List<PostVisibility> visibilities,
+            @NonNull List<Visibility> visibilities,
             long userId,
             long karmaScore)
             throws InternalServerErrorException {
@@ -117,7 +117,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     @Override
     public List<PostRatingResponse> findTopNRatingsWithUsername(
             int size,
-            @NonNull List<PostVisibility> visibilities,
+            @NonNull List<Visibility> visibilities,
             long userId,
             @NonNull String username)
             throws InternalServerErrorException {
@@ -133,7 +133,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     @Override
     public List<PostRatingResponse> findNextNRatingsWithUsername(
             int size,
-            @NonNull List<PostVisibility> visibilities,
+            @NonNull List<Visibility> visibilities,
             long userId,
             long karmaScore,
             @NonNull String username)
@@ -163,7 +163,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public int changeVisibilityById(long postId, @NonNull PostVisibility visibility) {
+    public int changeVisibilityById(long postId, @NonNull Visibility visibility) {
 
         var criteriaUpdate = cb.createCriteriaUpdate(Post.class);
         var root = criteriaUpdate.getRoot();
@@ -175,7 +175,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<PostDto> findTopNWithUserId(int size, @NonNull List<PostVisibility> visibilities, long userId) {
+    public List<PostDto> findTopNWithUserId(int size, @NonNull List<Visibility> visibilities, long userId) {
 
         var finder = new FindNPostJoined(entityManager, cb);
         finder.setVisibilitiesIn(visibilities);
@@ -187,7 +187,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     @Override
     public List<PostDto> findNextNWithUserId(
             int size,
-            @NonNull List<PostVisibility> visibilities,
+            @NonNull List<Visibility> visibilities,
             long userId,
             long karmaScore) {
 

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.msik404.karmaapp.post.Post;
-import com.msik404.karmaapp.post.PostVisibility;
+import com.msik404.karmaapp.post.Visibility;
 import com.msik404.karmaapp.user.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.*;
@@ -26,7 +26,7 @@ public abstract class FindNPostPaginated<T> extends FindTemplate<T>{
         this.wherePredicateMap = new HashMap<>();
     }
 
-    public void setVisibilitiesIn(@NonNull List<PostVisibility> visibilities) {
+    public void setVisibilitiesIn(@NonNull List<Visibility> visibilities) {
         wherePredicateMap.put("visibilityPredicate", postRoot.get("visibility").in(visibilities));
     }
 

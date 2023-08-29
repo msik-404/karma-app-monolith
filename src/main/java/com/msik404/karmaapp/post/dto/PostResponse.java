@@ -1,6 +1,6 @@
 package com.msik404.karmaapp.post.dto;
 
-import com.msik404.karmaapp.post.PostVisibility;
+import com.msik404.karmaapp.post.Visibility;
 import lombok.Builder;
 import lombok.Data;
 
@@ -18,6 +18,6 @@ public class PostResponse {
 
     private final Long karmaScore;
 
-    private final PostVisibility visibility;
+    private final Visibility visibility;
 
 }

@@ -37,7 +37,7 @@ public class PostController {
             @RequestParam(value = "username", required = false) String username)
             throws InternalServerErrorException {
 
-        return postService.findPaginatedPosts(size, List.of(PostVisibility.ACTIVE), karmaScore, username)
+        return postService.findPaginatedPosts(size, List.of(Visibility.ACTIVE), karmaScore, username)
                 .stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
@@ -51,7 +51,7 @@ public class PostController {
             @RequestParam(value = "karma_score", required = false) Long karmaScore)
             throws InternalServerErrorException {
 
-        List<PostVisibility> visibilities = createVisibilityList(active, hidden, false);
+        List<Visibility> visibilities = createVisibilityList(active, hidden, false);
 
         return postService.findPaginatedOwnedPosts(size, visibilities, karmaScore)
                 .stream()
@@ -66,21 +66,21 @@ public class PostController {
             @RequestParam(value = "username", required = false) String username)
         throws InternalServerErrorException {
 
-        return postService.findPaginatedPostRatings(size, List.of(PostVisibility.ACTIVE), karmaScore, username);
+        return postService.findPaginatedPostRatings(size, List.of(Visibility.ACTIVE), karmaScore, username);
     }
 
-    private List<PostVisibility> createVisibilityList(boolean active, boolean hidden, boolean deleted) {
+    private List<Visibility> createVisibilityList(boolean active, boolean hidden, boolean deleted) {
 
-        List<PostVisibility> visibilities = new ArrayList<>();
+        List<Visibility> visibilities = new ArrayList<>();
 
         if (active) {
-            visibilities.add(PostVisibility.ACTIVE);
+            visibilities.add(Visibility.ACTIVE);
         }
         if (hidden) {
-            visibilities.add(PostVisibility.HIDDEN);
+            visibilities.add(Visibility.HIDDEN);
         }
         if (deleted) {
-            visibilities.add(PostVisibility.DELETED);
+            visibilities.add(Visibility.DELETED);
         }
         return visibilities;
     }
@@ -94,7 +94,7 @@ public class PostController {
             @RequestParam(value = "username", required = false) String username)
             throws InternalServerErrorException {
 
-        List<PostVisibility> visibilities = createVisibilityList(active, hidden, false);
+        List<Visibility> visibilities = createVisibilityList(active, hidden, false);
 
         return postService.findPaginatedPosts(size, visibilities, karmaScore, username)
                 .stream()
@@ -111,7 +111,7 @@ public class PostController {
             @RequestParam(value = "username", required = false) String username)
             throws InternalServerErrorException {
 
-        List<PostVisibility> visibilities = createVisibilityList(active, hidden, false);
+        List<Visibility> visibilities = createVisibilityList(active, hidden, false);
 
         return postService.findPaginatedPostRatings(size, visibilities, karmaScore, username);
     }
@@ -126,7 +126,7 @@ public class PostController {
             @RequestParam(value = "username", required = false) String username)
             throws  InternalServerErrorException {
 
-        List<PostVisibility> visibilities = createVisibilityList(active, hidden, deleted);
+        List<Visibility> visibilities = createVisibilityList(active, hidden, deleted);
 
         return postService.findPaginatedPosts(size, visibilities, karmaScore, username)
                 .stream()
@@ -144,7 +144,7 @@ public class PostController {
             @RequestParam(value = "username", required = false) String username)
             throws InternalServerErrorException {
 
-        List<PostVisibility> visibilities = createVisibilityList(active, hidden, deleted);
+        List<Visibility> visibilities = createVisibilityList(active, hidden, deleted);
 
         return postService.findPaginatedPostRatings(size, visibilities, karmaScore, username);
     }
@@ -185,42 +185,42 @@ public class PostController {
     @PostMapping("user/posts/{postId}/hide")
     public ResponseEntity<Void> hideByUser(@PathVariable Long postId) throws AccessDeniedException, PostNotFoundException {
 
-        postService.changeOwnedPostVisibility(postId, PostVisibility.HIDDEN);
+        postService.changeOwnedPostVisibility(postId, Visibility.HIDDEN);
         return ResponseEntity.ok(null);
     }
 
     @PostMapping("user/posts/{postId}/unhide")
     public ResponseEntity<Void> unhideByUser(@PathVariable Long postId) throws AccessDeniedException, PostNotFoundException {
 
-        postService.changeOwnedPostVisibility(postId, PostVisibility.ACTIVE);
+        postService.changeOwnedPostVisibility(postId, Visibility.ACTIVE);
         return ResponseEntity.ok(null);
     }
 
     @PostMapping("mod/posts/{postId}/hide")
     public ResponseEntity<Void> hideByMod(@PathVariable Long postId) throws PostNotFoundException {
 
-        postService.changeVisibility(postId, PostVisibility.HIDDEN);
+        postService.changeVisibility(postId, Visibility.HIDDEN);
         return ResponseEntity.ok(null);
     }
 
     @PostMapping("user/posts/{postId}/delete")
     public ResponseEntity<Void> deleteByUser(@PathVariable Long postId) throws AccessDeniedException, PostNotFoundException {
 
-        postService.changeOwnedPostVisibility(postId, PostVisibility.DELETED);
+        postService.changeOwnedPostVisibility(postId, Visibility.DELETED);
         return ResponseEntity.ok(null);
     }
 
     @PostMapping("admin/posts/{postId}/delete")
     public ResponseEntity<Void> deleteByAdmin(@PathVariable Long postId) throws AccessDeniedException, PostNotFoundException {
 
-        postService.changeVisibility(postId, PostVisibility.DELETED);
+        postService.changeVisibility(postId, Visibility.DELETED);
         return ResponseEntity.ok(null);
     }
 
     @PostMapping("admin/posts/{postId}/activate")
     public ResponseEntity<Void> activateByAdmin(@PathVariable Long postId) throws AccessDeniedException, PostNotFoundException {
 
-        postService.changeVisibility(postId, PostVisibility.ACTIVE);
+        postService.changeVisibility(postId, Visibility.ACTIVE);
         return ResponseEntity.ok(null);
     }
 }

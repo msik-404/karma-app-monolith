@@ -8,7 +8,7 @@ import com.msik404.karmaapp.constraintExceptions.ConstraintExceptionsHandler;
 import com.msik404.karmaapp.constraintExceptions.strategy.ConstraintViolationExceptionErrorMessageExtractionStrategy;
 import com.msik404.karmaapp.constraintExceptions.strategy.RoundBraceErrorMassageParseStrategy;
 import com.msik404.karmaapp.post.Post;
-import com.msik404.karmaapp.post.PostVisibility;
+import com.msik404.karmaapp.post.Visibility;
 import com.msik404.karmaapp.post.dto.PostDto;
 import com.msik404.karmaapp.user.repository.UserCriteriaUpdater;
 import com.msik404.karmaapp.user.repository.UserRepository;
@@ -63,10 +63,10 @@ class PostRepositoryCustomImplTest {
 
         // with auto generated ids
         final List<Post> allTopPersistedPosts = dataCreator.getTopPosts(
-                postRepository.findAll(), Set.of(PostVisibility.ACTIVE));
+                postRepository.findAll(), Set.of(Visibility.ACTIVE));
 
         final int size = 10;
-        final List<PostVisibility> visibilities = List.of(PostVisibility.ACTIVE);
+        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
         final List<PostDto> results = postRepository.findTopNPosts(size, visibilities);
 
         assertEquals(8, results.size());
@@ -82,10 +82,10 @@ class PostRepositoryCustomImplTest {
 
         // with auto generated ids
         final List<Post> allTopPersistedPosts = dataCreator.getTopPosts(
-                postRepository.findAll(), Set.of(PostVisibility.ACTIVE));
+                postRepository.findAll(), Set.of(Visibility.ACTIVE));
 
         final int size = 5;
-        final List<PostVisibility> visibilities = List.of(PostVisibility.ACTIVE);
+        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
         final List<PostDto> results = postRepository.findTopNPosts(size, visibilities);
 
         assertEquals(5, results.size());
@@ -101,10 +101,10 @@ class PostRepositoryCustomImplTest {
 
         // with auto generated ids
         final List<Post> allTopPersistedPosts = dataCreator.getTopPosts(
-                postRepository.findAll(), Set.of(PostVisibility.ACTIVE));
+                postRepository.findAll(), Set.of(Visibility.ACTIVE));
 
         final int size = 1;
-        final List<PostVisibility> visibilities = List.of(PostVisibility.ACTIVE);
+        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
         final List<PostDto> results = postRepository.findTopNPosts(size, visibilities);
 
         assertEquals(1, results.size());
@@ -119,7 +119,7 @@ class PostRepositoryCustomImplTest {
     void findTopZeroActive() {
 
         final int size = 0;
-        final List<PostVisibility> visibilities = List.of(PostVisibility.ACTIVE);
+        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
         final List<PostDto> results = postRepository.findTopNPosts(size, visibilities);
 
         assertEquals(0, results.size());
@@ -130,10 +130,10 @@ class PostRepositoryCustomImplTest {
 
         // with auto generated ids
         final List<Post> allTopPersistedPosts = dataCreator.getTopPosts(
-                postRepository.findAll(), Set.of(PostVisibility.ACTIVE));
+                postRepository.findAll(), Set.of(Visibility.ACTIVE));
 
         final int topSize = 2;
-        final List<PostVisibility> visibilities = List.of(PostVisibility.ACTIVE);
+        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
         final List<PostDto> topResults = postRepository.findTopNPosts(topSize, visibilities);
 
         assertEquals(2, topResults.size());
@@ -165,10 +165,10 @@ class PostRepositoryCustomImplTest {
 
         // with auto generated ids
         final List<Post> allTopPersistedPosts = dataCreator.getTopPosts(
-                postRepository.findAll(), Set.of(PostVisibility.ACTIVE));
+                postRepository.findAll(), Set.of(Visibility.ACTIVE));
 
         final int topSize = 2;
-        final List<PostVisibility> visibilities = List.of(PostVisibility.ACTIVE);
+        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
         final List<PostDto> topResults = postRepository.findTopNPosts(topSize, visibilities);
 
         assertEquals(2, topResults.size());
@@ -192,10 +192,10 @@ class PostRepositoryCustomImplTest {
 
         // with auto generated ids
         final List<Post> allTopPersistedPosts = dataCreator.getTopPosts(
-                postRepository.findAll(), Set.of(PostVisibility.ACTIVE));
+                postRepository.findAll(), Set.of(Visibility.ACTIVE));
 
         final int topSize = 5;
-        final List<PostVisibility> visibilities = List.of(PostVisibility.ACTIVE);
+        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
         final List<PostDto> topResults = postRepository.findTopNPosts(topSize, visibilities);
 
         assertEquals(5, topResults.size());
@@ -227,10 +227,10 @@ class PostRepositoryCustomImplTest {
 
         // with auto generated ids
         final List<Post> allTopPersistedPosts = dataCreator.getTopPosts(
-                postRepository.findAll(), Set.of(PostVisibility.ACTIVE));
+                postRepository.findAll(), Set.of(Visibility.ACTIVE));
 
         final int topSize = 6;
-        final List<PostVisibility> visibilities = List.of(PostVisibility.ACTIVE);
+        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
         final List<PostDto> topResults = postRepository.findTopNPosts(topSize, visibilities);
 
         assertEquals(6, topResults.size());
@@ -262,10 +262,10 @@ class PostRepositoryCustomImplTest {
 
         // with auto generated ids
         final List<Post> allTopPersistedPosts = dataCreator.getTopPosts(
-                postRepository.findAll(), Set.of(PostVisibility.ACTIVE));
+                postRepository.findAll(), Set.of(Visibility.ACTIVE));
 
         final int topSize = 7;
-        final List<PostVisibility> visibilities = List.of(PostVisibility.ACTIVE);
+        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
         final List<PostDto> topResults = postRepository.findTopNPosts(topSize, visibilities);
 
         assertEquals(7, topResults.size());
@@ -297,10 +297,10 @@ class PostRepositoryCustomImplTest {
 
         // with auto generated ids
         final List<Post> allTopPersistedPosts = dataCreator.getTopPosts(
-                postRepository.findAll(), Set.of(PostVisibility.ACTIVE));
+                postRepository.findAll(), Set.of(Visibility.ACTIVE));
 
         final int size = 10;
-        final List<PostVisibility> visibilities = List.of(PostVisibility.ACTIVE);
+        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
         final List<PostDto> topResults = postRepository.findTopNPosts(size, visibilities);
 
         assertEquals(8, topResults.size());
@@ -321,10 +321,10 @@ class PostRepositoryCustomImplTest {
 
         // with auto generated ids
         final List<Post> allTopPersistedPostsOfUserOne = dataCreator.getTopUsersPosts(
-                postRepository.findAll(), 1, Set.of(PostVisibility.ACTIVE));
+                postRepository.findAll(), 1, Set.of(Visibility.ACTIVE));
 
         final int size = 3;
-        final List<PostVisibility> visibilities = List.of(PostVisibility.ACTIVE);
+        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
 
         final List<PostDto> results = postRepository.findTopNPostsWithUsername(
                 size, visibilities, dataCreator.getTestingUsername(1));
@@ -342,10 +342,10 @@ class PostRepositoryCustomImplTest {
 
         // with auto generated ids
         final List<Post> allTopPersistedPostsOfUserOne = dataCreator.getTopUsersPosts(
-                postRepository.findAll(), 1, Set.of(PostVisibility.ACTIVE));
+                postRepository.findAll(), 1, Set.of(Visibility.ACTIVE));
 
         final int size = 5;
-        final List<PostVisibility> visibilities = List.of(PostVisibility.ACTIVE);
+        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
 
         final List<PostDto> results = postRepository.findTopNPostsWithUsername(
                 size, visibilities, dataCreator.getTestingUsername(1));
@@ -363,10 +363,10 @@ class PostRepositoryCustomImplTest {
 
         // with auto generated ids
         final List<Post> allTopPersistedPostsOfUserOne = dataCreator.getTopUsersPosts(
-                postRepository.findAll(), 1, Set.of(PostVisibility.ACTIVE));
+                postRepository.findAll(), 1, Set.of(Visibility.ACTIVE));
 
         final int size = 2;
-        final List<PostVisibility> visibilities = List.of(PostVisibility.ACTIVE);
+        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
 
         final List<PostDto> results = postRepository.findTopNPostsWithUsername(
                 size, visibilities, dataCreator.getTestingUsername(1));
@@ -383,7 +383,7 @@ class PostRepositoryCustomImplTest {
     void findTopZeroWithUsername() {
 
         final int size = 0;
-        final List<PostVisibility> visibilities = List.of(PostVisibility.ACTIVE);
+        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
 
         final List<PostDto> results = postRepository.findTopNPostsWithUsername(
                 size, visibilities, dataCreator.getTestingUsername(1));
@@ -395,7 +395,7 @@ class PostRepositoryCustomImplTest {
     void findTopTwoWithNonExistingUsername() {
 
         final int size = 2;
-        final List<PostVisibility> visibilities = List.of(PostVisibility.ACTIVE);
+        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
 
         final List<PostDto> results = postRepository.findTopNPostsWithUsername(
                 size, visibilities, dataCreator.getTestingUsername(404));
@@ -408,10 +408,10 @@ class PostRepositoryCustomImplTest {
 
         // with auto generated ids
         final List<Post> allTopPersistedPostsOfUserOne = dataCreator.getTopUsersPosts(
-                postRepository.findAll(), 1, Set.of(PostVisibility.ACTIVE));
+                postRepository.findAll(), 1, Set.of(Visibility.ACTIVE));
 
         final int topSize = 1;
-        final List<PostVisibility> visibilities = List.of(PostVisibility.ACTIVE);
+        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
         final String username = dataCreator.getTestingUsername(1);
 
         final List<PostDto> topResults = postRepository.findTopNPostsWithUsername(
