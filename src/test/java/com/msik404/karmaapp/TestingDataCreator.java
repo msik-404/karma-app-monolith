@@ -3,6 +3,7 @@ package com.msik404.karmaapp;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.msik404.karmaapp.post.Post;
@@ -17,7 +18,21 @@ public class TestingDataCreator {
 
     private final List<User> usersForTesting;
     private final List<Post> postsForTesting;
-    private final List<Post> topPosts;
+
+    /**
+     * This comparator is made so to mimic the desired sort order, that is ascending id and descending score.
+     */
+    static class PostComparator implements Comparator<Post> {
+
+        @Override
+        public int compare(Post postOne, Post postTwo) {
+            if (postOne.getKarmaScore().equals(postTwo.getKarmaScore())) {
+                return - postOne.getId().compareTo(postTwo.getId());
+            }
+            return postOne.getKarmaScore().compareTo(postTwo.getKarmaScore());
+        }
+
+    }
 
     public TestingDataCreator() {
 
@@ -29,17 +44,30 @@ public class TestingDataCreator {
         this.createThirdUserData();
         this.createFirstModData();
         this.createFirstAdminData();
+    }
 
-        this.topPosts = postsForTesting.stream()
-                .sorted(Comparator.comparing(Post::getKarmaScore).reversed())
+    public List<Post> getTopPosts(@NonNull List<Post> posts, @NonNull Set<PostVisibility> visibilities) {
+
+        return posts.stream()
+                .filter(post -> visibilities.contains(post.getVisibility()))
+                .sorted(new PostComparator().reversed())
                 .collect(Collectors.toList());
     }
 
-    private String getTestingUsername(long userId) {
+    public List<Post> getTopUsersPosts(@NonNull List<Post> posts, long userId, @NonNull Set<PostVisibility> visibilities) {
+
+        return posts.stream()
+                .filter(post -> post.getUser().getUsername().equals(getTestingUsername(userId)))
+                .filter(post -> visibilities.contains(post.getVisibility()))
+                .sorted(new PostComparator().reversed())
+                .collect(Collectors.toList());
+    }
+
+    public String getTestingUsername(long userId) {
         return String.format("username_%d", userId);
     }
 
-    private String getTestingEmail(@NonNull String username) {
+    public String getTestingEmail(@NonNull String username) {
         return String.format("%s@mail.com", username);
     }
 
@@ -75,9 +103,9 @@ public class TestingDataCreator {
 
         usersForTesting.add(user);
 
+        postsForTesting.add(getPostForTesting(PostVisibility.ACTIVE, 11, user));
+        postsForTesting.add(getPostForTesting(PostVisibility.ACTIVE, 11, user));
         postsForTesting.add(getPostForTesting(PostVisibility.ACTIVE, 10, user));
-        postsForTesting.add(getPostForTesting(PostVisibility.ACTIVE, 11, user));
-        postsForTesting.add(getPostForTesting(PostVisibility.ACTIVE, 11, user));
 
         postsForTesting.add(getPostForTesting(PostVisibility.HIDDEN, -11, user));
 
