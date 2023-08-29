@@ -69,7 +69,7 @@ public class PostService {
         return results;
     }
 
-    private List<PostDto> findNextNHandler(int size, List<Visibility> visibilities, long karmaScore) {
+    private List<PostDto> findNextNHandler(int size, List<Visibility> visibilities, long postId, long karmaScore) {
 
         List<PostDto> results;
 
@@ -86,11 +86,11 @@ public class PostService {
                 results = newValuesForCache.subList(firstSmallerElementIdx, size);
             } else {
                 results = cache.findNextNCached(size, karmaScore).orElseGet(
-                        () -> repository.findNextNPosts(size, visibilities, karmaScore));
+                        () -> repository.findNextNPosts(size, visibilities, postId, karmaScore));
             }
 
         } else {
-            results = repository.findNextNPosts(size, visibilities, karmaScore);
+            results = repository.findNextNPosts(size, visibilities, postId, karmaScore);
         }
 
         return results;
@@ -100,6 +100,7 @@ public class PostService {
     public List<PostDto> findPaginatedPosts(
             int size,
             @NonNull List<Visibility> visibilities,
+            @Nullable Long postId,
             @Nullable Long karmaScore,
             @Nullable String username)
             throws InternalServerErrorException {
@@ -111,7 +112,7 @@ public class PostService {
         } else if (karmaScore != null && username != null) {
             results = repository.findNextNPostsWithUsername(size, visibilities, karmaScore, username);
         } else if (karmaScore != null) { // username == null
-            results = findNextNHandler(size, visibilities, karmaScore);
+            results = findNextNHandler(size, visibilities, postId, karmaScore);
         } else { // username != null and karmaScore == null
             results = repository.findTopNPostsWithUsername(size, visibilities, username);
         }

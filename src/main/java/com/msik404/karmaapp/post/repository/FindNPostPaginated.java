@@ -30,6 +30,14 @@ public abstract class FindNPostPaginated<T> extends FindTemplate<T>{
         wherePredicateMap.put("visibilityPredicate", postRoot.get("visibility").in(visibilities));
     }
 
+    public void setPostIdGreaterThan(long postId) {
+        wherePredicateMap.put("postIdPredicate", cb.greaterThan(postRoot.get("id"), postId));
+    }
+
+    public void setKarmaScoreLessThanOrEqualTo(long karmaScore) {
+        wherePredicateMap.put("karmaScorePredicate", cb.lessThanOrEqualTo(postRoot.get("karmaScore"), karmaScore));
+    }
+
     public void setKarmaScoreLessThan(long karmaScore) {
         wherePredicateMap.put("karmaScorePredicate", cb.lessThan(postRoot.get("karmaScore"), karmaScore));
     }

@@ -18,6 +18,7 @@ public interface PostRepositoryCustom {
     List<PostDto> findNextNPosts(
             int size,
             @NonNull List<Visibility> visibilities,
+            long postId,
             long karmaScore
             ) throws InternalServerErrorException;
 

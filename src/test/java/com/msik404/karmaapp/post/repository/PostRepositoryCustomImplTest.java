@@ -143,11 +143,13 @@ class PostRepositoryCustomImplTest {
             assertEquals(allTopPersistedPosts.get(i).getKarmaScore(), topResults.get(i).getKarmaScore());
         }
 
-        final long lastPostScore = topResults.get(topResults.size()-1).getKarmaScore();
+        final PostDto lastPost = topResults.get(topResults.size()-1);
+        final long lastPostId = lastPost.getId();
+        final long lastPostScore = lastPost.getKarmaScore();
 
         final int nextSize = 2;
 
-        final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, lastPostScore);
+        final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, lastPostId, lastPostScore);
 
         assertEquals(2, nextResults.size());
 
@@ -178,11 +180,13 @@ class PostRepositoryCustomImplTest {
             assertEquals(allTopPersistedPosts.get(i).getKarmaScore(), topResults.get(i).getKarmaScore());
         }
 
-        final long lastPostScore = topResults.get(topResults.size()-1).getKarmaScore();
+        final PostDto lastPost = topResults.get(topResults.size()-1);
+        final long lastPostId = lastPost.getId();
+        final long lastPostScore = lastPost.getKarmaScore();
 
         final int nextSize = 0;
 
-        final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, lastPostScore);
+        final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, lastPostId, lastPostScore);
 
         assertEquals(0, nextResults.size());
     }
@@ -205,11 +209,13 @@ class PostRepositoryCustomImplTest {
             assertEquals(allTopPersistedPosts.get(i).getKarmaScore(), topResults.get(i).getKarmaScore());
         }
 
-        final long lastPostScore = topResults.get(topResults.size()-1).getKarmaScore();
+        final PostDto lastPost = topResults.get(topResults.size()-1);
+        final long lastPostId = lastPost.getId();
+        final long lastPostScore = lastPost.getKarmaScore();
 
         final int nextSize = 3;
 
-        final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, lastPostScore);
+        final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, lastPostId, lastPostScore);
 
         assertEquals(3, nextResults.size());
 
@@ -240,11 +246,13 @@ class PostRepositoryCustomImplTest {
             assertEquals(allTopPersistedPosts.get(i).getKarmaScore(), topResults.get(i).getKarmaScore());
         }
 
-        final long lastPostScore = topResults.get(topResults.size()-1).getKarmaScore();
+        final PostDto lastPost = topResults.get(topResults.size()-1);
+        final long lastPostId = lastPost.getId();
+        final long lastPostScore = lastPost.getKarmaScore();
 
         final int nextSize = 3;
 
-        final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, lastPostScore);
+        final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, lastPostId, lastPostScore);
 
         assertEquals(2, nextResults.size());
 
@@ -275,11 +283,13 @@ class PostRepositoryCustomImplTest {
             assertEquals(allTopPersistedPosts.get(i).getKarmaScore(), topResults.get(i).getKarmaScore());
         }
 
-        final long lastPostScore = topResults.get(topResults.size()-1).getKarmaScore();
+        final PostDto lastPost = topResults.get(topResults.size()-1);
+        final long lastPostId = lastPost.getId();
+        final long lastPostScore = lastPost.getKarmaScore();
 
         final int nextSize = 3;
 
-        final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, lastPostScore);
+        final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, lastPostId, lastPostScore);
 
         assertEquals(1, nextResults.size());
 
@@ -299,9 +309,9 @@ class PostRepositoryCustomImplTest {
         final List<Post> allTopPersistedPosts = dataCreator.getTopPosts(
                 postRepository.findAll(), Set.of(Visibility.ACTIVE));
 
-        final int size = 10;
+        final int topSize = 10;
         final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
-        final List<PostDto> topResults = postRepository.findTopNPosts(size, visibilities);
+        final List<PostDto> topResults = postRepository.findTopNPosts(topSize, visibilities);
 
         assertEquals(8, topResults.size());
 
@@ -310,8 +320,13 @@ class PostRepositoryCustomImplTest {
             assertEquals(allTopPersistedPosts.get(i).getKarmaScore(), topResults.get(i).getKarmaScore());
         }
 
-        final long lastPostScore = topResults.get(topResults.size()-1).getKarmaScore();
-        final List<PostDto> nextResults = postRepository.findNextNPosts(size, visibilities, lastPostScore);
+        final PostDto lastPost = topResults.get(topResults.size()-1);
+        final long lastPostId = lastPost.getId();
+        final long lastPostScore = lastPost.getKarmaScore();
+
+        final int nextSize = 3;
+
+        final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, lastPostId, lastPostScore);
 
         assertEquals(0, nextResults.size());
     }

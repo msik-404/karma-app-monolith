@@ -33,11 +33,12 @@ public class PostController {
     @GetMapping("guest/posts")
     public List<EntityModel<PostResponse>> findPaginatedPosts(
             @RequestParam(value = "size", defaultValue = "100") int size,
+            @RequestParam(value = "post_id", required = false) Long postId,
             @RequestParam(value = "karma_score", required = false) Long karmaScore,
             @RequestParam(value = "username", required = false) String username)
             throws InternalServerErrorException {
 
-        return postService.findPaginatedPosts(size, List.of(Visibility.ACTIVE), karmaScore, username)
+        return postService.findPaginatedPosts(size, List.of(Visibility.ACTIVE), postId, karmaScore, username)
                 .stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
@@ -90,13 +91,14 @@ public class PostController {
             @RequestParam(value = "size", defaultValue = "100") int size,
             @RequestParam(value = "active", defaultValue = "false") boolean active,
             @RequestParam(value = "hidden", defaultValue = "false") boolean hidden,
+            @RequestParam(value = "post_id", required = false) Long postId,
             @RequestParam(value = "karma_score", required = false) Long karmaScore,
             @RequestParam(value = "username", required = false) String username)
             throws InternalServerErrorException {
 
         List<Visibility> visibilities = createVisibilityList(active, hidden, false);
 
-        return postService.findPaginatedPosts(size, visibilities, karmaScore, username)
+        return postService.findPaginatedPosts(size, visibilities, postId, karmaScore, username)
                 .stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
@@ -122,13 +124,14 @@ public class PostController {
             @RequestParam(value = "active", defaultValue = "false") boolean active,
             @RequestParam(value = "hidden", defaultValue = "false") boolean hidden,
             @RequestParam(value = "deleted", defaultValue = "false") boolean deleted,
+            @RequestParam(value = "post_id", required = false) Long postId,
             @RequestParam(value = "karma_score", required = false) Long karmaScore,
             @RequestParam(value = "username", required = false) String username)
             throws  InternalServerErrorException {
 
         List<Visibility> visibilities = createVisibilityList(active, hidden, deleted);
 
-        return postService.findPaginatedPosts(size, visibilities, karmaScore, username)
+        return postService.findPaginatedPosts(size, visibilities, postId, karmaScore, username)
                 .stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());

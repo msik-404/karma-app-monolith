@@ -42,6 +42,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     public List<PostDto> findNextNPosts(
             int size,
             @NonNull List<Visibility> visibilities,
+            long postId,
             long karmaScore
             ) throws InternalServerErrorException {
 
@@ -49,7 +50,8 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         if (!visibilities.isEmpty()) {
             finder.setVisibilitiesIn(visibilities);
         }
-        finder.setKarmaScoreLessThan(karmaScore);
+        finder.setPostIdGreaterThan(postId);
+        finder.setKarmaScoreLessThanOrEqualTo(karmaScore);
         return finder.execute(size);
     }
 
