@@ -8,11 +8,11 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 
-public class FindNPostRating extends FindNPostPaginated<PostRatingResponse> {
+public class FindNRatings extends FindNPostPaginated<PostRatingResponse> {
 
     protected Join<Post, KarmaScore> karmaScoreJoin;
 
-    public FindNPostRating(EntityManager entityManager, CriteriaBuilder cb, long userId) {
+    public FindNRatings(EntityManager entityManager, CriteriaBuilder cb, long userId) {
         super(entityManager, cb, PostRatingResponse.class);
 
         this.karmaScoreJoin = postRoot

@@ -4,9 +4,9 @@ import com.msik404.karmaapp.post.dto.PostDto;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 
-public class FindNPostJoined extends FindNPostPaginated<PostDto> {
+public class FindNPosts extends FindNPostPaginated<PostDto> {
 
-    public FindNPostJoined(EntityManager entityManager, CriteriaBuilder cb) {
+    public FindNPosts(EntityManager entityManager, CriteriaBuilder cb) {
         super(entityManager, cb, PostDto.class);
     }
 

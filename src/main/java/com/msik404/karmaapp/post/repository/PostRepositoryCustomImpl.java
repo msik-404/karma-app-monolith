@@ -31,7 +31,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
             @NonNull List<Visibility> visibilities)
             throws InternalServerErrorException {
 
-        var finder = new FindNPostJoined(entityManager, cb);
+        var finder = new FindNPosts(entityManager, cb);
         if (!visibilities.isEmpty()) {
             finder.setVisibilitiesIn(visibilities);
         }
@@ -45,7 +45,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
             long karmaScore
             ) throws InternalServerErrorException {
 
-        var finder = new FindNPostJoined(entityManager, cb);
+        var finder = new FindNPosts(entityManager, cb);
         if (!visibilities.isEmpty()) {
             finder.setVisibilitiesIn(visibilities);
         }
@@ -60,7 +60,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
             @NonNull String username)
             throws InternalServerErrorException {
 
-        var finder = new FindNPostJoined(entityManager, cb);
+        var finder = new FindNPosts(entityManager, cb);
         if (!visibilities.isEmpty()) {
             finder.setVisibilitiesIn(visibilities);
         }
@@ -76,7 +76,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
             @NonNull String username)
             throws InternalServerErrorException {
 
-        var finder = new FindNPostJoined(entityManager, cb);
+        var finder = new FindNPosts(entityManager, cb);
         if (!visibilities.isEmpty()) {
             finder.setVisibilitiesIn(visibilities);
         }
@@ -91,7 +91,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
             @NonNull List<Visibility> visibilities, long userId)
             throws InternalServerErrorException {
 
-        var finder = new FindNPostRating(entityManager, cb, userId);
+        var finder = new FindNRatings(entityManager, cb, userId);
         if (!visibilities.isEmpty()) {
             finder.setVisibilitiesIn(visibilities);
         }
@@ -106,7 +106,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
             long karmaScore)
             throws InternalServerErrorException {
 
-        var finder = new FindNPostRating(entityManager, cb, userId);
+        var finder = new FindNRatings(entityManager, cb, userId);
         if (!visibilities.isEmpty()) {
             finder.setVisibilitiesIn(visibilities);
         }
@@ -122,7 +122,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
             @NonNull String username)
             throws InternalServerErrorException {
 
-        var finder = new FindNPostRating(entityManager, cb, userId);
+        var finder = new FindNRatings(entityManager, cb, userId);
         if (!visibilities.isEmpty()) {
             finder.setVisibilitiesIn(visibilities);
         }
@@ -139,7 +139,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
             @NonNull String username)
             throws InternalServerErrorException {
 
-        var finder = new FindNPostRating(entityManager, cb, userId);
+        var finder = new FindNRatings(entityManager, cb, userId);
         if (!visibilities.isEmpty()) {
             finder.setVisibilitiesIn(visibilities);
         }
@@ -177,7 +177,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     @Override
     public List<PostDto> findTopNWithUserId(int size, @NonNull List<Visibility> visibilities, long userId) {
 
-        var finder = new FindNPostJoined(entityManager, cb);
+        var finder = new FindNPosts(entityManager, cb);
         finder.setVisibilitiesIn(visibilities);
         finder.setUserIdEqual(userId);
 
@@ -191,7 +191,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
             long userId,
             long karmaScore) {
 
-        var finder = new FindNPostJoined(entityManager, cb);
+        var finder = new FindNPosts(entityManager, cb);
         finder.setVisibilitiesIn(visibilities);
         finder.setUserIdEqual(userId);
         finder.setKarmaScoreLessThan(karmaScore);
