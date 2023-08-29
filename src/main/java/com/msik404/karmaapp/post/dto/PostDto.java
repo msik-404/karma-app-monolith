@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class PostJoined {
+public class PostDto {
 
     private Long id;
 

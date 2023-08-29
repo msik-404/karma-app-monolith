@@ -3,31 +3,31 @@ package com.msik404.karmaapp.post.repository;
 import java.util.List;
 
 import com.msik404.karmaapp.post.PostVisibility;
-import com.msik404.karmaapp.post.dto.PostJoined;
+import com.msik404.karmaapp.post.dto.PostDto;
 import com.msik404.karmaapp.post.dto.PostRatingResponse;
 import com.msik404.karmaapp.post.exception.InternalServerErrorException;
 import org.springframework.lang.NonNull;
 
 public interface PostRepositoryCustom {
 
-    List<PostJoined> findTopN(
+    List<PostDto> findTopN(
             int size,
             @NonNull List<PostVisibility> visibilities
             ) throws InternalServerErrorException;
 
-    List<PostJoined> findNextN(
+    List<PostDto> findNextN(
             int size,
             @NonNull List<PostVisibility> visibilities,
             long karmaScore
             ) throws InternalServerErrorException;
 
-    List<PostJoined> findTopNWithUsername(
+    List<PostDto> findTopNWithUsername(
             int size,
             @NonNull List<PostVisibility> visibilities,
             @NonNull String username
     ) throws InternalServerErrorException;
 
-    List<PostJoined> findNextNWithUsername(
+    List<PostDto> findNextNWithUsername(
             int size,
             @NonNull List<PostVisibility> visibilities,
             long karmaScore,
@@ -66,9 +66,9 @@ public interface PostRepositoryCustom {
 
     int changeVisibilityById(long postId, @NonNull PostVisibility visibility);
 
-    List<PostJoined> findTopNWithUserId(int size, @NonNull List<PostVisibility> visibilities, long userId);
+    List<PostDto> findTopNWithUserId(int size, @NonNull List<PostVisibility> visibilities, long userId);
 
-    List<PostJoined> findNextNWithUserId(
+    List<PostDto> findNextNWithUserId(
             int size,
             @NonNull List<PostVisibility> visibilities,
             long userId,

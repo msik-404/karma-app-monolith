@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.msik404.karmaapp.post.Post;
 import com.msik404.karmaapp.post.PostVisibility;
-import com.msik404.karmaapp.post.dto.PostJoined;
+import com.msik404.karmaapp.post.dto.PostDto;
 import com.msik404.karmaapp.post.dto.PostRatingResponse;
 import com.msik404.karmaapp.post.exception.InternalServerErrorException;
 import jakarta.persistence.EntityManager;
@@ -26,7 +26,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<PostJoined> findTopN(
+    public List<PostDto> findTopN(
             int size,
             @NonNull List<PostVisibility> visibilities)
             throws InternalServerErrorException {
@@ -39,7 +39,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<PostJoined> findNextN(
+    public List<PostDto> findNextN(
             int size,
             @NonNull List<PostVisibility> visibilities,
             long karmaScore
@@ -54,7 +54,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<PostJoined> findTopNWithUsername(
+    public List<PostDto> findTopNWithUsername(
             int size,
             @NonNull List<PostVisibility> visibilities,
             @NonNull String username)
@@ -69,7 +69,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<PostJoined> findNextNWithUsername(
+    public List<PostDto> findNextNWithUsername(
             int size,
             @NonNull List<PostVisibility> visibilities,
             long karmaScore,
@@ -175,7 +175,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<PostJoined> findTopNWithUserId(int size, @NonNull List<PostVisibility> visibilities, long userId) {
+    public List<PostDto> findTopNWithUserId(int size, @NonNull List<PostVisibility> visibilities, long userId) {
 
         var finder = new FindNPostJoined(entityManager, cb);
         finder.setVisibilitiesIn(visibilities);
@@ -185,7 +185,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<PostJoined> findNextNWithUserId(
+    public List<PostDto> findNextNWithUserId(
             int size,
             @NonNull List<PostVisibility> visibilities,
             long userId,

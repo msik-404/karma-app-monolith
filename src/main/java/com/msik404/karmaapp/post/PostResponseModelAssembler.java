@@ -3,7 +3,7 @@ package com.msik404.karmaapp.post;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.msik404.karmaapp.post.dto.PostJoined;
+import com.msik404.karmaapp.post.dto.PostDto;
 import com.msik404.karmaapp.post.dto.PostResponse;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
@@ -15,25 +15,25 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Component
-public class PostResponseModelAssembler implements RepresentationModelAssembler<PostJoined, EntityModel<PostResponse>> {
+public class PostResponseModelAssembler implements RepresentationModelAssembler<PostDto, EntityModel<PostResponse>> {
 
-    private PostResponse postResponseBuilder(@NonNull PostJoined postJoined) {
+    private PostResponse postResponseBuilder(@NonNull PostDto postDto) {
 
         return PostResponse.builder()
-                .id(postJoined.getId())
-                .username(postJoined.getUsername())
-                .headline(postJoined.getHeadline())
-                .text(postJoined.getText())
-                .karmaScore(postJoined.getKarmaScore())
-                .visibility(postJoined.getVisibility())
+                .id(postDto.getId())
+                .username(postDto.getUsername())
+                .headline(postDto.getHeadline())
+                .text(postDto.getText())
+                .karmaScore(postDto.getKarmaScore())
+                .visibility(postDto.getVisibility())
                 .build();
     }
 
     @Override
-    public EntityModel<PostResponse> toModel(@NonNull PostJoined postJoined) {
+    public EntityModel<PostResponse> toModel(@NonNull PostDto postDto) {
 
-        final Long postId = postJoined.getId();
-        final var postResponse = postResponseBuilder(postJoined);
+        final Long postId = postDto.getId();
+        final var postResponse = postResponseBuilder(postDto);
 
         List<Link> links = new ArrayList<>();
 

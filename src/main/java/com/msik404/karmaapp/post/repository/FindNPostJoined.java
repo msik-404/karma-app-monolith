@@ -1,13 +1,13 @@
 package com.msik404.karmaapp.post.repository;
 
-import com.msik404.karmaapp.post.dto.PostJoined;
+import com.msik404.karmaapp.post.dto.PostDto;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 
-public class FindNPostJoined extends FindNPostPaginated<PostJoined> {
+public class FindNPostJoined extends FindNPostPaginated<PostDto> {
 
     public FindNPostJoined(EntityManager entityManager, CriteriaBuilder cb) {
-        super(entityManager, cb, PostJoined.class);
+        super(entityManager, cb, PostDto.class);
     }
 
     @Override
@@ -15,7 +15,7 @@ public class FindNPostJoined extends FindNPostPaginated<PostJoined> {
 
         criteriaQuery.select(
                 cb.construct(
-                        PostJoined.class,
+                        PostDto.class,
                         postRoot.get("id"),
                         postRoot.get("user").get("id"),
                         userJoin.get("username"),

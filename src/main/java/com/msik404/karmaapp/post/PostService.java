@@ -13,7 +13,7 @@ import com.msik404.karmaapp.karma.exception.KarmaScoreAlreadyExistsException;
 import com.msik404.karmaapp.karma.exception.KarmaScoreNotFoundException;
 import com.msik404.karmaapp.post.cache.PostRedisCache;
 import com.msik404.karmaapp.post.dto.PostCreationRequest;
-import com.msik404.karmaapp.post.dto.PostJoined;
+import com.msik404.karmaapp.post.dto.PostDto;
 import com.msik404.karmaapp.post.dto.PostRatingResponse;
 import com.msik404.karmaapp.post.exception.FileProcessingException;
 import com.msik404.karmaapp.post.exception.ImageNotFoundException;
@@ -45,19 +45,19 @@ public class PostService {
         return visibilities.size() == 1 && visibilities.contains(PostVisibility.ACTIVE);
     }
 
-    private List<PostJoined> updateCache() {
-        List<PostJoined> newValuesForCache = repository.findTopN(CACHED_POSTS_AMOUNT, List.of(PostVisibility.ACTIVE));
+    private List<PostDto> updateCache() {
+        List<PostDto> newValuesForCache = repository.findTopN(CACHED_POSTS_AMOUNT, List.of(PostVisibility.ACTIVE));
         cache.reinitializeCache(newValuesForCache);
         return newValuesForCache;
     }
 
-    private List<PostJoined> findTopNHandler(int size, List<PostVisibility> visibilities) {
+    private List<PostDto> findTopNHandler(int size, List<PostVisibility> visibilities) {
 
-        List<PostJoined> results;
+        List<PostDto> results;
 
         if (isOnlyActive(visibilities)) {
             if (cache.isEmpty()) {
-                List<PostJoined> newValuesForCache = updateCache();
+                List<PostDto> newValuesForCache = updateCache();
                 results = newValuesForCache.subList(0, size);
             } else {
                 results = cache.findTopNCached(size).orElseGet(() -> repository.findTopN(size, visibilities));
@@ -69,13 +69,13 @@ public class PostService {
         return results;
     }
 
-    private List<PostJoined> findNextNHandler(int size, List<PostVisibility> visibilities, long karmaScore) {
+    private List<PostDto> findNextNHandler(int size, List<PostVisibility> visibilities, long karmaScore) {
 
-        List<PostJoined> results;
+        List<PostDto> results;
 
         if (isOnlyActive(visibilities)) {
             if (cache.isEmpty()) {
-                List<PostJoined> newValuesForCache = updateCache();
+                List<PostDto> newValuesForCache = updateCache();
                 int firstSmallerElementIdx = 0;
                 for (int i = 0; i < newValuesForCache.size(); i++) {
                     if (newValuesForCache.get(i).getKarmaScore() < karmaScore) {
@@ -97,14 +97,14 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public List<PostJoined> findPaginatedPosts(
+    public List<PostDto> findPaginatedPosts(
             int size,
             @NonNull List<PostVisibility> visibilities,
             @Nullable Long karmaScore,
             @Nullable String username)
             throws InternalServerErrorException {
 
-        List<PostJoined> results;
+        List<PostDto> results;
 
         if (karmaScore == null && username == null) {
             results = findTopNHandler(size, visibilities);
@@ -120,7 +120,7 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public List<PostJoined> findPaginatedOwnedPosts(
+    public List<PostDto> findPaginatedOwnedPosts(
             int size,
             @NonNull List<PostVisibility> visibilities,
             @Nullable Long karmaScore)
@@ -129,7 +129,7 @@ public class PostService {
         final var authentication = SecurityContextHolder.getContext().getAuthentication();
         final var userId = (long) authentication.getPrincipal();
 
-        List<PostJoined> results;
+        List<PostDto> results;
 
         if (karmaScore == null) {
             results = repository.findTopNWithUserId(size, visibilities, userId);

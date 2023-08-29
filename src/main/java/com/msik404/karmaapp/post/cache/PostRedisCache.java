@@ -4,7 +4,7 @@ import java.time.Duration;
 import java.util.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.msik404.karmaapp.post.dto.PostJoined;
+import com.msik404.karmaapp.post.dto.PostDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.connection.DefaultStringTuple;
 import org.springframework.data.redis.connection.StringRedisConnection;
@@ -45,16 +45,16 @@ public class PostRedisCache {
      *
      * @param posts Collection of posts which should be placed in a cache.
      */
-    public void reinitializeCache(@NonNull Collection<PostJoined> posts) {
+    public void reinitializeCache(@NonNull Collection<PostDto> posts) {
 
         Set<StringRedisConnection.StringTuple> tuplesToAdd = new HashSet<>(posts.size());
-        for (PostJoined post : posts) {
+        for (PostDto post : posts) {
             var tuple = new DefaultStringTuple(getPostKey(post.getId()), post.getKarmaScore().doubleValue());
             tuplesToAdd.add(tuple);
         }
 
         Map<String, String> valuesMap = new HashMap<>(posts.size());
-        for (PostJoined post : posts) {
+        for (PostDto post : posts) {
             valuesMap.put(getPostKey(post.getId()), serialize(post));
         }
 
@@ -100,7 +100,7 @@ public class PostRedisCache {
         return Optional.ofNullable(byteRedisTemplate.opsForValue().getAndExpire(getPostImageKey(postId), TIMEOUT));
     }
 
-    private Optional<List<PostJoined>> findCachedByZSet(
+    private Optional<List<PostDto>> findCachedByZSet(
             Collection<ZSetOperations.TypedTuple<String>> postIdKeySetWithScores) {
 
         int size = postIdKeySetWithScores.size();
@@ -115,17 +115,17 @@ public class PostRedisCache {
         HashOperations<String, String, String> hashOps = redisTemplate.opsForHash();
         List<String> serializedResults = hashOps.multiGet(POST_HASH_KEY, postIdKeyList);
 
-        List<PostJoined> results = new ArrayList<>(size);
+        List<PostDto> results = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
-            PostJoined postJoinedDto = deserialize(serializedResults.get(i));
-            postJoinedDto.setKarmaScore(postScoreList.get(i).longValue());
-            results.add(postJoinedDto);
+            PostDto postDto = deserialize(serializedResults.get(i));
+            postDto.setKarmaScore(postScoreList.get(i).longValue());
+            results.add(postDto);
         }
 
         return Optional.of(results);
     }
 
-    public Optional<List<PostJoined>> findTopNCached(int size) {
+    public Optional<List<PostDto>> findTopNCached(int size) {
 
         Set<ZSetOperations.TypedTuple<String>> postIdKeySetWithScores = redisTemplate.opsForZSet()
                 .reverseRangeWithScores(KARMA_SCORE_ZSET_KEY, 0, size-1);
@@ -137,7 +137,7 @@ public class PostRedisCache {
         return findCachedByZSet(postIdKeySetWithScores);
     }
 
-    public Optional<List<PostJoined>> findNextNCached(int size, long karmaScore) {
+    public Optional<List<PostDto>> findNextNCached(int size, long karmaScore) {
 
         // offset is one because we have to skip first element with karmaScore, otherwise we will have duplicates
         // in pagination
@@ -186,7 +186,7 @@ public class PostRedisCache {
         return results.size() == 2 && (Long) results.get(0) == 1 && (Long) results.get(1) == 1;
     }
 
-    private String serialize(@NonNull PostJoined post) {
+    private String serialize(@NonNull PostDto post) {
 
         try {
             return objectMapper.writeValueAsString(post);
@@ -195,10 +195,10 @@ public class PostRedisCache {
         }
     }
 
-    private PostJoined deserialize(@NonNull String json) {
+    private PostDto deserialize(@NonNull String json) {
 
         try {
-            return objectMapper.readValue(json, PostJoined.class);
+            return objectMapper.readValue(json, PostDto.class);
         } catch (Exception e) {
             throw new RuntimeException("Error deserializing JSON to PostJoinedDto", e);
         }
