@@ -11,6 +11,7 @@ import com.msik404.karmaapp.karma.KarmaKey;
 import com.msik404.karmaapp.karma.KarmaScoreService;
 import com.msik404.karmaapp.karma.exception.KarmaScoreAlreadyExistsException;
 import com.msik404.karmaapp.karma.exception.KarmaScoreNotFoundException;
+import com.msik404.karmaapp.pagin.Pagination;
 import com.msik404.karmaapp.post.cache.PostRedisCache;
 import com.msik404.karmaapp.post.dto.PostCreationRequest;
 import com.msik404.karmaapp.post.dto.PostDto;
@@ -69,7 +70,7 @@ public class PostService {
         return results;
     }
 
-    private List<PostDto> findNextNHandler(int size, List<Visibility> visibilities, long postId, long karmaScore) {
+    private List<PostDto> findNextNHandler(int size, List<Visibility> visibilities, Pagination pagination) {
 
         List<PostDto> results;
 
@@ -78,19 +79,19 @@ public class PostService {
                 List<PostDto> newValuesForCache = updateCache();
                 int firstSmallerElementIdx = 0;
                 for (int i = 0; i < newValuesForCache.size(); i++) {
-                    if (newValuesForCache.get(i).getKarmaScore() < karmaScore) {
+                    if (newValuesForCache.get(i).getKarmaScore() < pagination.karmaScore()) {
                         firstSmallerElementIdx = i;
                         break;
                     }
                 }
                 results = newValuesForCache.subList(firstSmallerElementIdx, size);
             } else {
-                results = cache.findNextNCached(size, karmaScore).orElseGet(
-                        () -> repository.findNextNPosts(size, visibilities, postId, karmaScore));
+                results = cache.findNextNCached(size, pagination.karmaScore()).orElseGet(
+                        () -> repository.findNextNPosts(size, visibilities, pagination));
             }
 
         } else {
-            results = repository.findNextNPosts(size, visibilities, postId, karmaScore);
+            results = repository.findNextNPosts(size, visibilities, pagination);
         }
 
         return results;
@@ -100,20 +101,19 @@ public class PostService {
     public List<PostDto> findPaginatedPosts(
             int size,
             @NonNull List<Visibility> visibilities,
-            @Nullable Long postId,
-            @Nullable Long karmaScore,
+            @Nullable Pagination pagination,
             @Nullable String username)
             throws InternalServerErrorException {
 
         List<PostDto> results;
 
-        if (karmaScore == null && username == null) {
+        if (pagination == null && username == null) {
             results = findTopNHandler(size, visibilities);
-        } else if (karmaScore != null && username != null) {
-            results = repository.findNextNPostsWithUsername(size, visibilities, karmaScore, username);
-        } else if (karmaScore != null) { // username == null
-            results = findNextNHandler(size, visibilities, postId, karmaScore);
-        } else { // username != null and karmaScore == null
+        } else if (pagination != null && username != null) {
+            results = repository.findNextNPostsWithUsername(size, visibilities, pagination, username);
+        } else if (pagination != null) { // username == null
+            results = findNextNHandler(size, visibilities, pagination);
+        } else { // username != null and pagination == null
             results = repository.findTopNPostsWithUsername(size, visibilities, username);
         }
 
@@ -124,7 +124,7 @@ public class PostService {
     public List<PostDto> findPaginatedOwnedPosts(
             int size,
             @NonNull List<Visibility> visibilities,
-            @Nullable Long karmaScore)
+            @Nullable Pagination pagination)
             throws InternalServerErrorException {
 
         final var authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -132,10 +132,10 @@ public class PostService {
 
         List<PostDto> results;
 
-        if (karmaScore == null) {
+        if (pagination == null) {
             results = repository.findTopNWithUserId(size, visibilities, userId);
         } else {
-            results = repository.findNextNWithUserId(size, visibilities, userId, karmaScore);
+            results = repository.findNextNWithUserId(size, visibilities, userId, pagination);
         }
 
         return results;
@@ -145,7 +145,7 @@ public class PostService {
     public List<PostRatingResponse> findPaginatedPostRatings(
             int size,
             @NonNull List<Visibility> visibilities,
-            @Nullable Long karmaScore,
+            @Nullable Pagination pagination,
             @Nullable String username)
             throws InternalServerErrorException {
 
@@ -154,13 +154,13 @@ public class PostService {
 
         List<PostRatingResponse> results;
 
-        if (karmaScore == null && username == null) {
+        if (pagination == null && username == null) {
             results = repository.findTopNRatings(size, visibilities, userId);
-        } else if (karmaScore != null && username != null) {
-            results = repository.findNextNRatingsWithUsername(size, visibilities, userId, karmaScore, username);
-        } else if (karmaScore != null) { // username == null
-            results = repository.findNextNRatings(size, visibilities, userId, karmaScore);
-        } else { // username != null and karmaScore == null
+        } else if (pagination != null && username != null) {
+            results = repository.findNextNRatingsWithUsername(size, visibilities, userId, pagination, username);
+        } else if (pagination != null) { // username == null
+            results = repository.findNextNRatings(size, visibilities, userId, pagination);
+        } else { // username != null and pagination == null
             results = repository.findTopNRatingsWithUsername(size, visibilities, userId, username);
         }
 

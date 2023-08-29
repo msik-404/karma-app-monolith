@@ -2,6 +2,7 @@ package com.msik404.karmaapp.post.repository;
 
 import java.util.List;
 
+import com.msik404.karmaapp.pagin.Pagination;
 import com.msik404.karmaapp.post.Post;
 import com.msik404.karmaapp.post.Visibility;
 import com.msik404.karmaapp.post.dto.PostDto;
@@ -35,6 +36,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         if (!visibilities.isEmpty()) {
             finder.setVisibilitiesIn(visibilities);
         }
+
         return finder.execute(size);
     }
 
@@ -42,16 +44,14 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     public List<PostDto> findNextNPosts(
             int size,
             @NonNull List<Visibility> visibilities,
-            long postId,
-            long karmaScore
-            ) throws InternalServerErrorException {
+            @NonNull Pagination pagination) throws InternalServerErrorException {
 
         var finder = new FindNPosts(entityManager, cb);
         if (!visibilities.isEmpty()) {
             finder.setVisibilitiesIn(visibilities);
         }
-        finder.setPostIdGreaterThan(postId);
-        finder.setKarmaScoreLessThanOrEqualTo(karmaScore);
+        finder.setPagination(pagination);
+
         return finder.execute(size);
     }
 
@@ -67,6 +67,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
             finder.setVisibilitiesIn(visibilities);
         }
         finder.setUsernameEqual(username);
+
         return finder.execute(size);
     }
 
@@ -74,7 +75,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     public List<PostDto> findNextNPostsWithUsername(
             int size,
             @NonNull List<Visibility> visibilities,
-            long karmaScore,
+            @NonNull Pagination pagination,
             @NonNull String username)
             throws InternalServerErrorException {
 
@@ -82,8 +83,9 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         if (!visibilities.isEmpty()) {
             finder.setVisibilitiesIn(visibilities);
         }
-        finder.setKarmaScoreLessThan(karmaScore);
+        finder.setPagination(pagination);
         finder.setUsernameEqual(username);
+
         return finder.execute(size);
     }
 
@@ -97,6 +99,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         if (!visibilities.isEmpty()) {
             finder.setVisibilitiesIn(visibilities);
         }
+
         return finder.execute(size);
     }
 
@@ -105,14 +108,15 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
             int size,
             @NonNull List<Visibility> visibilities,
             long userId,
-            long karmaScore)
+            @NonNull Pagination pagination)
             throws InternalServerErrorException {
 
         var finder = new FindNRatings(entityManager, cb, userId);
         if (!visibilities.isEmpty()) {
             finder.setVisibilitiesIn(visibilities);
         }
-        finder.setKarmaScoreLessThan(karmaScore);
+        finder.setPagination(pagination);
+
         return finder.execute(size);
     }
 
@@ -129,6 +133,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
             finder.setVisibilitiesIn(visibilities);
         }
         finder.setUsernameEqual(username);
+
         return finder.execute(size);
     }
 
@@ -137,7 +142,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
             int size,
             @NonNull List<Visibility> visibilities,
             long userId,
-            long karmaScore,
+            @NonNull Pagination pagination,
             @NonNull String username)
             throws InternalServerErrorException {
 
@@ -145,8 +150,9 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         if (!visibilities.isEmpty()) {
             finder.setVisibilitiesIn(visibilities);
         }
-        finder.setKarmaScoreLessThan(karmaScore);
+        finder.setPagination(pagination);
         finder.setUsernameEqual(username);
+
         return finder.execute(size);
     }
 
@@ -191,12 +197,12 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
             int size,
             @NonNull List<Visibility> visibilities,
             long userId,
-            long karmaScore) {
+            @NonNull Pagination pagination) {
 
         var finder = new FindNPosts(entityManager, cb);
         finder.setVisibilitiesIn(visibilities);
+        finder.setPagination(pagination);
         finder.setUserIdEqual(userId);
-        finder.setKarmaScoreLessThan(karmaScore);
 
         return finder.execute(size);
     }

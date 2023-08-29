@@ -2,6 +2,7 @@ package com.msik404.karmaapp.post.repository;
 
 import java.util.List;
 
+import com.msik404.karmaapp.pagin.Pagination;
 import com.msik404.karmaapp.post.Visibility;
 import com.msik404.karmaapp.post.dto.PostDto;
 import com.msik404.karmaapp.post.dto.PostRatingResponse;
@@ -18,9 +19,7 @@ public interface PostRepositoryCustom {
     List<PostDto> findNextNPosts(
             int size,
             @NonNull List<Visibility> visibilities,
-            long postId,
-            long karmaScore
-            ) throws InternalServerErrorException;
+            @NonNull Pagination pagination) throws InternalServerErrorException;
 
     List<PostDto> findTopNPostsWithUsername(
             int size,
@@ -31,7 +30,7 @@ public interface PostRepositoryCustom {
     List<PostDto> findNextNPostsWithUsername(
             int size,
             @NonNull List<Visibility> visibilities,
-            long karmaScore,
+            @NonNull Pagination pagination,
             @NonNull String username
     ) throws InternalServerErrorException;
 
@@ -45,8 +44,7 @@ public interface PostRepositoryCustom {
             int size,
             @NonNull List<Visibility> visibilities,
             long userId,
-            long karmaScore
-    ) throws InternalServerErrorException;
+            @NonNull Pagination pagination) throws InternalServerErrorException;
 
     List<PostRatingResponse> findTopNRatingsWithUsername(
             int size,
@@ -59,7 +57,7 @@ public interface PostRepositoryCustom {
             int size,
             @NonNull List<Visibility> visibilities,
             long userId,
-            long karmaScore,
+            @NonNull Pagination pagination,
             @NonNull String username
     ) throws InternalServerErrorException;
 
@@ -73,5 +71,5 @@ public interface PostRepositoryCustom {
             int size,
             @NonNull List<Visibility> visibilities,
             long userId,
-            long karmaScore);
+            @NonNull Pagination pagination);
 }

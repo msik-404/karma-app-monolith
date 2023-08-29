@@ -7,6 +7,7 @@ import com.msik404.karmaapp.TestingDataCreator;
 import com.msik404.karmaapp.constraintExceptions.ConstraintExceptionsHandler;
 import com.msik404.karmaapp.constraintExceptions.strategy.ConstraintViolationExceptionErrorMessageExtractionStrategy;
 import com.msik404.karmaapp.constraintExceptions.strategy.RoundBraceErrorMassageParseStrategy;
+import com.msik404.karmaapp.pagin.Pagination;
 import com.msik404.karmaapp.post.Post;
 import com.msik404.karmaapp.post.Visibility;
 import com.msik404.karmaapp.post.dto.PostDto;
@@ -144,12 +145,11 @@ class PostRepositoryCustomImplTest {
         }
 
         final PostDto lastPost = topResults.get(topResults.size()-1);
-        final long lastPostId = lastPost.getId();
-        final long lastPostScore = lastPost.getKarmaScore();
+        final var pagination = new Pagination(lastPost.getId(), lastPost.getKarmaScore());
 
         final int nextSize = 2;
 
-        final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, lastPostId, lastPostScore);
+        final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, pagination);
 
         assertEquals(2, nextResults.size());
 
@@ -181,12 +181,11 @@ class PostRepositoryCustomImplTest {
         }
 
         final PostDto lastPost = topResults.get(topResults.size()-1);
-        final long lastPostId = lastPost.getId();
-        final long lastPostScore = lastPost.getKarmaScore();
+        final var pagination = new Pagination(lastPost.getId(), lastPost.getKarmaScore());
 
         final int nextSize = 0;
 
-        final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, lastPostId, lastPostScore);
+        final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, pagination);
 
         assertEquals(0, nextResults.size());
     }
@@ -210,12 +209,11 @@ class PostRepositoryCustomImplTest {
         }
 
         final PostDto lastPost = topResults.get(topResults.size()-1);
-        final long lastPostId = lastPost.getId();
-        final long lastPostScore = lastPost.getKarmaScore();
+        final var pagination = new Pagination(lastPost.getId(), lastPost.getKarmaScore());
 
         final int nextSize = 3;
 
-        final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, lastPostId, lastPostScore);
+        final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, pagination);
 
         assertEquals(3, nextResults.size());
 
@@ -247,12 +245,11 @@ class PostRepositoryCustomImplTest {
         }
 
         final PostDto lastPost = topResults.get(topResults.size()-1);
-        final long lastPostId = lastPost.getId();
-        final long lastPostScore = lastPost.getKarmaScore();
+        final var pagination = new Pagination(lastPost.getId(), lastPost.getKarmaScore());
 
         final int nextSize = 3;
 
-        final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, lastPostId, lastPostScore);
+        final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, pagination);
 
         assertEquals(2, nextResults.size());
 
@@ -284,12 +281,11 @@ class PostRepositoryCustomImplTest {
         }
 
         final PostDto lastPost = topResults.get(topResults.size()-1);
-        final long lastPostId = lastPost.getId();
-        final long lastPostScore = lastPost.getKarmaScore();
+        final var pagination = new Pagination(lastPost.getId(), lastPost.getKarmaScore());
 
         final int nextSize = 3;
 
-        final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, lastPostId, lastPostScore);
+        final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, pagination);
 
         assertEquals(1, nextResults.size());
 
@@ -321,12 +317,11 @@ class PostRepositoryCustomImplTest {
         }
 
         final PostDto lastPost = topResults.get(topResults.size()-1);
-        final long lastPostId = lastPost.getId();
-        final long lastPostScore = lastPost.getKarmaScore();
+        final var pagination = new Pagination(lastPost.getId(), lastPost.getKarmaScore());
 
         final int nextSize = 3;
 
-        final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, lastPostId, lastPostScore);
+        final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, pagination);
 
         assertEquals(0, nextResults.size());
     }
@@ -437,19 +432,19 @@ class PostRepositoryCustomImplTest {
         assertEquals(allTopPersistedPostsOfUserOne.get(0).getId(), topResults.get(0).getId());
         assertEquals(allTopPersistedPostsOfUserOne.get(0).getKarmaScore(), topResults.get(0).getKarmaScore());
 
+        final PostDto lastPost = topResults.get(topResults.size()-1);
+        final var pagination = new Pagination(lastPost.getId(), lastPost.getKarmaScore());
+
         final int nextSize = 2;
 
-        final long lastPostScore = topResults.get(0).getKarmaScore();
         final List<PostDto> nextResults = postRepository.findNextNPostsWithUsername(
-                nextSize, visibilities, lastPostScore, username);
-
-        final int endBound = Math.min(topSize + nextSize, allTopPersistedPostsOfUserOne.size());
-        final List<Post> groundTruth = allTopPersistedPostsOfUserOne.subList(topSize, endBound);
+                nextSize, visibilities, pagination, username);
 
         assertEquals(2, nextResults.size());
 
         // Posts that should be returned to pass the test
-//        final List<Post> groundTruth = dataCreator.getTopPosts().subList(topSize, topSize + nextSize);
+        final int endBound = Math.min(topSize + nextSize, allTopPersistedPostsOfUserOne.size());
+        final List<Post> groundTruth = allTopPersistedPostsOfUserOne.subList(topSize, endBound);
         for (int i = 0; i < nextResults.size(); i++) {
             assertEquals(groundTruth.get(i).getId(), nextResults.get(i).getId());
             assertEquals(groundTruth.get(i).getKarmaScore(), nextResults.get(i).getKarmaScore());

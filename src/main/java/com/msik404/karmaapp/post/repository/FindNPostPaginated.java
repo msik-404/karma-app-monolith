@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.msik404.karmaapp.pagin.Pagination;
 import com.msik404.karmaapp.post.Post;
 import com.msik404.karmaapp.post.Visibility;
 import com.msik404.karmaapp.user.User;
@@ -11,7 +12,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.*;
 import org.springframework.lang.NonNull;
 
-public abstract class FindNPostPaginated<T> extends FindTemplate<T>{
+public abstract class FindNPostPaginated<T> extends FindTemplate<T> {
 
     protected Root<Post> postRoot;
     protected Join<Post, User> userJoin;
@@ -30,16 +31,21 @@ public abstract class FindNPostPaginated<T> extends FindTemplate<T>{
         wherePredicateMap.put("visibilityPredicate", postRoot.get("visibility").in(visibilities));
     }
 
-    public void setPostIdGreaterThan(long postId) {
-        wherePredicateMap.put("postIdPredicate", cb.greaterThan(postRoot.get("id"), postId));
-    }
+    /**
+     * Fancy method that set predicate used to perform stable sort on two columns.
+     * In postgresql this could be rewritten as (karmaScore, postId) > (?, ?)
+     *
+     * @param pagination object with variables required to perform stable sort. These variables are postId and karmaScore
+     */
+    public void setPagination(@NonNull Pagination pagination) {
 
-    public void setKarmaScoreLessThanOrEqualTo(long karmaScore) {
-        wherePredicateMap.put("karmaScorePredicate", cb.lessThanOrEqualTo(postRoot.get("karmaScore"), karmaScore));
-    }
-
-    public void setKarmaScoreLessThan(long karmaScore) {
-        wherePredicateMap.put("karmaScorePredicate", cb.lessThan(postRoot.get("karmaScore"), karmaScore));
+        wherePredicateMap.put("paginationPredicate", cb.or(
+                cb.lessThan(postRoot.get("karmaScore"), pagination.karmaScore()),
+                cb.and(
+                        cb.equal(postRoot.get("karmaScore"), pagination.karmaScore()),
+                        cb.greaterThan(postRoot.get("id"), pagination.postId())
+                )
+        ));
     }
 
     public void setUsernameEqual(@NonNull String username) {
