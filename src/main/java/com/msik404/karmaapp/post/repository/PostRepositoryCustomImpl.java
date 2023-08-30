@@ -92,7 +92,8 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     @Override
     public List<PostRatingResponse> findTopNRatings(
             int size,
-            @NonNull List<Visibility> visibilities, long userId)
+            @NonNull List<Visibility> visibilities,
+            long userId)
             throws InternalServerErrorException {
 
         var finder = new FindNRatings(entityManager, cb, userId);
