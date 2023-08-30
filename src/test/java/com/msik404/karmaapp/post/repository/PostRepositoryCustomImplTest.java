@@ -60,7 +60,7 @@ class PostRepositoryCustomImplTest {
     }
 
     @Test
-    void findTopTenActive() {
+    void findTopTenActivePosts() {
 
         // with auto generated ids
         final List<Post> allTopPersistedPosts = dataCreator.getTopPosts(
@@ -79,7 +79,7 @@ class PostRepositoryCustomImplTest {
     }
 
     @Test
-    void findTopFiveActive() {
+    void findTopFiveActivePosts() {
 
         // with auto generated ids
         final List<Post> allTopPersistedPosts = dataCreator.getTopPosts(
@@ -98,7 +98,7 @@ class PostRepositoryCustomImplTest {
     }
 
     @Test
-    void findTopOneActive() {
+    void findTopOneActivePosts() {
 
         // with auto generated ids
         final List<Post> allTopPersistedPosts = dataCreator.getTopPosts(
@@ -117,7 +117,7 @@ class PostRepositoryCustomImplTest {
     }
 
     @Test
-    void findTopZeroActive() {
+    void findTopZeroActivePosts() {
 
         final int size = 0;
         final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
@@ -127,7 +127,7 @@ class PostRepositoryCustomImplTest {
     }
 
     @Test
-    void findNextTwoActiveAfterTopTwoActive() {
+    void findNextTwoActivePostsAfterTopTwoActivePosts() {
 
         // with auto generated ids
         final List<Post> allTopPersistedPosts = dataCreator.getTopPosts(
@@ -163,7 +163,7 @@ class PostRepositoryCustomImplTest {
     }
 
     @Test
-    void findNextZeroActiveAfterTopTwoActive() {
+    void findNextZeroActivePostsAfterTopTwoActivePosts() {
 
         // with auto generated ids
         final List<Post> allTopPersistedPosts = dataCreator.getTopPosts(
@@ -191,7 +191,7 @@ class PostRepositoryCustomImplTest {
     }
 
     @Test
-    void findNextThreeActiveAfterTopFiveActive() {
+    void findNextThreeActivePostsAfterTopFiveActivePosts() {
 
         // with auto generated ids
         final List<Post> allTopPersistedPosts = dataCreator.getTopPosts(
@@ -227,7 +227,7 @@ class PostRepositoryCustomImplTest {
     }
 
     @Test
-    void findNextThreeActiveAfterTopSixActive() {
+    void findNextThreeActivePostsAfterTopSixActivePosts() {
 
         // with auto generated ids
         final List<Post> allTopPersistedPosts = dataCreator.getTopPosts(
@@ -263,7 +263,7 @@ class PostRepositoryCustomImplTest {
     }
 
     @Test
-    void findNextThreeActiveAfterTopSevenActive() {
+    void findNextThreeActivePostsAfterTopSevenActivePosts() {
 
         // with auto generated ids
         final List<Post> allTopPersistedPosts = dataCreator.getTopPosts(
@@ -299,7 +299,7 @@ class PostRepositoryCustomImplTest {
     }
 
     @Test
-    void findNextThreeActiveAfterTopTenActive() {
+    void findNextThreeActivePostsAfterTopTenActivePosts() {
 
         // with auto generated ids
         final List<Post> allTopPersistedPosts = dataCreator.getTopPosts(
@@ -327,7 +327,7 @@ class PostRepositoryCustomImplTest {
     }
 
     @Test
-    void findTopThreeWithUsername() {
+    void findTopThreeActivePostsWithUsername() {
 
         // with auto generated ids
         final List<Post> allTopPersistedPostsOfUserOne = dataCreator.getTopUsersPosts(
@@ -348,7 +348,7 @@ class PostRepositoryCustomImplTest {
     }
 
     @Test
-    void findTopFiveWithUsername() {
+    void findTopFiveActivePostsWithUsername() {
 
         // with auto generated ids
         final List<Post> allTopPersistedPostsOfUserOne = dataCreator.getTopUsersPosts(
@@ -369,7 +369,7 @@ class PostRepositoryCustomImplTest {
     }
 
     @Test
-    void findTopTwoWithUsername() {
+    void findTopTwoActivePostsWithUsername() {
 
         // with auto generated ids
         final List<Post> allTopPersistedPostsOfUserOne = dataCreator.getTopUsersPosts(
@@ -390,7 +390,7 @@ class PostRepositoryCustomImplTest {
     }
 
     @Test
-    void findTopZeroWithUsername() {
+    void findTopZeroActivePostsWithUsername() {
 
         final int size = 0;
         final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
@@ -402,7 +402,7 @@ class PostRepositoryCustomImplTest {
     }
 
     @Test
-    void findTopTwoWithNonExistingUsername() {
+    void findTopTwoActivePostsWithNonExistingUsername() {
 
         final int size = 2;
         final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
@@ -414,7 +414,7 @@ class PostRepositoryCustomImplTest {
     }
 
     @Test
-    void findNextOneActiveAfterTopTwoActiveWithUsername() {
+    void findNextOneActivePostsAfterTopTwoActivePostsWithUsername() {
 
         // with auto generated ids
         final List<Post> allTopPersistedPostsOfUserOne = dataCreator.getTopUsersPosts(
@@ -452,19 +452,11 @@ class PostRepositoryCustomImplTest {
     }
 
 //    @Test
-//    void testFindTopN() {
+//    void findTopNRatings() {
 //    }
 //
 //    @Test
-//    void testFindNextN() {
-//    }
-//
-//    @Test
-//    void testFindTopNWithUsername() {
-//    }
-//
-//    @Test
-//    void testFindNextNWithUsername() {
+//    void findNextNRatings() {
 //    }
 //
 //    @Test
