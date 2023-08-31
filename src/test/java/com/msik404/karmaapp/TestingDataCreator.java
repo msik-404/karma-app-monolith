@@ -1,23 +1,31 @@
 package com.msik404.karmaapp;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import com.msik404.karmaapp.karma.KarmaKey;
+import com.msik404.karmaapp.karma.KarmaScore;
+import com.msik404.karmaapp.karma.KarmaScoreRepository;
 import com.msik404.karmaapp.post.Post;
 import com.msik404.karmaapp.post.Visibility;
+import com.msik404.karmaapp.post.dto.PostRatingResponse;
+import com.msik404.karmaapp.post.repository.PostRepository;
 import com.msik404.karmaapp.user.Role;
 import com.msik404.karmaapp.user.User;
+import com.msik404.karmaapp.user.repository.UserRepository;
 import lombok.Getter;
 import org.springframework.lang.NonNull;
 
 @Getter
 public class TestingDataCreator {
 
-    private final List<User> usersForTesting;
-    private final List<Post> postsForTesting;
+    private static final int USER_AMOUNT = 3;
+    private static final int MOD_AMOUNT = 1;
+    private static final int ADMIN_AMOUNT = 1;
+
+    private final UserRepository userRepository;
+    private final PostRepository postRepository;
+    private final KarmaScoreRepository karmaScoreRepository;
 
     /**
      * This comparator is made so to mimic the desired sort order, that is ascending id and descending score.
@@ -27,23 +35,29 @@ public class TestingDataCreator {
         @Override
         public int compare(Post postOne, Post postTwo) {
             if (postOne.getKarmaScore().equals(postTwo.getKarmaScore())) {
-                return - postOne.getId().compareTo(postTwo.getId());
+                return -postOne.getId().compareTo(postTwo.getId());
             }
             return postOne.getKarmaScore().compareTo(postTwo.getKarmaScore());
         }
 
     }
 
-    public TestingDataCreator() {
+    public TestingDataCreator(UserRepository userRepository, PostRepository postRepository, KarmaScoreRepository karmaScoreRepository) {
 
-        usersForTesting = new ArrayList<>();
-        postsForTesting = new ArrayList<>();
+        this.userRepository = userRepository;
+        this.postRepository = postRepository;
+        this.karmaScoreRepository = karmaScoreRepository;
+    }
 
-        this.createFirstUserData();
-        this.createSecondUserData();
-        this.createThirdUserData();
-        this.createFirstModData();
-        this.createFirstAdminData();
+    public void prepareData() {
+
+        List<User> savedUsers = createUsers();
+
+        createFirstUserPostsData(savedUsers);
+        createSecondUserPostsData(savedUsers);
+        createThirdUserPostsData(savedUsers);
+        createFirstModPostsData(savedUsers);
+        createFirstAdminPostsData(savedUsers);
     }
 
     public List<Post> getTopPosts(@NonNull List<Post> posts, @NonNull Set<Visibility> visibilities) {
@@ -63,22 +77,29 @@ public class TestingDataCreator {
                 .collect(Collectors.toList());
     }
 
+    public List<PostRatingResponse> getTopPostRatingsOfUser(
+            @NonNull List<Post> topPosts,
+            @NonNull List<KarmaScore> karmaScores,
+            long userId) {
+
+        Map<Long, Boolean> userRatingsMap = karmaScores.stream()
+                .filter(karmaScore -> karmaScore.getId().getUserId().equals(userId))
+                .collect(Collectors.toMap(karmaScore -> karmaScore.getId().getPostId(), KarmaScore::getIsPositive));
+
+        return topPosts.stream().map(post ->
+                PostRatingResponse.builder()
+                        .id(post.getId())
+                        .wasRatedPositively(userRatingsMap.getOrDefault(post.getId(), null))
+                        .build()
+        ).toList();
+    }
+
     public String getTestingUsername(long userId) {
         return String.format("username_%d", userId);
     }
 
     public String getTestingEmail(@NonNull String username) {
         return String.format("%s@mail.com", username);
-    }
-
-    private Post getPostForTesting(@NonNull Visibility visibility, long karmaScore, User user) {
-
-        // I ignore fields which will not be useful for query testing.
-        return Post.builder()
-                .visibility(visibility)
-                .karmaScore(karmaScore)
-                .user(user)
-                .build();
     }
 
     private User getUserForTesting(long userId, @NonNull Role role) {
@@ -97,70 +118,170 @@ public class TestingDataCreator {
                 .build();
     }
 
-    private void createFirstUserData() {
+    private Post getPostForTesting(@NonNull Visibility visibility, User user) {
 
-        User user = getUserForTesting(1, Role.USER);
-
-        usersForTesting.add(user);
-
-        postsForTesting.add(getPostForTesting(Visibility.ACTIVE, 11, user));
-        postsForTesting.add(getPostForTesting(Visibility.ACTIVE, 11, user));
-        postsForTesting.add(getPostForTesting(Visibility.ACTIVE, 10, user));
-
-        postsForTesting.add(getPostForTesting(Visibility.HIDDEN, -11, user));
-
-        postsForTesting.add(getPostForTesting(Visibility.DELETED, -100, user));
+        // I ignore fields which will not be useful for query testing.
+        return Post.builder()
+                .visibility(visibility)
+                .user(user)
+                .karmaScore(0L)
+                .build();
     }
 
-    private void createSecondUserData() {
+    private KarmaScore getKarmaScoreForTesting(@NonNull Post post, @NonNull User user, boolean isPositive) {
 
-        User user = getUserForTesting(2, Role.USER);
-
-        usersForTesting.add(user);
-
-        postsForTesting.add(getPostForTesting(Visibility.ACTIVE, 100, user));
-
-        postsForTesting.add(getPostForTesting(Visibility.ACTIVE, 111, user));
+        return KarmaScore.builder()
+                .id(new KarmaKey(user.getId(), post.getId()))
+                .post(post)
+                .user(user)
+                .isPositive(isPositive)
+                .build();
     }
 
-    private void createThirdUserData() {
+    private KarmaScore ratePostByUser(@NonNull Post post, @NonNull User user, boolean isPositive) {
 
-        User user = getUserForTesting(3, Role.USER);
-
-        usersForTesting.add(user);
-
-        postsForTesting.add(getPostForTesting(Visibility.ACTIVE, 30, user));
-
-        postsForTesting.add(getPostForTesting(Visibility.HIDDEN, -11, user));
-        postsForTesting.add(getPostForTesting(Visibility.HIDDEN, -31, user));
-        postsForTesting.add(getPostForTesting(Visibility.HIDDEN, -43, user));
-
-        postsForTesting.add(getPostForTesting(Visibility.DELETED, -58, user));
+        post.setKarmaScore(post.getKarmaScore() + (isPositive ? 1 : -1));
+        return getKarmaScoreForTesting(post, user, isPositive);
     }
 
-    private void createFirstModData() {
+    private List<User> createUsers() {
 
-        User user = getUserForTesting(4, Role.MOD);
+        List<User> usersForTesting = new ArrayList<>(USER_AMOUNT + MOD_AMOUNT + ADMIN_AMOUNT);
 
-        usersForTesting.add(user);
+        for (int i = 0; i < USER_AMOUNT; i++) {
+            User user = getUserForTesting(i + 1, Role.USER);
+            usersForTesting.add(user);
+        }
+        usersForTesting.add(getUserForTesting(4, Role.MOD));
+        usersForTesting.add(getUserForTesting(5, Role.ADMIN));
 
-        postsForTesting.add(getPostForTesting(Visibility.ACTIVE, 77, user));
-
-        postsForTesting.add(getPostForTesting(Visibility.HIDDEN, -23, user));
-
-        postsForTesting.add(getPostForTesting(Visibility.DELETED, -4, user));
+        return userRepository.saveAll(usersForTesting);
     }
 
-    private void createFirstAdminData() {
+    private void createFirstUserPostsData(@NonNull List<User> savedUsers) {
 
-        User user = getUserForTesting(5, Role.ADMIN);
+        final int userId = 0;
+        User savedUserOne = savedUsers.get(userId);
 
-        usersForTesting.add(user);
+        final int karmaScoresAmount = 10;
+        List<KarmaScore> karmaScores = new ArrayList<>(karmaScoresAmount);
 
-        postsForTesting.add(getPostForTesting(Visibility.ACTIVE, 777, user));
+        Post savedPostOne = postRepository.save(getPostForTesting(Visibility.ACTIVE, savedUserOne)); // karmaScore = 3;
+        for (int i = 0; i < 3; i++) {
+            karmaScores.add(ratePostByUser(savedPostOne, savedUsers.get(i), true));
+        }
 
-        postsForTesting.add(getPostForTesting(Visibility.HIDDEN, -83, user));
+        Post savedPostTwo = postRepository.save(getPostForTesting(Visibility.ACTIVE, savedUserOne)); // karmaScore = 3;
+        for (int i = 0; i < 3; i++) {
+            karmaScores.add(ratePostByUser(savedPostTwo, savedUsers.get(i), true));
+        }
 
-        postsForTesting.add(getPostForTesting(Visibility.DELETED, -9, user));
+        Post savedPostThree = postRepository.save(getPostForTesting(Visibility.ACTIVE, savedUserOne)); // karmaScore = 2;
+        for (int i = 0; i < 2; i++) {
+            karmaScores.add(ratePostByUser(savedPostThree, savedUsers.get(i), true));
+        }
+
+        postRepository.save(getPostForTesting(Visibility.HIDDEN, savedUserOne)); // karmaScore = 0;
+
+        Post savedPostFive = postRepository.save(getPostForTesting(Visibility.DELETED, savedUserOne)); // karmaScore = -2;
+        for (int i = 0; i < 2; i++) {
+            karmaScores.add(ratePostByUser(savedPostFive, savedUsers.get(i), false));
+        }
+
+        karmaScoreRepository.saveAll(karmaScores);
+    }
+
+    private void createSecondUserPostsData(@NonNull List<User> savedUsers) {
+
+        final int userId = 1;
+        User savedUserTwo = savedUsers.get(userId);
+
+        final int karmaScoresAmount = 9;
+        List<KarmaScore> karmaScores = new ArrayList<>(karmaScoresAmount);
+
+        Post savedPostOne = postRepository.save(getPostForTesting(Visibility.ACTIVE, savedUserTwo)); // karmaScore = max = 5;
+        for (User user : savedUsers) {
+            karmaScores.add(ratePostByUser(savedPostOne, user, true));
+        }
+
+        Post savedPostTwo = postRepository.save(getPostForTesting(Visibility.ACTIVE, savedUserTwo)); // karmaScore = 4;
+        for (int i = 0; i < 4; i++) {
+            karmaScores.add(ratePostByUser(savedPostTwo, savedUserTwo, true));
+        }
+
+        karmaScoreRepository.saveAll(karmaScores);
+    }
+
+    private void createThirdUserPostsData(@NonNull List<User> savedUsers) {
+
+        final int userId = 2;
+        User savedUserThree = savedUsers.get(userId);
+
+        final int karmaScoresAmount = 7;
+        List<KarmaScore> karmaScores = new ArrayList<>(karmaScoresAmount);
+
+        Post savedPostOne = postRepository.save(getPostForTesting(Visibility.ACTIVE, savedUserThree)); // karmaScore = 3;
+        for (int i = 0; i < 3; i++) {
+            karmaScores.add(ratePostByUser(savedPostOne, savedUsers.get(i), true));
+        }
+
+        postRepository.save(getPostForTesting(Visibility.HIDDEN, savedUserThree)); // karmaScore = 0;
+
+        Post savedPostThree = postRepository.save(getPostForTesting(Visibility.HIDDEN, savedUserThree)); // karmaScore = -1
+        karmaScores.add(ratePostByUser(savedPostThree, savedUsers.get(0), false));
+
+        Post savedPostFour = postRepository.save(getPostForTesting(Visibility.HIDDEN, savedUserThree)); // karmaScore = -1;
+        karmaScores.add(ratePostByUser(savedPostFour, savedUsers.get(0), false));
+
+        Post savedPostFive = postRepository.save(getPostForTesting(Visibility.DELETED, savedUserThree)); // karmaScore = -2;
+        for (int i = 0; i < 2; i++) {
+            karmaScores.add(ratePostByUser(savedPostFive, savedUsers.get(i), false));
+        }
+
+        karmaScoreRepository.saveAll(karmaScores);
+    }
+
+    private void createFirstModPostsData(@NonNull List<User> savedUsers) {
+
+        final int userId = 3;
+        User savedModUserOne = savedUsers.get(userId);
+
+        final int karmaScoresAmount = 6;
+        List<KarmaScore> karmaScores = new ArrayList<>(karmaScoresAmount);
+
+        postRepository.save(getPostForTesting(Visibility.ACTIVE, savedModUserOne)); // karmaScore = 0;
+
+        Post savedPostTwo = postRepository.save(getPostForTesting(Visibility.HIDDEN, savedModUserOne)); // karmaScore = -2;
+        for (int i = 0; i < 2; i++) {
+            karmaScores.add(ratePostByUser(savedPostTwo, savedUsers.get(i), false));
+        }
+
+        Post savedPostThree = postRepository.save(getPostForTesting(Visibility.DELETED, savedModUserOne)); // karmaScore = -4;
+        for (int i = 0; i < 4; i++) {
+            karmaScores.add(ratePostByUser(savedPostThree, savedUsers.get(i), false));
+        }
+
+        karmaScoreRepository.saveAll(karmaScores);
+    }
+
+    private void createFirstAdminPostsData(@NonNull List<User> savedUsers) {
+
+        final int userId = 4;
+        User savedAdminUserOne = savedUsers.get(userId);
+
+        final int karmaScoresAmount = 6;
+        final List<KarmaScore> karmaScores = new ArrayList<>(karmaScoresAmount);
+
+        Post savedPostOne = postRepository.save(getPostForTesting(Visibility.ACTIVE, savedAdminUserOne)); // karmaScore = 1;
+        karmaScores.add(ratePostByUser(savedPostOne, savedUsers.get(0), true));
+
+        postRepository.save(getPostForTesting(Visibility.HIDDEN, savedAdminUserOne)); // karmaScore = 0;
+
+        Post savedPostThree = postRepository.save(getPostForTesting(Visibility.DELETED, savedAdminUserOne)); // karmaScore = min = -5;
+        for (User user : savedUsers) {
+            karmaScores.add(ratePostByUser(savedPostThree, user, false));
+        }
+
+        karmaScoreRepository.saveAll(karmaScores);
     }
 }

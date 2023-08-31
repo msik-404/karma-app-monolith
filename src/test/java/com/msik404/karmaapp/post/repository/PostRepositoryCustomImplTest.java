@@ -1,16 +1,20 @@
 package com.msik404.karmaapp.post.repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import com.msik404.karmaapp.TestingDataCreator;
 import com.msik404.karmaapp.constraintExceptions.ConstraintExceptionsHandler;
 import com.msik404.karmaapp.constraintExceptions.strategy.ConstraintViolationExceptionErrorMessageExtractionStrategy;
 import com.msik404.karmaapp.constraintExceptions.strategy.RoundBraceErrorMassageParseStrategy;
+import com.msik404.karmaapp.karma.KarmaScoreRepository;
 import com.msik404.karmaapp.pagin.Pagination;
 import com.msik404.karmaapp.post.Post;
 import com.msik404.karmaapp.post.Visibility;
 import com.msik404.karmaapp.post.dto.PostDto;
+import com.msik404.karmaapp.post.dto.PostRatingResponse;
+import com.msik404.karmaapp.user.User;
 import com.msik404.karmaapp.user.repository.UserCriteriaUpdater;
 import com.msik404.karmaapp.user.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -22,6 +26,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 @Import({
@@ -35,21 +40,23 @@ class PostRepositoryCustomImplTest {
 
     private final TestingDataCreator dataCreator;
 
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private PostRepository postRepository;
+    private final UserRepository userRepository;
+    private final PostRepository postRepository;
+    private final KarmaScoreRepository karmaScoreRepository;
 
-    PostRepositoryCustomImplTest() {
+    @Autowired
+    PostRepositoryCustomImplTest(UserRepository userRepository, PostRepository postRepository, KarmaScoreRepository karmaScoreRepository) {
 
-        this.dataCreator = new TestingDataCreator();
+        this.userRepository = userRepository;
+        this.postRepository = postRepository;
+        this.karmaScoreRepository = karmaScoreRepository;
+
+        this.dataCreator = new TestingDataCreator(userRepository, postRepository, karmaScoreRepository);
     }
 
     @BeforeEach
     void setUp() {
-
-        userRepository.saveAll(dataCreator.getUsersForTesting());
-        postRepository.saveAll(dataCreator.getPostsForTesting());
+        dataCreator.prepareData();
     }
 
     @AfterEach
@@ -57,6 +64,7 @@ class PostRepositoryCustomImplTest {
 
         postRepository.deleteAll();
         userRepository.deleteAll();
+        karmaScoreRepository.deleteAll();
     }
 
     @Test
@@ -327,27 +335,6 @@ class PostRepositoryCustomImplTest {
     }
 
     @Test
-    void findTopThreeActivePostsWithUsername() {
-
-        // with auto generated ids
-        final List<Post> allTopPersistedPostsOfUserOne = dataCreator.getTopUsersPosts(
-                postRepository.findAll(), 1, Set.of(Visibility.ACTIVE));
-
-        final int size = 3;
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
-
-        final List<PostDto> results = postRepository.findTopNPostsWithUsername(
-                size, visibilities, dataCreator.getTestingUsername(1));
-
-        assertEquals(3, results.size());
-
-        for (int i = 0; i < results.size(); i++) {
-            assertEquals(allTopPersistedPostsOfUserOne.get(i).getId(), results.get(i).getId());
-            assertEquals(allTopPersistedPostsOfUserOne.get(i).getKarmaScore(), results.get(i).getKarmaScore());
-        }
-    }
-
-    @Test
     void findTopFiveActivePostsWithUsername() {
 
         // with auto generated ids
@@ -366,39 +353,6 @@ class PostRepositoryCustomImplTest {
             assertEquals(allTopPersistedPostsOfUserOne.get(i).getId(), results.get(i).getId());
             assertEquals(allTopPersistedPostsOfUserOne.get(i).getKarmaScore(), results.get(i).getKarmaScore());
         }
-    }
-
-    @Test
-    void findTopTwoActivePostsWithUsername() {
-
-        // with auto generated ids
-        final List<Post> allTopPersistedPostsOfUserOne = dataCreator.getTopUsersPosts(
-                postRepository.findAll(), 1, Set.of(Visibility.ACTIVE));
-
-        final int size = 2;
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
-
-        final List<PostDto> results = postRepository.findTopNPostsWithUsername(
-                size, visibilities, dataCreator.getTestingUsername(1));
-
-        assertEquals(2, results.size());
-
-        for (int i = 0; i < results.size(); i++) {
-            assertEquals(allTopPersistedPostsOfUserOne.get(i).getId(), results.get(i).getId());
-            assertEquals(allTopPersistedPostsOfUserOne.get(i).getKarmaScore(), results.get(i).getKarmaScore());
-        }
-    }
-
-    @Test
-    void findTopZeroActivePostsWithUsername() {
-
-        final int size = 0;
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
-
-        final List<PostDto> results = postRepository.findTopNPostsWithUsername(
-                size, visibilities, dataCreator.getTestingUsername(1));
-
-        assertEquals(0, results.size());
     }
 
     @Test
@@ -451,10 +405,36 @@ class PostRepositoryCustomImplTest {
         }
     }
 
-//    @Test
-//    void findTopNRatings() {
-//    }
-//
+    @Test
+    void findTopEightActiveRatingsByUserOne() {
+
+        // with auto generated ids
+        final List<Post> allTopPersistedPosts = dataCreator.getTopPosts(
+                postRepository.findAll(), Set.of(Visibility.ACTIVE));
+
+        final int topSize = 8;
+        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        final String username = dataCreator.getTestingUsername(1);
+
+        final Optional<User> optionalUser = userRepository.findByUsername(username);
+
+        assertTrue(optionalUser.isPresent());
+
+        final long userId = optionalUser.get().getId();
+
+        final List<PostRatingResponse> results = postRepository.findTopNRatings(topSize, visibilities, userId);
+
+        assertEquals(8, results.size());
+
+        final List<PostRatingResponse> groundTruth = dataCreator.getTopPostRatingsOfUser(
+                allTopPersistedPosts, karmaScoreRepository.findAll(), userId);
+
+        for (int i = 0; i < results.size(); i++) {
+            assertEquals(allTopPersistedPosts.get(i).getId(), results.get(i).getId());
+            assertEquals(groundTruth.get(i), results.get(i));
+        }
+    }
+
 //    @Test
 //    void findNextNRatings() {
 //    }
