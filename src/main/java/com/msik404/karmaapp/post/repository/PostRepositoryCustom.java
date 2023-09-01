@@ -34,6 +34,14 @@ public interface PostRepositoryCustom {
             @NonNull String username
     ) throws InternalServerErrorException;
 
+    List<PostDto> findTopNWithUserId(int size, @NonNull List<Visibility> visibilities, long userId);
+
+    List<PostDto> findNextNWithUserId(
+            int size,
+            @NonNull List<Visibility> visibilities,
+            long userId,
+            @NonNull Pagination pagination);
+
     List<PostRatingResponse> findTopNRatings(
             int size,
             @NonNull List<Visibility> visibilities,
@@ -64,12 +72,4 @@ public interface PostRepositoryCustom {
     int addKarmaScoreToPost(long postId, long value);
 
     int changeVisibilityById(long postId, @NonNull Visibility visibility);
-
-    List<PostDto> findTopNWithUserId(int size, @NonNull List<Visibility> visibilities, long userId);
-
-    List<PostDto> findNextNWithUserId(
-            int size,
-            @NonNull List<Visibility> visibilities,
-            long userId,
-            @NonNull Pagination pagination);
 }

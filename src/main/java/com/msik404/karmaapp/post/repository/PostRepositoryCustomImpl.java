@@ -90,6 +90,31 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
+    public List<PostDto> findTopNWithUserId(int size, @NonNull List<Visibility> visibilities, long userId) {
+
+        var finder = new FindNPosts(entityManager, cb);
+        finder.setVisibilitiesIn(visibilities);
+        finder.setUserIdEqual(userId);
+
+        return finder.execute(size);
+    }
+
+    @Override
+    public List<PostDto> findNextNWithUserId(
+            int size,
+            @NonNull List<Visibility> visibilities,
+            long userId,
+            @NonNull Pagination pagination) {
+
+        var finder = new FindNPosts(entityManager, cb);
+        finder.setVisibilitiesIn(visibilities);
+        finder.setPagination(pagination);
+        finder.setUserIdEqual(userId);
+
+        return finder.execute(size);
+    }
+
+    @Override
     public List<PostRatingResponse> findTopNRatings(
             int size,
             @NonNull List<Visibility> visibilities,
@@ -181,31 +206,6 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         criteriaUpdate.where(cb.equal(root.get("id"), postId));
 
         return entityManager.createQuery(criteriaUpdate).executeUpdate();
-    }
-
-    @Override
-    public List<PostDto> findTopNWithUserId(int size, @NonNull List<Visibility> visibilities, long userId) {
-
-        var finder = new FindNPosts(entityManager, cb);
-        finder.setVisibilitiesIn(visibilities);
-        finder.setUserIdEqual(userId);
-
-        return finder.execute(size);
-    }
-
-    @Override
-    public List<PostDto> findNextNWithUserId(
-            int size,
-            @NonNull List<Visibility> visibilities,
-            long userId,
-            @NonNull Pagination pagination) {
-
-        var finder = new FindNPosts(entityManager, cb);
-        finder.setVisibilitiesIn(visibilities);
-        finder.setPagination(pagination);
-        finder.setUserIdEqual(userId);
-
-        return finder.execute(size);
     }
 
 }
