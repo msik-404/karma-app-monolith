@@ -68,10 +68,11 @@ public class TestingDataCreator {
                 .collect(Collectors.toList());
     }
 
-    public List<Post> getTopUsersPosts(@NonNull List<Post> posts, long userId, @NonNull Set<Visibility> visibilities) {
+    public List<Post> getTopUsersPosts(
+            @NonNull List<Post> posts, @NonNull String username, @NonNull Set<Visibility> visibilities) {
 
         return posts.stream()
-                .filter(post -> post.getUser().getUsername().equals(getTestingUsername(userId)))
+                .filter(post -> post.getUser().getUsername().equals(username))
                 .filter(post -> visibilities.contains(post.getVisibility()))
                 .sorted(new PostComparator().reversed())
                 .collect(Collectors.toList());
