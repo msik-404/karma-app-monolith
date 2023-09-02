@@ -60,7 +60,7 @@ public class TestingDataCreator {
         createFirstAdminPostsData(savedUsers);
     }
 
-    public List<Post> getTopPosts(@NonNull List<Post> posts, @NonNull Set<Visibility> visibilities) {
+    public static List<Post> getTopPosts(@NonNull List<Post> posts, @NonNull Set<Visibility> visibilities) {
 
         return posts.stream()
                 .filter(post -> visibilities.contains(post.getVisibility()))
@@ -68,7 +68,7 @@ public class TestingDataCreator {
                 .collect(Collectors.toList());
     }
 
-    public List<Post> getTopUsersPosts(
+    public static List<Post> getTopUsersPosts(
             @NonNull List<Post> posts, @NonNull String username, @NonNull Set<Visibility> visibilities) {
 
         return posts.stream()
@@ -78,7 +78,7 @@ public class TestingDataCreator {
                 .collect(Collectors.toList());
     }
 
-    public List<PostRatingResponse> getTopPostRatingsOfUser(
+    public static List<PostRatingResponse> getTopPostRatingsOfUser(
             @NonNull List<Post> topPosts,
             @NonNull List<KarmaScore> karmaScores,
             long userId) {
@@ -95,15 +95,15 @@ public class TestingDataCreator {
         ).toList();
     }
 
-    public String getTestingUsername(long userId) {
+    public static String getTestingUsername(long userId) {
         return String.format("username_%d", userId);
     }
 
-    public String getTestingEmail(@NonNull String username) {
+    public static String getTestingEmail(@NonNull String username) {
         return String.format("%s@mail.com", username);
     }
 
-    private User getUserForTesting(long userId, @NonNull Role role) {
+    public static User getUserForTesting(long userId, @NonNull Role role) {
 
         String username = getTestingUsername(userId);
 
@@ -119,7 +119,7 @@ public class TestingDataCreator {
                 .build();
     }
 
-    private Post getPostForTesting(@NonNull Visibility visibility, @NonNull User user, long karmaScore) {
+    private static Post getPostForTesting(@NonNull Visibility visibility, @NonNull User user, long karmaScore) {
 
         // I ignore fields which will not be useful for query testing.
         return Post.builder()
@@ -129,18 +129,14 @@ public class TestingDataCreator {
                 .build();
     }
 
-    private KarmaScore getKarmaScoreForTesting(@NonNull Post post, @NonNull User user, boolean isPositive) {
+    private static KarmaScore getKarmaScoreForTesting(@NonNull Post post, @NonNull User user, boolean isPositive) {
 
-        return KarmaScore.builder()
+        return com.msik404.karmaapp.karma.KarmaScore.builder()
                 .id(new KarmaKey(user.getId(), post.getId()))
                 .post(post)
                 .user(user)
                 .isPositive(isPositive)
                 .build();
-    }
-
-    private KarmaScore ratePostByUser(@NonNull Post post, @NonNull User user, boolean isPositive) {
-        return getKarmaScoreForTesting(post, user, isPositive);
     }
 
     private List<User> createUsers() {
@@ -166,24 +162,24 @@ public class TestingDataCreator {
 
         Post savedPostOne = postRepository.save(getPostForTesting(Visibility.ACTIVE, savedUserOne, 3)); // karmaScore = 3;
         for (int i = 0; i < 3; i++) {
-            karmaScores.add(ratePostByUser(savedPostOne, savedUsers.get(i), true));
+            karmaScores.add(getKarmaScoreForTesting(savedPostOne, savedUsers.get(i), true));
         }
 
         Post savedPostTwo = postRepository.save(getPostForTesting(Visibility.ACTIVE, savedUserOne, 3)); // karmaScore = 3;
         for (int i = 0; i < 3; i++) {
-            karmaScores.add(ratePostByUser(savedPostTwo, savedUsers.get(i), true));
+            karmaScores.add(getKarmaScoreForTesting(savedPostTwo, savedUsers.get(i), true));
         }
 
         Post savedPostThree = postRepository.save(getPostForTesting(Visibility.ACTIVE, savedUserOne, 2)); // karmaScore = 2;
         for (int i = 0; i < 2; i++) {
-            karmaScores.add(ratePostByUser(savedPostThree, savedUsers.get(i), true));
+            karmaScores.add(getKarmaScoreForTesting(savedPostThree, savedUsers.get(i), true));
         }
 
         postRepository.save(getPostForTesting(Visibility.HIDDEN, savedUserOne, 0)); // karmaScore = 0;
 
         Post savedPostFive = postRepository.save(getPostForTesting(Visibility.DELETED, savedUserOne, -2)); // karmaScore = -2;
         for (int i = 0; i < 2; i++) {
-            karmaScores.add(ratePostByUser(savedPostFive, savedUsers.get(i), false));
+            karmaScores.add(getKarmaScoreForTesting(savedPostFive, savedUsers.get(i), false));
         }
 
         karmaScoreRepository.saveAll(karmaScores);
@@ -199,12 +195,12 @@ public class TestingDataCreator {
 
         Post savedPostOne = postRepository.save(getPostForTesting(Visibility.ACTIVE, savedUserTwo, 5)); // karmaScore = max = 5;
         for (User user : savedUsers) {
-            karmaScores.add(ratePostByUser(savedPostOne, user, true));
+            karmaScores.add(getKarmaScoreForTesting(savedPostOne, user, true));
         }
 
         Post savedPostTwo = postRepository.save(getPostForTesting(Visibility.ACTIVE, savedUserTwo, 4)); // karmaScore = 4;
         for (int i = 0; i < 4; i++) {
-            karmaScores.add(ratePostByUser(savedPostTwo, savedUserTwo, true));
+            karmaScores.add(getKarmaScoreForTesting(savedPostTwo, savedUserTwo, true));
         }
 
         karmaScoreRepository.saveAll(karmaScores);
@@ -220,20 +216,20 @@ public class TestingDataCreator {
 
         Post savedPostOne = postRepository.save(getPostForTesting(Visibility.ACTIVE, savedUserThree, 3)); // karmaScore = 3;
         for (int i = 0; i < 3; i++) {
-            karmaScores.add(ratePostByUser(savedPostOne, savedUsers.get(i), true));
+            karmaScores.add(getKarmaScoreForTesting(savedPostOne, savedUsers.get(i), true));
         }
 
         postRepository.save(getPostForTesting(Visibility.HIDDEN, savedUserThree, 0)); // karmaScore = 0;
 
         Post savedPostThree = postRepository.save(getPostForTesting(Visibility.HIDDEN, savedUserThree, -1)); // karmaScore = -1
-        karmaScores.add(ratePostByUser(savedPostThree, savedUsers.get(0), false));
+        karmaScores.add(getKarmaScoreForTesting(savedPostThree, savedUsers.get(0), false));
 
         Post savedPostFour = postRepository.save(getPostForTesting(Visibility.HIDDEN, savedUserThree, -1)); // karmaScore = -1;
-        karmaScores.add(ratePostByUser(savedPostFour, savedUsers.get(0), false));
+        karmaScores.add(getKarmaScoreForTesting(savedPostFour, savedUsers.get(0), false));
 
         Post savedPostFive = postRepository.save(getPostForTesting(Visibility.DELETED, savedUserThree, -2)); // karmaScore = -2;
         for (int i = 0; i < 2; i++) {
-            karmaScores.add(ratePostByUser(savedPostFive, savedUsers.get(i), false));
+            karmaScores.add(getKarmaScoreForTesting(savedPostFive, savedUsers.get(i), false));
         }
 
         karmaScoreRepository.saveAll(karmaScores);
@@ -251,12 +247,12 @@ public class TestingDataCreator {
 
         Post savedPostTwo = postRepository.save(getPostForTesting(Visibility.HIDDEN, savedModUserOne, -2)); // karmaScore = -2;
         for (int i = 0; i < 2; i++) {
-            karmaScores.add(ratePostByUser(savedPostTwo, savedUsers.get(i), false));
+            karmaScores.add(getKarmaScoreForTesting(savedPostTwo, savedUsers.get(i), false));
         }
 
         Post savedPostThree = postRepository.save(getPostForTesting(Visibility.DELETED, savedModUserOne, -4)); // karmaScore = -4;
         for (int i = 0; i < 4; i++) {
-            karmaScores.add(ratePostByUser(savedPostThree, savedUsers.get(i), false));
+            karmaScores.add(getKarmaScoreForTesting(savedPostThree, savedUsers.get(i), false));
         }
 
         karmaScoreRepository.saveAll(karmaScores);
@@ -271,13 +267,13 @@ public class TestingDataCreator {
         final List<KarmaScore> karmaScores = new ArrayList<>(karmaScoresAmount);
 
         Post savedPostOne = postRepository.save(getPostForTesting(Visibility.ACTIVE, savedAdminUserOne, 1)); // karmaScore = 1;
-        karmaScores.add(ratePostByUser(savedPostOne, savedUsers.get(0), true));
+        karmaScores.add(getKarmaScoreForTesting(savedPostOne, savedUsers.get(0), true));
 
         postRepository.save(getPostForTesting(Visibility.HIDDEN, savedAdminUserOne, 0)); // karmaScore = 0;
 
         Post savedPostThree = postRepository.save(getPostForTesting(Visibility.DELETED, savedAdminUserOne, -5)); // karmaScore = min = -5;
         for (User user : savedUsers) {
-            karmaScores.add(ratePostByUser(savedPostThree, user, false));
+            karmaScores.add(getKarmaScoreForTesting(savedPostThree, user, false));
         }
 
         karmaScoreRepository.saveAll(karmaScores);
