@@ -24,7 +24,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.lang.NonNull;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -45,14 +51,22 @@ class PostRepositoryCustomImplTest {
     private final PostRepository postRepository;
     private final KarmaScoreRepository karmaScoreRepository;
 
+    private final TransactionTemplate transactionTemplate;
+
     @Autowired
-    PostRepositoryCustomImplTest(UserRepository userRepository, PostRepository postRepository, KarmaScoreRepository karmaScoreRepository) {
+    PostRepositoryCustomImplTest(
+            UserRepository userRepository,
+            PostRepository postRepository,
+            KarmaScoreRepository karmaScoreRepository,
+            TransactionTemplate transactionTemplate) {
 
         this.userRepository = userRepository;
         this.postRepository = postRepository;
         this.karmaScoreRepository = karmaScoreRepository;
 
         this.dataCreator = new TestingDataCreator(userRepository, postRepository, karmaScoreRepository);
+
+        this.transactionTemplate = transactionTemplate;
     }
 
     @BeforeEach
@@ -63,9 +77,9 @@ class PostRepositoryCustomImplTest {
     @AfterEach
     void tearDown() {
 
+        karmaScoreRepository.deleteAll();
         postRepository.deleteAll();
         userRepository.deleteAll();
-        karmaScoreRepository.deleteAll();
     }
 
     @Test
@@ -150,7 +164,7 @@ class PostRepositoryCustomImplTest {
         }
 
         final int nextSize = 2;
-        final PostDto lastPost = topResults.get(topResults.size()-1);
+        final PostDto lastPost = topResults.get(topResults.size() - 1);
         final var pagination = new Pagination(lastPost.getId(), lastPost.getKarmaScore());
 
         final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, pagination);
@@ -184,7 +198,7 @@ class PostRepositoryCustomImplTest {
         }
 
         final int nextSize = 0;
-        final PostDto lastPost = topResults.get(topResults.size()-1);
+        final PostDto lastPost = topResults.get(topResults.size() - 1);
         final var pagination = new Pagination(lastPost.getId(), lastPost.getKarmaScore());
 
         final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, pagination);
@@ -210,7 +224,7 @@ class PostRepositoryCustomImplTest {
         }
 
         final int nextSize = 3;
-        final PostDto lastPost = topResults.get(topResults.size()-1);
+        final PostDto lastPost = topResults.get(topResults.size() - 1);
         final var pagination = new Pagination(lastPost.getId(), lastPost.getKarmaScore());
 
         final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, pagination);
@@ -244,7 +258,7 @@ class PostRepositoryCustomImplTest {
         }
 
         final int nextSize = 3;
-        final PostDto lastPost = topResults.get(topResults.size()-1);
+        final PostDto lastPost = topResults.get(topResults.size() - 1);
         final var pagination = new Pagination(lastPost.getId(), lastPost.getKarmaScore());
 
         final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, pagination);
@@ -277,7 +291,7 @@ class PostRepositoryCustomImplTest {
             assertEquals(groundTruthTopPosts.get(i).getKarmaScore(), topResults.get(i).getKarmaScore());
         }
 
-        final PostDto lastPost = topResults.get(topResults.size()-1);
+        final PostDto lastPost = topResults.get(topResults.size() - 1);
         final var pagination = new Pagination(lastPost.getId(), lastPost.getKarmaScore());
 
         final int nextSize = 3;
@@ -311,7 +325,7 @@ class PostRepositoryCustomImplTest {
             assertEquals(groundTruthTopPosts.get(i).getKarmaScore(), topResults.get(i).getKarmaScore());
         }
 
-        final PostDto lastPost = topResults.get(topResults.size()-1);
+        final PostDto lastPost = topResults.get(topResults.size() - 1);
         final var pagination = new Pagination(lastPost.getId(), lastPost.getKarmaScore());
 
         final int nextSize = 3;
@@ -376,7 +390,7 @@ class PostRepositoryCustomImplTest {
         assertEquals(groundTruthTopPostsOfUserOne.get(0).getId(), topResults.get(0).getId());
         assertEquals(groundTruthTopPostsOfUserOne.get(0).getKarmaScore(), topResults.get(0).getKarmaScore());
 
-        final PostDto lastPost = topResults.get(topResults.size()-1);
+        final PostDto lastPost = topResults.get(topResults.size() - 1);
         final var pagination = new Pagination(lastPost.getId(), lastPost.getKarmaScore());
 
         final int nextSize = 2;
@@ -525,7 +539,7 @@ class PostRepositoryCustomImplTest {
             assertEquals(groundTruthTopRatings.get(i), topResults.get(i));
         }
 
-        final Post lastPost = groundTruthTopPosts.get(topResults.size()-1);
+        final Post lastPost = groundTruthTopPosts.get(topResults.size() - 1);
         final var pagination = new Pagination(lastPost.getId(), lastPost.getKarmaScore());
 
         final int nextSize = 2;
@@ -609,7 +623,7 @@ class PostRepositoryCustomImplTest {
         assertEquals(groundTruthTopPostsOfUserOne.get(0).getId(), topCreatorsResults.get(0).getId());
         assertEquals(groundTruthTopRatings.get(0), topCreatorsResults.get(0));
 
-        final Post lastPost = groundTruthTopPostsOfUserOne.get(topCreatorsResults.size()-1);
+        final Post lastPost = groundTruthTopPostsOfUserOne.get(topCreatorsResults.size() - 1);
         final var pagination = new Pagination(lastPost.getId(), lastPost.getKarmaScore());
 
         final int nextSize = 4;
@@ -630,11 +644,58 @@ class PostRepositoryCustomImplTest {
         }
     }
 
-//    @Test
-//    void addKarmaScoreToPost() {
-//    }
-//
-//    @Test
-//    void changeVisibilityById() {
-//    }
+    @Test
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    void addKarmaScoreToPost() {
+
+        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        final List<Post> groundTruthTopPosts = dataCreator.getTopPosts(
+                postRepository.findAll(), new HashSet<>(visibilities));
+
+        Post topPost = groundTruthTopPosts.get(0);
+
+        final int scoreToAdd = 10;
+        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+            @Override
+            protected void doInTransactionWithoutResult(@NonNull TransactionStatus transactionStatus) {
+                postRepository.addKarmaScoreToPost(topPost.getId(), scoreToAdd);
+            }
+        });
+
+        Optional<Post> optionalUpdatedPost = postRepository.findById(topPost.getId());
+
+        assertTrue(optionalUpdatedPost.isPresent());
+
+        Post updatedPost = optionalUpdatedPost.get();
+
+        assertEquals(topPost.getKarmaScore() + scoreToAdd, updatedPost.getKarmaScore());
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    void changeVisibilityById() {
+
+        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        final List<Post> groundTruthTopPosts = dataCreator.getTopPosts(
+                postRepository.findAll(), new HashSet<>(visibilities));
+
+        Post topPost = groundTruthTopPosts.get(0);
+
+        Visibility newVisibility = Visibility.DELETED;
+
+        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+            @Override
+            protected void doInTransactionWithoutResult(@NonNull TransactionStatus transactionStatus) {
+                postRepository.changeVisibilityById(topPost.getId(), newVisibility);
+            }
+        });
+
+        Optional<Post> optionalUpdatedPost = postRepository.findById(topPost.getId());
+
+        assertTrue(optionalUpdatedPost.isPresent());
+
+        Post updatedPost = optionalUpdatedPost.get();
+
+        assertEquals(newVisibility, updatedPost.getVisibility());
+    }
 }

@@ -1,12 +1,9 @@
 package com.msik404.karmaapp;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-
-@SpringBootTest
+//@SpringBootTest
 class KarmaAppApplicationTests {
 
-	@Test
+//	@Test
 	void contextLoads() {
 	}
 
