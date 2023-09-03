@@ -60,7 +60,8 @@ class UserRepositoryCustomImplTest {
     private final TransactionTemplate transactionTemplate;
 
     @Container
-    private static final PostgreSQLContainer<?> database = new PostgreSQLContainer<>("postgres:alpine");
+    private static final PostgreSQLContainer<?> POSTGRESQL_CONTAINER =
+            new PostgreSQLContainer<>("postgres:alpine");
 
     public static class DataSourceInitializer
             implements ApplicationContextInitializer<ConfigurableApplicationContext> {
@@ -69,9 +70,9 @@ class UserRepositoryCustomImplTest {
         public void initialize(@NonNull ConfigurableApplicationContext applicationContext) {
             TestPropertySourceUtils.addInlinedPropertiesToEnvironment(
                     applicationContext,
-                    "spring.datasource.url=" + database.getJdbcUrl(),
-                    "spring.datasource.username=" + database.getUsername(),
-                    "spring.datasource.password=" + database.getPassword()
+                    "spring.datasource.url=" + POSTGRESQL_CONTAINER.getJdbcUrl(),
+                    "spring.datasource.username=" + POSTGRESQL_CONTAINER.getUsername(),
+                    "spring.datasource.password=" + POSTGRESQL_CONTAINER.getPassword()
             );
         }
     }
