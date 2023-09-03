@@ -6,7 +6,7 @@ import org.springframework.lang.NonNull;
 
 public abstract class BaseExceptionHandler implements ChainExceptionHandler {
 
-    protected Optional<ChainExceptionHandler> nextHandler;
+    protected Optional<ChainExceptionHandler> nextHandler = Optional.empty();
 
     @Override
     public void setNext(@NonNull ChainExceptionHandler handler) {
