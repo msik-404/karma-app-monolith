@@ -1,46 +1,32 @@
 package com.msik404.karmaapp.user.dto;
 
 import com.msik404.karmaapp.user.Role;
-import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import org.springframework.lang.Nullable;
 
-@ToString
-@Setter
-@Getter
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class UserUpdateRequestWithAdminPrivilege extends UserUpdateRequestWithUserPrivilege {
 
-    public UserUpdateRequestWithAdminPrivilege(
-            String firstName,
-            String lastName,
-            String username,
-            String email,
-            String password, Role role,
-            boolean accountNonExpired,
-            boolean accountNonLocked,
-            boolean credentialsNonExpired,
-            boolean enabled) {
+    @Nullable
+    private Role role;
 
-        super(firstName, lastName, username, email, password);
+    @Nullable
+    private Boolean accountNonExpired;
 
-        this.role = role;
-        this.accountNonExpired = accountNonExpired;
-        this.accountNonLocked = accountNonLocked;
-        this.credentialsNonExpired = credentialsNonExpired;
-        this.enabled = enabled;
-    }
+    @Nullable
+    private Boolean accountNonLocked;
 
-    private final Role role;
+    @Nullable
+    private Boolean credentialsNonExpired;
 
-    @NotNull
-    private final boolean accountNonExpired;
-    @NotNull
-    private final boolean accountNonLocked;
-    @NotNull
-    private final boolean credentialsNonExpired;
-    @NotNull
-    private final boolean enabled;
+    @Nullable
+    private Boolean enabled;
 
 }
 

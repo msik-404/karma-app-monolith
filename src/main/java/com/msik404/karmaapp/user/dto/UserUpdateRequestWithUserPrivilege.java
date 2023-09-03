@@ -1,23 +1,29 @@
 package com.msik404.karmaapp.user.dto;
 
 import jakarta.validation.constraints.Email;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
+import org.springframework.lang.Nullable;
 
-@RequiredArgsConstructor
-@ToString
-@Setter
-@Getter
+@Data
+@SuperBuilder
+@NoArgsConstructor
 public class UserUpdateRequestWithUserPrivilege {
 
-    private final String firstName;
-    private final String lastName;
+    @Nullable
+    private String firstName;
 
-    private final String username;
+    @Nullable
+    private String lastName;
+
+    @Nullable
+    private String username;
+
     @Email
-    private final String email;
-    private final String password;
+    @Nullable
+    private String email;
+
+    @Nullable
+    private String password;
 
 }
