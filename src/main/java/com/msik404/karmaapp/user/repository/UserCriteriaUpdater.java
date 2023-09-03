@@ -43,10 +43,18 @@ public class UserCriteriaUpdater {
         if (dto.getRole() != null) {
             criteriaUpdate.set(root.get("role"), dto.getRole());
         }
-        criteriaUpdate.set(root.get("accountNonExpired"), dto.isAccountNonExpired());
-        criteriaUpdate.set(root.get("accountNonLocked"), dto.isAccountNonLocked());
-        criteriaUpdate.set(root.get("credentialsNonExpired"), dto.isCredentialsNonExpired());
-        criteriaUpdate.set(root.get("enabled"), dto.isEnabled());
+        if (dto.getAccountNonExpired() != null) {
+            criteriaUpdate.set(root.get("accountNonExpired"), dto.getAccountNonExpired());
+        }
+        if (dto.getAccountNonLocked() != null) {
+            criteriaUpdate.set(root.get("accountNonLocked"), dto.getAccountNonLocked());
+        }
+        if (dto.getCredentialsNonExpired() != null) {
+            criteriaUpdate.set(root.get("credentialsNonExpired"), dto.getCredentialsNonExpired());
+        }
+        if (dto.getEnabled() != null) {
+            criteriaUpdate.set(root.get("enabled"), dto.getEnabled());
+        }
     }
 
 }
