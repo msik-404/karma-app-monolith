@@ -101,7 +101,7 @@ public class PostRedisCache {
     }
 
     private Optional<List<PostDto>> findCachedByZSet(
-            Collection<ZSetOperations.TypedTuple<String>> postIdKeySetWithScores) {
+            @NonNull Collection<ZSetOperations.TypedTuple<String>> postIdKeySetWithScores) {
 
         int size = postIdKeySetWithScores.size();
 
@@ -152,7 +152,7 @@ public class PostRedisCache {
         return findCachedByZSet(postIdKeySetWithScores);
     }
 
-    public OptionalDouble updateKarmaScoreIfPresent(long postId, Double delta) {
+    public OptionalDouble updateKarmaScoreIfPresent(long postId, double delta) {
 
         ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
         final String postIdKey = getPostKey(postId);
