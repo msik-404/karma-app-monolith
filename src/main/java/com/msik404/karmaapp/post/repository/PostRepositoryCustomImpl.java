@@ -14,7 +14,6 @@ import jakarta.persistence.criteria.Path;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
-// TODO: write tests using h2 in memory database
 @Repository
 public class PostRepositoryCustomImpl implements PostRepositoryCustom {
 
