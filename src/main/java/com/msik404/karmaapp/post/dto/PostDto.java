@@ -1,9 +1,13 @@
 package com.msik404.karmaapp.post.dto;
 
 import com.msik404.karmaapp.post.Visibility;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
 @Builder
 public class PostDto {
