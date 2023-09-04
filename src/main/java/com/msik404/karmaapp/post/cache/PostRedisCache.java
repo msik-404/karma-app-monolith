@@ -169,7 +169,7 @@ public class PostRedisCache {
         return OptionalDouble.of(newScore);
     }
 
-    public boolean deleteFromCache(long postId) {
+    public boolean deletePostFromCache(long postId) {
 
         final String postIdKey = getPostKey(postId);
 
@@ -183,7 +183,7 @@ public class PostRedisCache {
             return null;
         });
 
-        return results.size() == 2 && (Long) results.get(0) == 1 && (Long) results.get(1) == 1;
+        return results.size() == 3 && (Long) results.get(0) == 1 && (Long) results.get(1) == 1;
     }
 
     private String serialize(@NonNull PostDto post) {

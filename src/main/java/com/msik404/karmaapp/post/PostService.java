@@ -304,7 +304,7 @@ public class PostService {
                     post.setVisibility(visibility);
                     repository.save(post);
                     if (!visibility.equals(Visibility.ACTIVE)) {
-                        cache.deleteFromCache(postId);
+                        cache.deletePostFromCache(postId);
                     }
                 },
                 PostNotFoundException::new
@@ -318,7 +318,7 @@ public class PostService {
             throw new PostNotFoundException();
         }
         if (!visibility.equals(Visibility.ACTIVE)) {
-            cache.deleteFromCache(postId);
+            cache.deletePostFromCache(postId);
         }
     }
 }
