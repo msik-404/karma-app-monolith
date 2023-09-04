@@ -61,7 +61,10 @@ public class PostService {
                 List<PostDto> newValuesForCache = updateCache();
                 results = newValuesForCache.subList(0, size);
             } else {
-                results = cache.findTopNCached(size).orElseGet(() -> repository.findTopNPosts(size, visibilities));
+                results = cache.findTopNCached(size);
+                if (results.isEmpty()) {
+                    results = repository.findTopNPosts(size, visibilities);
+                }
             }
         } else {
             results = repository.findTopNPosts(size, visibilities);
@@ -86,8 +89,10 @@ public class PostService {
                 }
                 results = newValuesForCache.subList(firstSmallerElementIdx, size);
             } else {
-                results = cache.findNextNCached(size, pagination.karmaScore()).orElseGet(
-                        () -> repository.findNextNPosts(size, visibilities, pagination));
+                results = cache.findNextNCached(size, pagination.karmaScore());
+                if (results.isEmpty()) {
+                    results = repository.findNextNPosts(size, visibilities, pagination);
+                }
             }
 
         } else {

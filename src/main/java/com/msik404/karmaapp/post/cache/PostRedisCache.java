@@ -100,7 +100,7 @@ public class PostRedisCache {
         return Optional.ofNullable(byteRedisTemplate.opsForValue().getAndExpire(getPostImageKey(postId), TIMEOUT));
     }
 
-    private Optional<List<PostDto>> findCachedByZSet(
+    private List<PostDto> findCachedByZSet(
             @NonNull Collection<ZSetOperations.TypedTuple<String>> postIdKeySetWithScores) {
 
         int size = postIdKeySetWithScores.size();
@@ -122,22 +122,22 @@ public class PostRedisCache {
             results.add(postDto);
         }
 
-        return Optional.of(results);
+        return results;
     }
 
-    public Optional<List<PostDto>> findTopNCached(int size) {
+    public List<PostDto> findTopNCached(int size) {
 
         Set<ZSetOperations.TypedTuple<String>> postIdKeySetWithScores = redisTemplate.opsForZSet()
                 .reverseRangeWithScores(KARMA_SCORE_ZSET_KEY, 0, size-1);
 
         if (postIdKeySetWithScores == null || postIdKeySetWithScores.size() != size) {
-            return Optional.empty();
+            return new ArrayList<>();
         }
 
         return findCachedByZSet(postIdKeySetWithScores);
     }
 
-    public Optional<List<PostDto>> findNextNCached(int size, long karmaScore) {
+    public List<PostDto> findNextNCached(int size, long karmaScore) {
 
         // offset is one because we have to skip first element with karmaScore, otherwise we will have duplicates
         // in pagination
@@ -146,7 +146,7 @@ public class PostRedisCache {
                         KARMA_SCORE_ZSET_KEY, Double.NEGATIVE_INFINITY, karmaScore, 1, size);
 
         if (postIdKeySetWithScores == null || postIdKeySetWithScores.size() != size) {
-            return Optional.empty();
+            return new ArrayList<>();
         }
 
         return findCachedByZSet(postIdKeySetWithScores);
