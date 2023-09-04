@@ -1,18 +1,18 @@
 package com.msik404.karmaapp.post.cache;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.msik404.karmaapp.RedisConfiguration;
 import com.msik404.karmaapp.TestingDataCreator;
 import com.msik404.karmaapp.post.Visibility;
 import com.msik404.karmaapp.post.dto.PostDto;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.lang.NonNull;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -21,11 +21,13 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Testcontainers
 @SpringBootTest(classes = {ObjectMapper.class, RedisConfiguration.class, PostRedisCache.class})
 class PostRedisCacheTest {
+
+    private final RedisConnectionFactory redisConnectionFactory;
 
     private final PostRedisCache redisCache;
 
@@ -42,7 +44,9 @@ class PostRedisCacheTest {
     }
 
     @Autowired
-    PostRedisCacheTest(PostRedisCache redisCache) {
+    PostRedisCacheTest(RedisConnectionFactory redisConnectionFactory, PostRedisCache redisCache) {
+
+        this.redisConnectionFactory = redisConnectionFactory;
         this.redisCache = redisCache;
     }
 
@@ -111,16 +115,9 @@ class PostRedisCacheTest {
         redisCache.reinitializeCache(TEST_CACHED_POSTS);
     }
 
-    @Test
-    void findTopALLCached() {
-
-        final List<PostDto> cachedPosts = redisCache.findTopNCached(TEST_CACHED_POSTS.size());
-
-        assertEquals(TEST_CACHED_POSTS.size(), cachedPosts.size());
-
-        for (int i = 0; i < cachedPosts.size(); i++) {
-            assertEquals(TEST_CACHED_POSTS.get(i), cachedPosts.get(i));
-        }
+    @AfterEach
+    void tearDown() {
+        redisConnectionFactory.getConnection().serverCommands().flushAll();
     }
 
     @Test
@@ -136,6 +133,30 @@ class PostRedisCacheTest {
 
         for (int i = 0; i < posts.size(); i++) {
             assertEquals(posts.get(i), cachedPosts.get(i));
+        }
+    }
+
+    @Test
+    void isNotEmpty() {
+        assertFalse(redisCache.isEmpty());
+    }
+
+    @Test
+    void isEmpty() {
+
+        redisConnectionFactory.getConnection().serverCommands().flushAll();
+        assertTrue(redisCache.isEmpty());
+    }
+
+    @Test
+    void findTopALLCached() {
+
+        final List<PostDto> cachedPosts = redisCache.findTopNCached(TEST_CACHED_POSTS.size());
+
+        assertEquals(TEST_CACHED_POSTS.size(), cachedPosts.size());
+
+        for (int i = 0; i < cachedPosts.size(); i++) {
+            assertEquals(TEST_CACHED_POSTS.get(i), cachedPosts.get(i));
         }
     }
 
@@ -164,6 +185,98 @@ class PostRedisCacheTest {
 
         for (int i = 0; i < nextCachedPosts.size(); i++) {
             assertEquals(groundTruthNextPosts.get(i), nextCachedPosts.get(i));
+        }
+    }
+
+    @Test
+    void cacheImageAndGetCachedImage() {
+
+        final PostDto post = TEST_CACHED_POSTS.get(0);
+        final byte[] dummyImageData = REDIS_CONTAINER.getDockerImageName().getBytes();
+
+        redisCache.cacheImage(post.getId(), dummyImageData);
+
+        final Optional<byte[]> cachedImageData = redisCache.getCachedImage(post.getId());
+
+        assertTrue(cachedImageData.isPresent());
+        assertArrayEquals(dummyImageData, cachedImageData.get());
+    }
+
+    @Test
+    void getNonexistentCachedImage() {
+
+        final PostDto post = TEST_CACHED_POSTS.get(0);
+
+        final Optional<byte[]> cachedImageData = redisCache.getCachedImage(post.getId());
+
+        assertFalse(cachedImageData.isPresent());
+    }
+
+    @Test
+    void updateKarmaScoreIfPresent() {
+
+        final PostDto post = TEST_CACHED_POSTS.get(0);
+
+        final double delta = 1;
+
+        OptionalDouble newScore = redisCache.updateKarmaScoreIfPresent(post.getId(), delta);
+
+        assertTrue(newScore.isPresent());
+
+        assertEquals(post.getKarmaScore() + delta, newScore.getAsDouble());
+
+        final List<PostDto> cachedPosts = redisCache.findTopNCached(TEST_CACHED_POSTS.size());
+
+        assertEquals(TEST_CACHED_POSTS.size(), cachedPosts.size());
+
+        final PostDto newTopPost = PostDto.builder()
+                .id(post.getId())
+                .userId(post.getUserId())
+                .username(post.getUsername())
+                .headline(post.getHeadline())
+                .text(post.getText())
+                .karmaScore((long) (post.getKarmaScore() + delta))
+                .visibility(post.getVisibility())
+                .build();
+
+        assertEquals(newTopPost, cachedPosts.get(0));
+
+        for (int i = 1; i < TEST_CACHED_POSTS.size(); i++) {
+            assertEquals(TEST_CACHED_POSTS.get(i), cachedPosts.get(i));
+        }
+    }
+
+    @Test
+    void updateKarmaScoreIfPresentNonExistent() {
+
+        final int nonExistentUserId = 404;
+
+        final double delta = 1;
+
+        OptionalDouble newScore = redisCache.updateKarmaScoreIfPresent(nonExistentUserId, delta);
+
+        assertTrue(newScore.isEmpty());
+    }
+
+    @Test
+    void deletePostFromCache() {
+
+        final PostDto post = TEST_CACHED_POSTS.get(0);
+
+        boolean wasSuccessful = redisCache.deletePostFromCache(post.getId());
+
+        assertTrue(wasSuccessful);
+
+        final int newSize = TEST_CACHED_POSTS.size()-1;
+
+        final List<PostDto> cachedPosts = redisCache.findTopNCached(newSize);
+
+        assertEquals(newSize, cachedPosts.size());
+
+        final List<PostDto> groundTruthTopPosts = TEST_CACHED_POSTS.subList(1, TEST_CACHED_POSTS.size());
+
+        for (int i = 0; i < cachedPosts.size(); i++) {
+            assertEquals(groundTruthTopPosts.get(i), cachedPosts.get(i));
         }
     }
 }
