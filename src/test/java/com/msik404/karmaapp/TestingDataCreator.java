@@ -34,6 +34,7 @@ public class TestingDataCreator {
 
         @Override
         public int compare(Post postOne, Post postTwo) {
+
             if (postOne.getKarmaScore().equals(postTwo.getKarmaScore())) {
                 return -postOne.getId().compareTo(postTwo.getId());
             }
