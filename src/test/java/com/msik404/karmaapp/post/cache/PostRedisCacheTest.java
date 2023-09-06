@@ -228,12 +228,12 @@ class PostRedisCacheTest {
     }
 
     @Test
-    void updateKarmaScoreIfPresent_PostIdIsTopAndDeltaIsOne_ScoreIsIncreasedAndNewOrderIsInPlace() {
+    void updateKarmaScoreIfPresent_PostIdIsTopAndDeltaIsMinusThree_ScoreIsIncreasedAndNewOrderIsInPlace() {
 
         // given
         final PostDto post = TEST_CACHED_POSTS.get(0);
 
-        final double delta = 1;
+        final double delta = -3;
 
         // when
         OptionalDouble newScore = redisCache.updateKarmaScoreIfPresent(post.getId(), delta);
@@ -247,7 +247,7 @@ class PostRedisCacheTest {
 
         assertEquals(TEST_CACHED_POSTS.size(), cachedPosts.size());
 
-        final PostDto newTopPost = PostDto.builder()
+        final PostDto updatedPost = PostDto.builder()
                 .id(post.getId())
                 .userId(post.getUserId())
                 .username(post.getUsername())
@@ -257,10 +257,15 @@ class PostRedisCacheTest {
                 .visibility(post.getVisibility())
                 .build();
 
-        assertEquals(newTopPost, cachedPosts.get(0));
+        // shallow copy
+        List<PostDto> updatedGroundTruthPosts = new ArrayList<>(TEST_CACHED_POSTS.stream().toList());
+        // make the first element reference to updatedPost
+        updatedGroundTruthPosts.set(0, updatedPost);
+        // sort references
+        updatedGroundTruthPosts.sort(new CachedPostComparator());
 
-        for (int i = 1; i < TEST_CACHED_POSTS.size(); i++) {
-            assertEquals(TEST_CACHED_POSTS.get(i), cachedPosts.get(i));
+        for (int i = 0; i < TEST_CACHED_POSTS.size(); i++) {
+            assertEquals(updatedGroundTruthPosts.get(i), cachedPosts.get(i));
         }
     }
 
