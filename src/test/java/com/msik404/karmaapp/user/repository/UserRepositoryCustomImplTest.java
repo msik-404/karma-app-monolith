@@ -119,7 +119,9 @@ class UserRepositoryCustomImplTest {
     @Test
     void updateNonNullWithPartiallyEmptyDto() {
 
+        // given
         final String username = TestingDataCreator.getTestingUsername(testUserId);
+
         final Optional<User> optionalUser = userRepository.findByUsername(username);
 
         assertTrue(optionalUser.isPresent());
@@ -139,6 +141,7 @@ class UserRepositoryCustomImplTest {
                 .role(newRole)
                 .build();
 
+        // when
         transactionTemplate.execute(new TransactionCallbackWithoutResult() {
             @Override
             protected void doInTransactionWithoutResult(@NonNull TransactionStatus transactionStatus) {
@@ -146,6 +149,7 @@ class UserRepositoryCustomImplTest {
             }
         });
 
+        // then
         final Optional<User> optionalNewUser = userRepository.findByUsername(newUsername);
 
         assertTrue(optionalNewUser.isPresent());
@@ -169,24 +173,28 @@ class UserRepositoryCustomImplTest {
     @Test
     void updateNonNullWithDuplicateUsername() {
 
+        // given
         final String username = TestingDataCreator.getTestingUsername(testUserId);
+
         final Optional<User> optionalUser = userRepository.findByUsername(username);
 
         assertTrue(optionalUser.isPresent());
 
         final long persistedUserId = optionalUser.get().getId();
-
         final int newUserId = 2;
+
         final User newUser = userRepository.save(getUserForTesting(newUserId));
 
         final var dto = UserUpdateRequestWithAdminPrivilege.builder()
                 .username(newUser.getUsername())
                 .build();
 
+        // then
         assertThrows(UnexpectedRollbackException.class, () ->
                 transactionTemplate.execute(new TransactionCallbackWithoutResult() {
                     @Override
                     protected void doInTransactionWithoutResult(@NonNull TransactionStatus transactionStatus) {
+                        // then                                              // when
                         assertThrows(DuplicateUsernameException.class, () -> userRepository.updateNonNull(persistedUserId, dto));
                     }
                 })
@@ -196,6 +204,7 @@ class UserRepositoryCustomImplTest {
     @Test
     void updateNonNullWithDuplicateEmail() {
 
+        // given
         final String username = TestingDataCreator.getTestingUsername(testUserId);
         final Optional<User> optionalUser = userRepository.findByUsername(username);
 
@@ -210,10 +219,12 @@ class UserRepositoryCustomImplTest {
                 .email(newUser.getEmail())
                 .build();
 
+        // then
         assertThrows(UnexpectedRollbackException.class, () ->
                 transactionTemplate.execute(new TransactionCallbackWithoutResult() {
                     @Override
                     protected void doInTransactionWithoutResult(@NonNull TransactionStatus transactionStatus) {
+                        // then                                           // when
                         assertThrows(DuplicateEmailException.class, () -> userRepository.updateNonNull(persistedUserId, dto));
                     }
                 })

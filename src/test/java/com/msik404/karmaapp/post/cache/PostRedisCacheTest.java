@@ -123,10 +123,13 @@ class PostRedisCacheTest {
     @Test
     void reinitializeCache() {
 
+        // given
         final List<PostDto> posts = TEST_CACHED_POSTS.subList(0, 2);
 
+        // when
         redisCache.reinitializeCache(posts);
 
+        // then
         final List<PostDto> cachedPosts = redisCache.findTopNCached(posts.size());
 
         assertEquals(posts.size(), cachedPosts.size());
@@ -144,15 +147,26 @@ class PostRedisCacheTest {
     @Test
     void isEmpty() {
 
+        // given
         redisConnectionFactory.getConnection().serverCommands().flushAll();
-        assertTrue(redisCache.isEmpty());
+
+        // when
+        boolean isCacheEmpty = redisCache.isEmpty();
+
+        // then
+        assertTrue(isCacheEmpty);
     }
 
     @Test
     void findTopALLCached() {
 
-        final List<PostDto> cachedPosts = redisCache.findTopNCached(TEST_CACHED_POSTS.size());
+        // given
+        final int size = TEST_CACHED_POSTS.size();
 
+        // when
+        final List<PostDto> cachedPosts = redisCache.findTopNCached(size);
+
+        // then
         assertEquals(TEST_CACHED_POSTS.size(), cachedPosts.size());
 
         for (int i = 0; i < cachedPosts.size(); i++) {
@@ -163,21 +177,27 @@ class PostRedisCacheTest {
     @Test
     void findNextTwoAfterTopTwoCached() {
 
+        // given
         final int topSize = 2;
 
+        // when
         final List<PostDto> topCachedPosts = redisCache.findTopNCached(topSize);
 
+        // then
         assertEquals(topSize, topCachedPosts.size());
 
         for (int i = 0; i < topCachedPosts.size(); i++) {
             assertEquals(TEST_CACHED_POSTS.get(i), topCachedPosts.get(i));
         }
 
+        // given
         final int nextSize = 2;
         final long lastPostScore = topCachedPosts.get(topSize-1).getKarmaScore();
 
+        // when
         final List<PostDto> nextCachedPosts = redisCache.findNextNCached(nextSize, lastPostScore);
 
+        // then
         assertEquals(nextSize, nextCachedPosts.size());
 
         final int endBound = Math.min(topSize + nextSize, TEST_CACHED_POSTS.size());
@@ -191,13 +211,16 @@ class PostRedisCacheTest {
     @Test
     void cacheImageAndGetCachedImage() {
 
+        // given
         final PostDto post = TEST_CACHED_POSTS.get(0);
         final byte[] dummyImageData = REDIS_CONTAINER.getDockerImageName().getBytes();
 
+        // when
         redisCache.cacheImage(post.getId(), dummyImageData);
 
         final Optional<byte[]> cachedImageData = redisCache.getCachedImage(post.getId());
 
+        // then
         assertTrue(cachedImageData.isPresent());
         assertArrayEquals(dummyImageData, cachedImageData.get());
     }
@@ -205,22 +228,28 @@ class PostRedisCacheTest {
     @Test
     void getNonexistentCachedImage() {
 
+        // given
         final PostDto post = TEST_CACHED_POSTS.get(0);
 
+        // when
         final Optional<byte[]> cachedImageData = redisCache.getCachedImage(post.getId());
 
+        // then
         assertFalse(cachedImageData.isPresent());
     }
 
     @Test
     void updateKarmaScoreIfPresent() {
 
+        // given
         final PostDto post = TEST_CACHED_POSTS.get(0);
 
         final double delta = 1;
 
+        // when
         OptionalDouble newScore = redisCache.updateKarmaScoreIfPresent(post.getId(), delta);
 
+        // then
         assertTrue(newScore.isPresent());
 
         assertEquals(post.getKarmaScore() + delta, newScore.getAsDouble());
@@ -249,22 +278,28 @@ class PostRedisCacheTest {
     @Test
     void updateKarmaScoreIfPresentNonExistent() {
 
+        // given
         final int nonExistentUserId = 404;
 
         final double delta = 1;
 
+        // when
         OptionalDouble newScore = redisCache.updateKarmaScoreIfPresent(nonExistentUserId, delta);
 
+        // then
         assertTrue(newScore.isEmpty());
     }
 
     @Test
     void deletePostFromCache() {
 
+        // given
         final PostDto post = TEST_CACHED_POSTS.get(0);
 
+        // when
         boolean wasSuccessful = redisCache.deletePostFromCache(post.getId());
 
+        // then
         assertTrue(wasSuccessful);
 
         final int newSize = TEST_CACHED_POSTS.size()-1;
