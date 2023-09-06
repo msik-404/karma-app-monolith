@@ -121,7 +121,7 @@ class PostRedisCacheTest {
     }
 
     @Test
-    void reinitializeCache() {
+    void reinitializeCache_TwoPosts_CacheHasOnlyTheseTwoPosts() {
 
         // given
         final List<PostDto> posts = TEST_CACHED_POSTS.subList(0, 2);
@@ -140,12 +140,12 @@ class PostRedisCacheTest {
     }
 
     @Test
-    void isNotEmpty() {
+    void isEmpty_CacheIsNotEmpty_False() {
         assertFalse(redisCache.isEmpty());
     }
 
     @Test
-    void isEmpty() {
+    void isEmpty_CacheIsEmpty_True() {
 
         // given
         redisConnectionFactory.getConnection().serverCommands().flushAll();
@@ -158,7 +158,7 @@ class PostRedisCacheTest {
     }
 
     @Test
-    void findTopALLCached() {
+    void findTopNCached_AllCachedPosts_AllCachedPostsFound() {
 
         // given
         final int size = TEST_CACHED_POSTS.size();
@@ -175,24 +175,13 @@ class PostRedisCacheTest {
     }
 
     @Test
-    void findNextTwoAfterTopTwoCached() {
-
-        // given
-        final int topSize = 2;
-
-        // when
-        final List<PostDto> topCachedPosts = redisCache.findTopNCached(topSize);
-
-        // then
-        assertEquals(topSize, topCachedPosts.size());
-
-        for (int i = 0; i < topCachedPosts.size(); i++) {
-            assertEquals(TEST_CACHED_POSTS.get(i), topCachedPosts.get(i));
-        }
+    void findNextNCached_NextSizeIsTwoAndTopSizeIsTwo_TwoAfterTopTwoFound() {
 
         // given
         final int nextSize = 2;
-        final long lastPostScore = topCachedPosts.get(topSize-1).getKarmaScore();
+        final int topSize = 2;
+
+        final long lastPostScore = TEST_CACHED_POSTS.get(topSize-1).getKarmaScore();
 
         // when
         final List<PostDto> nextCachedPosts = redisCache.findNextNCached(nextSize, lastPostScore);
@@ -209,7 +198,7 @@ class PostRedisCacheTest {
     }
 
     @Test
-    void cacheImageAndGetCachedImage() {
+    void cacheImage_PostIdIsTopAndDataIsTextAsBytes_GetCachedImage() {
 
         // given
         final PostDto post = TEST_CACHED_POSTS.get(0);
@@ -226,7 +215,7 @@ class PostRedisCacheTest {
     }
 
     @Test
-    void getNonexistentCachedImage() {
+    void getCachedImage_PostIdIsTopAndDataIsNonExisting_EmptyOptional() {
 
         // given
         final PostDto post = TEST_CACHED_POSTS.get(0);
@@ -239,7 +228,7 @@ class PostRedisCacheTest {
     }
 
     @Test
-    void updateKarmaScoreIfPresent() {
+    void updateKarmaScoreIfPresent_PostIdIsTopAndDeltaIsOne_ScoreIsIncreasedAndNewOrderIsInPlace() {
 
         // given
         final PostDto post = TEST_CACHED_POSTS.get(0);
@@ -276,7 +265,7 @@ class PostRedisCacheTest {
     }
 
     @Test
-    void updateKarmaScoreIfPresentNonExistent() {
+    void updateKarmaScoreIfPresent_PostIdIsNonExistingAndDeltaIsOne_EmptyOptional() {
 
         // given
         final int nonExistentUserId = 404;
@@ -291,7 +280,7 @@ class PostRedisCacheTest {
     }
 
     @Test
-    void deletePostFromCache() {
+    void deletePostFromCache_PostIdIsTop_PostGotDeletedAndNewOrderIsInPlace() {
 
         // given
         final PostDto post = TEST_CACHED_POSTS.get(0);

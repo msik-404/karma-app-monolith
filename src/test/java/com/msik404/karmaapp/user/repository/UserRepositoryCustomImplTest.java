@@ -117,7 +117,7 @@ class UserRepositoryCustomImplTest {
     }
 
     @Test
-    void updateNonNullWithPartiallyEmptyDto() {
+    void updateNonNull_UserIdIsOneAndDtoHasNullFields_NonNullFieldsAreUpdated() {
 
         // given
         final String username = TestingDataCreator.getTestingUsername(testUserId);
@@ -171,7 +171,7 @@ class UserRepositoryCustomImplTest {
     }
 
     @Test
-    void updateNonNullWithDuplicateUsername() {
+    void updateNonNull_UserIdIsOneAndDtoHasNullFieldsAndUsernameIsDuplicate_DuplicateUsernameExceptionIsThrown() {
 
         // given
         final String username = TestingDataCreator.getTestingUsername(testUserId);
@@ -202,7 +202,7 @@ class UserRepositoryCustomImplTest {
     }
 
     @Test
-    void updateNonNullWithDuplicateEmail() {
+    void updateNonNull_UserIdIsOneAndDtoHasNullFieldsAndEmailIsDuplicate_DuplicateEmailExceptionIsThrown() {
 
         // given
         final String username = TestingDataCreator.getTestingUsername(testUserId);
