@@ -13,6 +13,7 @@ import com.msik404.karmaapp.karma.exception.KarmaScoreAlreadyExistsException;
 import com.msik404.karmaapp.karma.exception.KarmaScoreNotFoundException;
 import com.msik404.karmaapp.pagin.Pagination;
 import com.msik404.karmaapp.post.cache.PostRedisCache;
+import com.msik404.karmaapp.post.cache.PostRedisCacheHandlerService;
 import com.msik404.karmaapp.post.dto.PostCreationRequest;
 import com.msik404.karmaapp.post.dto.PostDto;
 import com.msik404.karmaapp.post.dto.PostRatingResponse;
@@ -35,72 +36,11 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class PostService {
 
-    private static final int CACHED_POSTS_AMOUNT = 10_000;
-
     private final PostRepository repository;
     private final UserRepository userRepository;
     private final KarmaScoreService karmaScoreService;
     private final PostRedisCache cache;
-
-    private static boolean isOnlyActive(@NonNull List<Visibility> visibilities) {
-        return visibilities.size() == 1 && visibilities.contains(Visibility.ACTIVE);
-    }
-
-    private List<PostDto> updateCache() {
-        List<PostDto> newValuesForCache = repository.findTopNPosts(CACHED_POSTS_AMOUNT, List.of(Visibility.ACTIVE));
-        cache.reinitializeCache(newValuesForCache);
-        return newValuesForCache;
-    }
-
-    private List<PostDto> findTopNHandler(int size, List<Visibility> visibilities) {
-
-        List<PostDto> results;
-
-        if (isOnlyActive(visibilities)) {
-            if (cache.isEmpty()) {
-                List<PostDto> newValuesForCache = updateCache();
-                results = newValuesForCache.subList(0, size);
-            } else {
-                results = cache.findTopNCached(size);
-                if (results.isEmpty()) {
-                    results = repository.findTopNPosts(size, visibilities);
-                }
-            }
-        } else {
-            results = repository.findTopNPosts(size, visibilities);
-        }
-
-        return results;
-    }
-
-    private List<PostDto> findNextNHandler(int size, List<Visibility> visibilities, Pagination pagination) {
-
-        List<PostDto> results;
-
-        if (isOnlyActive(visibilities)) {
-            if (cache.isEmpty()) {
-                List<PostDto> newValuesForCache = updateCache();
-                int firstSmallerElementIdx = 0;
-                for (int i = 0; i < newValuesForCache.size(); i++) {
-                    if (newValuesForCache.get(i).getKarmaScore() < pagination.karmaScore()) {
-                        firstSmallerElementIdx = i;
-                        break;
-                    }
-                }
-                results = newValuesForCache.subList(firstSmallerElementIdx, size);
-            } else {
-                results = cache.findNextNCached(size, pagination.karmaScore());
-                if (results.isEmpty()) {
-                    results = repository.findNextNPosts(size, visibilities, pagination);
-                }
-            }
-
-        } else {
-            results = repository.findNextNPosts(size, visibilities, pagination);
-        }
-
-        return results;
-    }
+    private final PostRedisCacheHandlerService cacheService;
 
     @Transactional(readOnly = true)
     public List<PostDto> findPaginatedPosts(
@@ -113,11 +53,11 @@ public class PostService {
         List<PostDto> results;
 
         if (pagination == null && username == null) {
-            results = findTopNHandler(size, visibilities);
+            results = cacheService.findTopNHandler(size, visibilities);
         } else if (pagination != null && username != null) {
             results = repository.findNextNPostsWithUsername(size, visibilities, pagination, username);
         } else if (pagination != null) { // username == null
-            results = findNextNHandler(size, visibilities, pagination);
+            results = cacheService.findNextNHandler(size, visibilities, pagination);
         } else { // username != null and pagination == null
             results = repository.findTopNPostsWithUsername(size, visibilities, username);
         }
