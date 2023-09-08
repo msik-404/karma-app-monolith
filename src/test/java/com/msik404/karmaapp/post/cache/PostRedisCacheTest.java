@@ -124,15 +124,22 @@ class PostRedisCacheTest {
     void reinitializeCache_TwoPosts_CacheHasOnlyTheseTwoPosts() {
 
         // given
-        final List<PostDto> posts = TEST_CACHED_POSTS.subList(0, 2);
+        final int postsInCacheAmount = 2;
+        final List<PostDto> posts = TEST_CACHED_POSTS.subList(0, postsInCacheAmount);
 
         // when
         redisCache.reinitializeCache(posts);
 
         // then
-        final List<PostDto> cachedPosts = redisCache.findTopNCached(posts.size());
+        final Optional<List<PostDto>> optionalCachedPosts = redisCache.findTopNCached(posts.size());
 
-        assertEquals(posts.size(), cachedPosts.size());
+        assertTrue(optionalCachedPosts.isPresent());
+
+        final List<PostDto> cachedPosts = optionalCachedPosts.get();
+
+        assertEquals(postsInCacheAmount, cachedPosts.size());
+
+        assertEquals(2, cachedPosts.size());
 
         for (int i = 0; i < posts.size(); i++) {
             assertEquals(posts.get(i), cachedPosts.get(i));
@@ -164,10 +171,14 @@ class PostRedisCacheTest {
         final int size = TEST_CACHED_POSTS.size();
 
         // when
-        final List<PostDto> cachedPosts = redisCache.findTopNCached(size);
+        final Optional<List<PostDto>> optionalCachedPosts = redisCache.findTopNCached(size);
 
         // then
-        assertEquals(TEST_CACHED_POSTS.size(), cachedPosts.size());
+        assertTrue(optionalCachedPosts.isPresent());
+
+        final List<PostDto> cachedPosts = optionalCachedPosts.get();
+
+        assertEquals(size, cachedPosts.size());
 
         for (int i = 0; i < cachedPosts.size(); i++) {
             assertEquals(TEST_CACHED_POSTS.get(i), cachedPosts.get(i));
@@ -184,9 +195,13 @@ class PostRedisCacheTest {
         final long lastPostScore = TEST_CACHED_POSTS.get(topSize-1).getKarmaScore();
 
         // when
-        final List<PostDto> nextCachedPosts = redisCache.findNextNCached(nextSize, lastPostScore);
+        final Optional<List<PostDto>> optionalNextCachedPosts = redisCache.findNextNCached(nextSize, lastPostScore);
 
         // then
+        assertTrue(optionalNextCachedPosts.isPresent());
+
+        final List<PostDto> nextCachedPosts = optionalNextCachedPosts.get();
+
         assertEquals(nextSize, nextCachedPosts.size());
 
         final int endBound = Math.min(topSize + nextSize, TEST_CACHED_POSTS.size());
@@ -243,7 +258,11 @@ class PostRedisCacheTest {
 
         assertEquals(post.getKarmaScore() + delta, newScore.getAsDouble());
 
-        final List<PostDto> cachedPosts = redisCache.findTopNCached(TEST_CACHED_POSTS.size());
+        final Optional<List<PostDto>> optionalCachedPosts = redisCache.findTopNCached(TEST_CACHED_POSTS.size());
+
+        assertTrue(optionalCachedPosts.isPresent());
+
+        final List<PostDto> cachedPosts = optionalCachedPosts.get();
 
         assertEquals(TEST_CACHED_POSTS.size(), cachedPosts.size());
 
@@ -298,7 +317,11 @@ class PostRedisCacheTest {
 
         final int newSize = TEST_CACHED_POSTS.size()-1;
 
-        final List<PostDto> cachedPosts = redisCache.findTopNCached(newSize);
+        final Optional<List<PostDto>> optionalCachedPosts = redisCache.findTopNCached(newSize);
+
+        assertTrue(optionalCachedPosts.isPresent());
+
+        List<PostDto> cachedPosts = optionalCachedPosts.get();
 
         assertEquals(newSize, cachedPosts.size());
 

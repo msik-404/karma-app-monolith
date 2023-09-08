@@ -124,19 +124,19 @@ public class PostRedisCache {
         return results;
     }
 
-    public List<PostDto> findTopNCached(int size) {
+    public Optional<List<PostDto>> findTopNCached(int size) {
 
         Set<ZSetOperations.TypedTuple<String>> postIdKeySetWithScores = redisTemplate.opsForZSet()
                 .reverseRangeWithScores(KARMA_SCORE_ZSET_KEY, 0, size-1);
 
         if (postIdKeySetWithScores == null || postIdKeySetWithScores.size() != size) {
-            return new ArrayList<>();
+            return Optional.empty();
         }
 
-        return findCachedByZSet(postIdKeySetWithScores);
+        return Optional.of(findCachedByZSet(postIdKeySetWithScores));
     }
 
-    public List<PostDto> findNextNCached(int size, long karmaScore) {
+    public Optional<List<PostDto>> findNextNCached(int size, long karmaScore) {
 
         // offset is one because we have to skip first element with karmaScore, otherwise we will have duplicates
         // in pagination
@@ -145,10 +145,10 @@ public class PostRedisCache {
                         KARMA_SCORE_ZSET_KEY, Double.NEGATIVE_INFINITY, karmaScore, 1, size);
 
         if (postIdKeySetWithScores == null || postIdKeySetWithScores.size() != size) {
-            return new ArrayList<>();
+            return Optional.empty();
         }
 
-        return findCachedByZSet(postIdKeySetWithScores);
+        return Optional.of(findCachedByZSet(postIdKeySetWithScores));
     }
 
     public OptionalDouble updateKarmaScoreIfPresent(long postId, double delta) {
