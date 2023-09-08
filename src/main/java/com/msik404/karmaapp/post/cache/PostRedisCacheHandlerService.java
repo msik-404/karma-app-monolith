@@ -87,11 +87,13 @@ public class PostRedisCacheHandlerService {
         if (isOnlyActive(visibilities)) {
             if (cache.isEmpty()) {
                 final List<PostDto> newValuesForCache = updateCache();
-                final int firstSmallerElementIdx = findNextSmallerThan(newValuesForCache, pagination.karmaScore());
-                results = newValuesForCache.subList(firstSmallerElementIdx, newValuesForCache.size());
+                final int firstSmallerElementIdx = findNextSmallerThan(newValuesForCache, pagination);
+
+                final int endBound = Math.min(firstSmallerElementIdx + size, newValuesForCache.size());
+                results = newValuesForCache.subList(firstSmallerElementIdx, endBound);
             } else {
                 results = cache.findNextNCached(size, pagination.karmaScore())
-                        .orElseGet(() -> repository.findNextNPosts(size, visibilities, pagination) );
+                        .orElseGet(() -> repository.findNextNPosts(size, visibilities, pagination));
             }
         } else {
             results = repository.findNextNPosts(size, visibilities, pagination);
