@@ -1,10 +1,10 @@
 package com.msik404.karmaapp.post.cache;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import com.msik404.karmaapp.pagin.Pagination;
+import com.msik404.karmaapp.post.PostComparator;
 import com.msik404.karmaapp.post.Visibility;
 import com.msik404.karmaapp.post.dto.PostDto;
 import com.msik404.karmaapp.post.repository.PostRepository;
@@ -60,17 +60,18 @@ public class PostRedisCacheHandlerService {
         return results;
     }
 
-    private int findNextSmallerThan(@NonNull List<PostDto> topPosts, long karmaScore) {
+    private int findNextSmallerThan(@NonNull List<PostDto> topPosts, @NonNull Pagination pagination) {
 
         int value = Collections.binarySearch(
                 topPosts,
-                PostDto.builder().karmaScore(karmaScore).build(),
-                Comparator.comparing(PostDto::getKarmaScore, Comparator.reverseOrder()));
+                PostDto.builder().id(pagination.postId()).karmaScore(pagination.karmaScore()).build(),
+                new PostComparator().reversed()
+        );
 
         // returns topPosts.size() if post with karmaScore is last or insertion point would be last
         if (value < 0) {
             // get insertion point
-            return - value - 1;
+            return -value - 1;
         }
         return value + 1;
     }

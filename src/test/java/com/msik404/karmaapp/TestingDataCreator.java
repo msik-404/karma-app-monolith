@@ -1,12 +1,16 @@
 package com.msik404.karmaapp;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.msik404.karmaapp.karma.KarmaKey;
 import com.msik404.karmaapp.karma.KarmaScore;
 import com.msik404.karmaapp.karma.KarmaScoreRepository;
 import com.msik404.karmaapp.post.Post;
+import com.msik404.karmaapp.post.PostComparator;
 import com.msik404.karmaapp.post.Visibility;
 import com.msik404.karmaapp.post.dto.PostRatingResponse;
 import com.msik404.karmaapp.post.repository.PostRepository;
@@ -26,22 +30,6 @@ public class TestingDataCreator {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final KarmaScoreRepository karmaScoreRepository;
-
-    /**
-     * This comparator is made so to mimic the desired sort order, that is ascending id and descending score.
-     */
-    static class PostComparator implements Comparator<Post> {
-
-        @Override
-        public int compare(Post postOne, Post postTwo) {
-
-            if (postOne.getKarmaScore().equals(postTwo.getKarmaScore())) {
-                return -postOne.getId().compareTo(postTwo.getId());
-            }
-            return postOne.getKarmaScore().compareTo(postTwo.getKarmaScore());
-        }
-
-    }
 
     public TestingDataCreator(UserRepository userRepository, PostRepository postRepository, KarmaScoreRepository karmaScoreRepository) {
 
