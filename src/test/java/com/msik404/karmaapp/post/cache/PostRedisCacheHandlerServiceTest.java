@@ -8,8 +8,6 @@ import com.msik404.karmaapp.pagin.Pagination;
 import com.msik404.karmaapp.post.Visibility;
 import com.msik404.karmaapp.post.dto.PostDto;
 import com.msik404.karmaapp.post.repository.PostRepository;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -40,14 +38,6 @@ class PostRedisCacheHandlerServiceTest {
             posts.add(PostDto.builder().id((long) i).build());
         }
         return posts;
-    }
-
-    @BeforeEach
-    void setUp() {
-    }
-
-    @AfterEach
-    void tearDown() {
     }
 
     @Test
