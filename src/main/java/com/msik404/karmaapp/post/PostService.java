@@ -40,7 +40,7 @@ public class PostService {
     private final UserRepository userRepository;
     private final KarmaScoreService karmaScoreService;
     private final PostRedisCache cache;
-    private final PostRedisCacheHandlerService cacheService;
+    private final PostRedisCacheHandlerService cacheHandler;
 
     @Transactional(readOnly = true)
     public List<PostDto> findPaginatedPosts(
@@ -53,11 +53,11 @@ public class PostService {
         List<PostDto> results;
 
         if (pagination == null && username == null) {
-            results = cacheService.findTopNHandler(size, visibilities);
+            results = cacheHandler.findTopNHandler(size, visibilities);
         } else if (pagination != null && username != null) {
             results = repository.findNextNPostsWithUsername(size, visibilities, pagination, username);
         } else if (pagination != null) { // username == null
-            results = cacheService.findNextNHandler(size, visibilities, pagination);
+            results = cacheHandler.findNextNHandler(size, visibilities, pagination);
         } else { // username != null and pagination == null
             results = repository.findTopNPostsWithUsername(size, visibilities, username);
         }
