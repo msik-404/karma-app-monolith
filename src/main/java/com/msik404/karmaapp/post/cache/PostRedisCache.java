@@ -7,9 +7,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.msik404.karmaapp.post.dto.PostDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.connection.DefaultStringTuple;
+import org.springframework.data.redis.connection.RedisStringCommands;
+import org.springframework.data.redis.connection.RedisZSetCommands;
 import org.springframework.data.redis.connection.StringRedisConnection;
-import org.springframework.data.redis.core.*;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.data.redis.core.types.Expiration;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -33,8 +40,6 @@ public class PostRedisCache {
     private final ObjectMapper objectMapper;
 
     private final StringRedisTemplate redisTemplate;
-
-    private final RedisTemplate<String, byte[]> byteRedisTemplate;
 
     /**
      * Method caches posts in redis. It uses ZSet with key: KARMA_SCORE_ZSET_KEY for keeping the order of post
@@ -79,7 +84,7 @@ public class PostRedisCache {
      */
     public boolean isEmpty() {
 
-        List<Object> results = redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
+        final List<Object> results = redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
             StringRedisConnection stringRedisConn = (StringRedisConnection) connection;
 
             stringRedisConn.exists(KARMA_SCORE_ZSET_KEY);
@@ -91,18 +96,34 @@ public class PostRedisCache {
         return results.size() == 2 && !(Boolean) results.get(0) && !(Boolean) results.get(1);
     }
 
-    public void cacheImage(long postId, byte[] imageData) {
-        byteRedisTemplate.opsForValue().setIfAbsent(getPostImageKey(postId), imageData, TIMEOUT);
+    public boolean cacheImage(long postId, byte[] imageData) {
+
+        Object results = redisTemplate.execute((RedisCallback<Object>) connection ->
+                connection.stringCommands().set(
+                        getPostImageKey(postId).getBytes(),
+                        imageData,
+                        Expiration.from(TIMEOUT),
+                        RedisStringCommands.SetOption.ifAbsent())
+        );
+
+        return Boolean.TRUE.equals(results);
     }
 
     public Optional<byte[]> getCachedImage(long postId) {
-        return Optional.ofNullable(byteRedisTemplate.opsForValue().getAndExpire(getPostImageKey(postId), TIMEOUT));
+
+        Object results = redisTemplate.execute((RedisCallback<Object>) connection ->
+                connection.stringCommands().getEx(
+                        getPostImageKey(postId).getBytes(),
+                        Expiration.from(TIMEOUT))
+        );
+
+        return Optional.ofNullable((byte[]) results);
     }
 
     private List<PostDto> findCachedByZSet(
             @NonNull Collection<ZSetOperations.TypedTuple<String>> postIdKeySetWithScores) {
 
-        int size = postIdKeySetWithScores.size();
+        final int size = postIdKeySetWithScores.size();
 
         List<String> postIdKeyList = new ArrayList<>(size);
         List<Double> postScoreList = new ArrayList<>(size);
@@ -111,8 +132,8 @@ public class PostRedisCache {
             postScoreList.add(tuple.getScore());
         }
 
-        HashOperations<String, String, String> hashOps = redisTemplate.opsForHash();
-        List<String> serializedResults = hashOps.multiGet(POST_HASH_KEY, postIdKeyList);
+        final HashOperations<String, String, String> hashOps = redisTemplate.opsForHash();
+        final List<String> serializedResults = hashOps.multiGet(POST_HASH_KEY, postIdKeyList);
 
         List<PostDto> results = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
@@ -126,8 +147,8 @@ public class PostRedisCache {
 
     public Optional<List<PostDto>> findTopNCached(int size) {
 
-        Set<ZSetOperations.TypedTuple<String>> postIdKeySetWithScores = redisTemplate.opsForZSet()
-                .reverseRangeWithScores(KARMA_SCORE_ZSET_KEY, 0, size-1);
+        final Set<ZSetOperations.TypedTuple<String>> postIdKeySetWithScores = redisTemplate.opsForZSet()
+                .reverseRangeWithScores(KARMA_SCORE_ZSET_KEY, 0, size - 1);
 
         if (postIdKeySetWithScores == null || postIdKeySetWithScores.size() != size) {
             return Optional.empty();
@@ -140,7 +161,7 @@ public class PostRedisCache {
 
         // offset is one because we have to skip first element with karmaScore, otherwise we will have duplicates
         // in pagination
-        Set<ZSetOperations.TypedTuple<String>> postIdKeySetWithScores = redisTemplate.opsForZSet()
+        final Set<ZSetOperations.TypedTuple<String>> postIdKeySetWithScores = redisTemplate.opsForZSet()
                 .reverseRangeByScoreWithScores(
                         KARMA_SCORE_ZSET_KEY, Double.NEGATIVE_INFINITY, karmaScore, 1, size);
 
@@ -153,14 +174,14 @@ public class PostRedisCache {
 
     public OptionalDouble updateKarmaScoreIfPresent(long postId, double delta) {
 
-        ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
+        final ZSetOperations<String, String> zSetOps = redisTemplate.opsForZSet();
         final String postIdKey = getPostKey(postId);
 
         if (zSetOps.score(KARMA_SCORE_ZSET_KEY, postIdKey) == null) {
-            return  OptionalDouble.empty();
+            return OptionalDouble.empty();
         }
 
-        Double newScore = zSetOps.incrementScore(KARMA_SCORE_ZSET_KEY, postIdKey, delta);
+        final Double newScore = zSetOps.incrementScore(KARMA_SCORE_ZSET_KEY, postIdKey, delta);
 
         if (newScore == null) {
             return OptionalDouble.empty();
@@ -172,7 +193,7 @@ public class PostRedisCache {
 
         final String postIdKey = getPostKey(postId);
 
-        List<Object> results = redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
+        final List<Object> results = redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
             StringRedisConnection stringRedisConn = (StringRedisConnection) connection;
 
             stringRedisConn.zRem(KARMA_SCORE_ZSET_KEY, postIdKey);
@@ -183,6 +204,62 @@ public class PostRedisCache {
         });
 
         return results.size() == 3 && (Long) results.get(0) == 1 && (Long) results.get(1) == 1;
+    }
+
+    public Optional<Boolean> isKarmaScoreGreaterThanLowestScoreInZSet(long karmaScore) {
+
+        final Set<ZSetOperations.TypedTuple<String>> lowestScorePostIdWithScore = redisTemplate.opsForZSet()
+                .rangeWithScores(KARMA_SCORE_ZSET_KEY, 0, 0);
+
+        if (lowestScorePostIdWithScore == null || lowestScorePostIdWithScore.size() != 1) {
+            return Optional.empty();
+        }
+
+        final Double lowestScore = lowestScorePostIdWithScore.iterator().next().getScore();
+        if (lowestScore == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of(lowestScore < karmaScore);
+    }
+
+    public boolean insertPost(@NonNull PostDto post, @Nullable byte[] imageData) {
+
+        final String serializedPost = serialize(post);
+
+        final List<Object> results = redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
+
+            final byte[] postKeyBytes = getPostKey(post.getId()).getBytes();
+
+            connection.zSetCommands().zAdd(
+                    KARMA_SCORE_ZSET_KEY.getBytes(),
+                    post.getKarmaScore().doubleValue(),
+                    postKeyBytes,
+                    RedisZSetCommands.ZAddArgs.empty()
+            );
+
+            connection.hashCommands().hSet(
+                    POST_HASH_KEY.getBytes(),
+                    postKeyBytes,
+                    serializedPost.getBytes()
+            );
+
+            if (imageData != null) {
+                connection.stringCommands().set(
+                        getPostImageKey(post.getId()).getBytes(),
+                        imageData,
+                        Expiration.from(TIMEOUT),
+                        RedisStringCommands.SetOption.ifAbsent()
+                );
+            }
+
+            return null;
+        });
+
+        if (imageData == null) {
+            return results.size() == 2 && (Boolean) results.get(0) && (Boolean) results.get(1);
+        }
+        return results.size() == 3 && (Boolean) results.get(0) && (Boolean) results.get(1) && (Boolean) results.get(2);
     }
 
     private String serialize(@NonNull PostDto post) {
