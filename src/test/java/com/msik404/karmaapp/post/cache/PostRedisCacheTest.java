@@ -5,6 +5,7 @@ import java.util.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.msik404.karmaapp.RedisConfiguration;
 import com.msik404.karmaapp.TestingDataCreator;
+import com.msik404.karmaapp.TestingImageDataCreator;
 import com.msik404.karmaapp.post.Visibility;
 import com.msik404.karmaapp.post.dto.PostDto;
 import org.junit.jupiter.api.AfterEach;
@@ -192,7 +193,7 @@ class PostRedisCacheTest {
         final int nextSize = 2;
         final int topSize = 2;
 
-        final long lastPostScore = TEST_CACHED_POSTS.get(topSize-1).getKarmaScore();
+        final long lastPostScore = TEST_CACHED_POSTS.get(topSize - 1).getKarmaScore();
 
         // when
         final Optional<List<PostDto>> optionalNextCachedPosts = redisCache.findNextNCached(nextSize, lastPostScore);
@@ -217,10 +218,10 @@ class PostRedisCacheTest {
 
         // given
         final PostDto post = TEST_CACHED_POSTS.get(0);
-        final byte[] dummyImageData = REDIS_CONTAINER.getDockerImageName().getBytes();
+        final byte[] dummyImageData = TestingImageDataCreator.getTestingImage();
 
         // when
-        redisCache.cacheImage(post.getId(), dummyImageData);
+        assertTrue(redisCache.cacheImage(post.getId(), dummyImageData));
 
         final Optional<byte[]> cachedImageData = redisCache.getCachedImage(post.getId());
 
@@ -315,7 +316,7 @@ class PostRedisCacheTest {
         // then
         assertTrue(wasSuccessful);
 
-        final int newSize = TEST_CACHED_POSTS.size()-1;
+        final int newSize = TEST_CACHED_POSTS.size() - 1;
 
         final Optional<List<PostDto>> optionalCachedPosts = redisCache.findTopNCached(newSize);
 
@@ -330,5 +331,121 @@ class PostRedisCacheTest {
         for (int i = 0; i < cachedPosts.size(); i++) {
             assertEquals(groundTruthTopPosts.get(i), cachedPosts.get(i));
         }
+    }
+
+    @Test
+    void isKarmaScoreGreaterThanLowestScoreInZSet_KarmaScoreIsGreater_OptionalOfTrue() {
+
+        // given
+        final long karmaScore = 5;
+
+        // when
+        final Optional<Boolean> result = redisCache.isKarmaScoreGreaterThanLowestScoreInZSet(karmaScore);
+
+        // then
+        assertTrue(result.isPresent());
+        assertTrue(result.get());
+    }
+
+    @Test
+    void isKarmaScoreGreaterThanLowestScoreInZSet_KarmaScoreIsNotGreater_OptionalOfFalse() {
+
+        // given
+        final long karmaScore = -100;
+
+        // when
+        final Optional<Boolean> result = redisCache.isKarmaScoreGreaterThanLowestScoreInZSet(karmaScore);
+
+        // then
+        assertTrue(result.isPresent());
+        assertFalse(result.get());
+    }
+
+    @Test
+    void isKarmaScoreGreaterThanLowestScoreInZSet_CacheIsEmpty_OptionalEmpty() {
+
+        // given
+        redisConnectionFactory.getConnection().serverCommands().flushAll();
+        final long karmaScore = 404;
+
+        // when
+        final Optional<Boolean> result = redisCache.isKarmaScoreGreaterThanLowestScoreInZSet(karmaScore);
+
+        // then
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void insertPost_ImageDataIsNonNullAndThisPostIsNotPresentInCacheNorIsImage_ZSetAndHashShouldBeUpdatedAndImageDataShouldBeCached() {
+
+        // given
+        final long userId = 404;
+        final long postId = userId;
+        final long karmaScore = 5;
+
+        final PostDto postToBeInserted  = getPostDtoForTesting(userId, postId, karmaScore);
+
+        final byte[] imageData = TestingImageDataCreator.getTestingImage();
+
+        List<PostDto> groundTruthPosts = getPostsForTesting();
+        groundTruthPosts.add(postToBeInserted);
+        groundTruthPosts.sort(new CachedPostComparator());
+
+        // when
+        assertTrue(redisCache.insertPost(postToBeInserted, imageData));
+
+        // then
+
+        // ZSet and hash are updated
+        final Optional<List<PostDto>> optionalCachedPosts = redisCache.findTopNCached(groundTruthPosts.size());
+        assertTrue(optionalCachedPosts.isPresent());
+        final List<PostDto> cachedPosts = optionalCachedPosts.get();
+        assertEquals(groundTruthPosts.size(), cachedPosts.size());
+
+        for (int i = 0; i < groundTruthPosts.size(); i++) {
+            assertEquals(groundTruthPosts.get(i), cachedPosts.get(i));
+        }
+
+        // image is present in cache
+        final Optional<byte[]> optionalCachedImageData = redisCache.getCachedImage(postId);
+        assertTrue(optionalCachedImageData.isPresent());
+        final byte[] cachedImageData = optionalCachedImageData.get();
+        assertArrayEquals(imageData, cachedImageData);
+    }
+
+    @Test
+    void insertPost_ImageDataIsNullAndThisPostIsNotPresentInCacheNorIsImage_ZSetAndHashShouldBeUpdatedAndImageDataShouldNotBeCached() {
+
+        // given
+        final long userId = 404;
+        final long postId = userId;
+        final long karmaScore = 5;
+
+        final PostDto postToBeInserted = getPostDtoForTesting(userId, postId, karmaScore);
+
+        final byte[] imageData = null;
+
+        List<PostDto> groundTruthPosts = getPostsForTesting();
+        groundTruthPosts.add(postToBeInserted);
+        groundTruthPosts.sort(new CachedPostComparator());
+
+        // when
+        assertTrue(redisCache.insertPost(postToBeInserted, imageData));
+
+        // then
+
+        // ZSet and hash are updated
+        final Optional<List<PostDto>> optionalCachedPosts = redisCache.findTopNCached(groundTruthPosts.size());
+        assertTrue(optionalCachedPosts.isPresent());
+        final List<PostDto> cachedPosts = optionalCachedPosts.get();
+        assertEquals(groundTruthPosts.size(), cachedPosts.size());
+
+        for (int i = 0; i < groundTruthPosts.size(); i++) {
+            assertEquals(groundTruthPosts.get(i), cachedPosts.get(i));
+        }
+
+        // image is not present in cache
+        final Optional<byte[]> optionalCachedImageData = redisCache.getCachedImage(postId);
+        assertFalse(optionalCachedImageData.isPresent());
     }
 }
