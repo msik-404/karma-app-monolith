@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.msik404.karmaapp.TestingImageDataCreator;
 import com.msik404.karmaapp.pagin.Pagination;
 import com.msik404.karmaapp.post.Visibility;
 import com.msik404.karmaapp.post.dto.PostDto;
+import com.msik404.karmaapp.post.dto.PostDtoWithImageData;
 import com.msik404.karmaapp.post.repository.PostRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,7 +17,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -278,4 +280,178 @@ class PostRedisCacheHandlerServiceTest {
         verify(repository).findNextNPosts(size, visibilities, pagination);
     }
 
+
+    @Test
+    void loadPostDataToCacheIfKarmaScoreIsHighEnough_DtoIsFoundAndContainsImageDataAndScoreIsHighEnoughForCaching_DtoWithImageShouldBeCached() {
+
+        // given
+        final long postId = 404;
+        final long karmaScore = 400;
+        final var post = PostDtoWithImageData.builder()
+                .id(postId)
+                .userId(405L)
+                .username("username")
+                .headline("headline")
+                .text("text")
+                .karmaScore(karmaScore)
+                .visibility(Visibility.ACTIVE)
+                .imageData(TestingImageDataCreator.getTestingImage())
+                .build();
+
+        final var postDto = PostDto.builder()
+                .id(post.getId())
+                .userId(post.getUserId())
+                .username(post.getUsername())
+                .headline(post.getHeadline())
+                .text(post.getText())
+                .karmaScore(post.getKarmaScore())
+                .visibility(post.getVisibility())
+                .build();
+
+        when(repository.findPostDtoWithImageDataById(postId)).thenReturn(Optional.of(post));
+        when(cache.isKarmaScoreGreaterThanLowestScoreInZSet(karmaScore)).thenReturn(Optional.of(true));
+        when(cache.insertPost(postDto, post.getImageData())).thenReturn(true);
+
+        // when
+        assertTrue(cacheHandler.loadPostDataToCacheIfKarmaScoreIsHighEnough(postId));
+
+        // then
+        verify(repository).findPostDtoWithImageDataById(postId);
+        verify(cache).isKarmaScoreGreaterThanLowestScoreInZSet(karmaScore);
+        verify(cache).insertPost(postDto, post.getImageData());
+    }
+
+    @Test
+    void loadPostDataToCacheIfKarmaScoreIsHighEnough_DtoIsFoundAndDoesNotContainImageDataAndScoreIsHighEnoughForCaching_DtoWithImageShouldBeCached() {
+
+        // given
+        final long postId = 404;
+        final long karmaScore = 400;
+        final var post = PostDtoWithImageData.builder()
+                .id(postId)
+                .userId(405L)
+                .username("username")
+                .headline("headline")
+                .text("text")
+                .karmaScore(karmaScore)
+                .visibility(Visibility.ACTIVE)
+                .imageData(null)
+                .build();
+
+        final var postDto = PostDto.builder()
+                .id(post.getId())
+                .userId(post.getUserId())
+                .username(post.getUsername())
+                .headline(post.getHeadline())
+                .text(post.getText())
+                .karmaScore(post.getKarmaScore())
+                .visibility(post.getVisibility())
+                .build();
+
+        when(repository.findPostDtoWithImageDataById(postId)).thenReturn(Optional.of(post));
+        when(cache.isKarmaScoreGreaterThanLowestScoreInZSet(karmaScore)).thenReturn(Optional.of(true));
+        when(cache.insertPost(postDto, post.getImageData())).thenReturn(true);
+
+        // when
+        assertTrue(cacheHandler.loadPostDataToCacheIfKarmaScoreIsHighEnough(postId));
+
+        // then
+        verify(repository).findPostDtoWithImageDataById(postId);
+        verify(cache).isKarmaScoreGreaterThanLowestScoreInZSet(karmaScore);
+        verify(cache).insertPost(postDto, post.getImageData());
+    }
+
+    @Test
+    void loadPostDataToCacheIfKarmaScoreIsHighEnough_DtoIsFoundAndContainsImageDataAndScoreIsNotHighEnoughForCaching_DtoWithImageShouldNotBeCached() {
+
+        // given
+        final long postId = 404;
+        final long karmaScore = 400;
+        final var post = PostDtoWithImageData.builder()
+                .id(postId)
+                .userId(405L)
+                .username("username")
+                .headline("headline")
+                .text("text")
+                .karmaScore(karmaScore)
+                .visibility(Visibility.ACTIVE)
+                .imageData(TestingImageDataCreator.getTestingImage())
+                .build();
+
+        final var postDto = PostDto.builder()
+                .id(post.getId())
+                .userId(post.getUserId())
+                .username(post.getUsername())
+                .headline(post.getHeadline())
+                .text(post.getText())
+                .karmaScore(post.getKarmaScore())
+                .visibility(post.getVisibility())
+                .build();
+
+        when(repository.findPostDtoWithImageDataById(postId)).thenReturn(Optional.of(post));
+        when(cache.isKarmaScoreGreaterThanLowestScoreInZSet(karmaScore)).thenReturn(Optional.of(false));
+
+        // when
+        assertFalse(cacheHandler.loadPostDataToCacheIfKarmaScoreIsHighEnough(postId));
+
+        // then
+        verify(repository).findPostDtoWithImageDataById(postId);
+        verify(cache).isKarmaScoreGreaterThanLowestScoreInZSet(karmaScore);
+        verify(cache, never()).insertPost(postDto, post.getImageData());
+    }
+
+    @Test
+    void loadPostDataToCacheIfKarmaScoreIsHighEnough_DtoIsFoundAndContainsImageDataAndCacheIsEmpty_DtoWithImageShouldNotBeCached() {
+
+        // given
+        final long postId = 404;
+        final long karmaScore = 400;
+        final var post = PostDtoWithImageData.builder()
+                .id(postId)
+                .userId(405L)
+                .username("username")
+                .headline("headline")
+                .text("text")
+                .karmaScore(karmaScore)
+                .visibility(Visibility.ACTIVE)
+                .imageData(TestingImageDataCreator.getTestingImage())
+                .build();
+
+        final var postDto = PostDto.builder()
+                .id(post.getId())
+                .userId(post.getUserId())
+                .username(post.getUsername())
+                .headline(post.getHeadline())
+                .text(post.getText())
+                .karmaScore(post.getKarmaScore())
+                .visibility(post.getVisibility())
+                .build();
+
+        when(repository.findPostDtoWithImageDataById(postId)).thenReturn(Optional.of(post));
+        when(cache.isKarmaScoreGreaterThanLowestScoreInZSet(karmaScore)).thenReturn(Optional.empty());
+
+        // when
+        assertFalse(cacheHandler.loadPostDataToCacheIfKarmaScoreIsHighEnough(postId));
+
+        // then
+        verify(repository).findPostDtoWithImageDataById(postId);
+        verify(cache).isKarmaScoreGreaterThanLowestScoreInZSet(karmaScore);
+        verify(cache, never()).insertPost(postDto, post.getImageData());
+    }
+
+    @Test
+    void loadPostDataToCacheIfKarmaScoreIsHighEnough_DtoIsNotFound_DtoWithImageShouldNotBeCached() {
+
+        // given
+        final long postId = 404L;
+        when(repository.findPostDtoWithImageDataById(postId)).thenReturn(Optional.empty());
+
+        // when
+        assertFalse(cacheHandler.loadPostDataToCacheIfKarmaScoreIsHighEnough(postId));
+
+        // then
+        verify(repository).findPostDtoWithImageDataById(postId);
+        verify(cache, never()).isKarmaScoreGreaterThanLowestScoreInZSet(anyLong());
+        verify(cache, never()).insertPost(any(PostDto.class), any(byte[].class));
+    }
 }
