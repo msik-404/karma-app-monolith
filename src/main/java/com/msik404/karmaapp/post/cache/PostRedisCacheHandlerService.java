@@ -2,11 +2,13 @@ package com.msik404.karmaapp.post.cache;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import com.msik404.karmaapp.pagin.Pagination;
 import com.msik404.karmaapp.post.PostComparator;
 import com.msik404.karmaapp.post.Visibility;
 import com.msik404.karmaapp.post.dto.PostDto;
+import com.msik404.karmaapp.post.dto.PostDtoWithImageData;
 import com.msik404.karmaapp.post.repository.PostRepository;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -100,6 +102,47 @@ public class PostRedisCacheHandlerService {
         }
 
         return results;
+    }
+
+    @Transactional(readOnly = true)
+    public boolean loadToCacheIfKarmaScoreIsHighEnough(@NonNull PostDtoWithImageData post) {
+
+        final Optional<Boolean> optionalIsHighEnough = cache.isKarmaScoreGreaterThanLowestScoreInZSet(
+                post.getKarmaScore());
+
+        if (optionalIsHighEnough.isEmpty()) {
+            return false;
+        }
+
+        final boolean isHighEnough = optionalIsHighEnough.get();
+        if (!isHighEnough) {
+            return false;
+        }
+
+        final var postDto = PostDto.builder()
+                .id(post.getId())
+                .userId(post.getUserId())
+                .username(post.getUsername())
+                .headline(post.getHeadline())
+                .text(post.getText())
+                .karmaScore(post.getKarmaScore())
+                .visibility(post.getVisibility())
+                .build();
+
+        return cache.insertPost(postDto, post.getImageData());
+    }
+
+    @Transactional(readOnly = true)
+    public boolean loadPostDataToCacheIfKarmaScoreIsHighEnough(long postId) {
+
+        Optional<PostDtoWithImageData> optionalPost = repository.findPostDtoWithImageDataById(postId);
+
+        if (optionalPost.isEmpty()) {
+            return false;
+        }
+
+        PostDtoWithImageData post = optionalPost.get();
+        return loadToCacheIfKarmaScoreIsHighEnough(post);
     }
 
 }
