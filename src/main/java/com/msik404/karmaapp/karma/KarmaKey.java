@@ -4,25 +4,19 @@ import java.io.Serializable;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Embeddable
-@RequiredArgsConstructor
-@Getter
-@Setter
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class KarmaKey implements Serializable {
 
     @Column(name = "user_id")
-    private final Long userId;
+    private Long userId;
 
     @Column(name = "post_id")
-    private final Long postId;
-
-    public KarmaKey() {
-
-        this.userId = null;
-        this.postId = null;
-    }
+    private Long postId;
 }
