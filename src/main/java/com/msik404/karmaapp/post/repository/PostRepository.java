@@ -15,6 +15,10 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
 
     @Query("SELECT NEW com.msik404.karmaapp.post.dto.PostDtoWithImageData(p.id, p.user.id, u.username, p.headline, p.text, p.karmaScore, p.visibility, p.imageData) " +
             "FROM Post p JOIN p.user u WHERE p.id = :postId")
-    Optional<PostDtoWithImageData> findPostDtoWithImageDataById(@Param("postId") Long postId);
+    Optional<PostDtoWithImageData> findPostDtoWithImageDataById(@Param("postId") long postId);
+
+    @Query("SELECT NEW com.msik404.karmaapp.post.dto.PostDtoWithImageData(p.id, p.user.id, u.username, p.headline, p.text, p.karmaScore, p.visibility, p.imageData) " +
+            "FROM Post p JOIN p.user u WHERE p.id = :postId AND p.user.id = :userId")
+    Optional<PostDtoWithImageData> findPostDtoWithImageDataByIdAndUserId(@Param("postId") long postId, @Param("userId") long userId);
 
 }

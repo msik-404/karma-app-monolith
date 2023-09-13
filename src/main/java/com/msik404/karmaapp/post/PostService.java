@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalDouble;
 
 import javax.imageio.ImageIO;
 
@@ -22,11 +23,13 @@ import com.msik404.karmaapp.post.exception.ImageNotFoundException;
 import com.msik404.karmaapp.post.exception.InternalServerErrorException;
 import com.msik404.karmaapp.post.exception.PostNotFoundException;
 import com.msik404.karmaapp.post.repository.PostRepository;
+import com.msik404.karmaapp.user.Role;
 import com.msik404.karmaapp.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -117,12 +120,12 @@ public class PostService {
 
         return cache.getCachedImage(postId).orElseGet(() -> {
 
-            Optional<PostImageDataProjection> optionalPostImageDataProjection = repository.findImageById(postId);
+            final Optional<PostImageDataProjection> optionalPostImageDataProjection = repository.findImageById(postId);
 
-            PostImageDataProjection postImageDataProjection = optionalPostImageDataProjection
+            final PostImageDataProjection postImageDataProjection = optionalPostImageDataProjection
                     .orElseThrow(ImageNotFoundException::new);
 
-            byte[] imageData = postImageDataProjection.getImageData();
+            final byte[] imageData = postImageDataProjection.getImageData();
             if (imageData.length == 0) {
                 throw new ImageNotFoundException();
             }
@@ -132,7 +135,9 @@ public class PostService {
     }
 
     @Transactional
-    public void create(@NonNull PostCreationRequest request, @NonNull MultipartFile image) throws FileProcessingException {
+    public void create(
+            @NonNull PostCreationRequest request,
+            @NonNull MultipartFile image) throws FileProcessingException {
 
         final var authentication = SecurityContextHolder.getContext().getAuthentication();
         final var userId = (long) authentication.getPrincipal();
@@ -148,6 +153,9 @@ public class PostService {
             if (!image.isEmpty()) {
                 // Load the image from the multipart file
                 var bufferedImage = ImageIO.read(image.getInputStream());
+                if (bufferedImage == null) {
+                    throw new FileProcessingException();
+                }
                 // Create a ByteArrayOutputStream to hold the compressed image data
                 var byteArrayOutputStream = new ByteArrayOutputStream();
                 // Write the compressed image data to the ByteArrayOutputStream
@@ -159,8 +167,10 @@ public class PostService {
             throw new FileProcessingException();
         }
 
-        Post persistedPost = repository.save(newPost.build());
-        cache.cacheImage(persistedPost.getId(), persistedPost.getImageData());
+        final Post persistedPost = repository.save(newPost.build());
+        if (persistedPost.getImageData() != null) {
+            cache.cacheImage(persistedPost.getId(), persistedPost.getImageData());
+        }
     }
 
     /**
@@ -182,7 +192,7 @@ public class PostService {
         long delta = isNewRatingPositive ? 1L : -1L;
         try {
             var karmaScore = karmaScoreService.findById(new KarmaKey(userId, postId));
-            boolean isOldRatingPositive = karmaScore.getIsPositive();
+            final boolean isOldRatingPositive = karmaScore.getIsPositive();
             if (isOldRatingPositive == isNewRatingPositive) {
                 throw new KarmaScoreAlreadyExistsException(String.format(
                         "This post has been already rated %s by you",
@@ -194,12 +204,15 @@ public class PostService {
             karmaScoreService.create(userId, postId, isNewRatingPositive);
         }
 
-        int rowsAffected = repository.addKarmaScoreToPost(postId, delta);
+        final int rowsAffected = repository.addKarmaScoreToPost(postId, delta);
         if (rowsAffected == 0) {
             throw new PostNotFoundException();
         }
 
-        cache.updateKarmaScoreIfPresent(postId, (double) delta);
+        final OptionalDouble optionalNewKarmaScore = cache.updateKarmaScoreIfPresent(postId, (double) delta);
+        if (optionalNewKarmaScore.isEmpty()) { // this means that this post is not cached
+            cacheHandler.loadPostDataToCacheIfKarmaScoreIsHighEnough(postId);
+        }
     }
 
     /**
@@ -212,19 +225,35 @@ public class PostService {
         final var authentication = SecurityContextHolder.getContext().getAuthentication();
         final var userId = (long) authentication.getPrincipal();
 
-        var karmaKey = new KarmaKey(userId, postId);
-        var karmaScore = karmaScoreService.findById(karmaKey);
+        final var karmaKey = new KarmaKey(userId, postId);
+        final var karmaScore = karmaScoreService.findById(karmaKey);
 
-        long delta = karmaScore.getIsPositive() ? -1L : 1L;
+        final long delta = karmaScore.getIsPositive() ? -1L : 1L;
 
-        int rowsAffected = repository.addKarmaScoreToPost(postId, delta);
+        final int rowsAffected = repository.addKarmaScoreToPost(postId, delta);
         if (rowsAffected == 0) {
             throw new PostNotFoundException();
         }
 
         karmaScoreService.deleteById(karmaKey);
 
-        cache.updateKarmaScoreIfPresent(postId, (double) delta);
+        OptionalDouble optionalNewKarmaScore = cache.updateKarmaScoreIfPresent(postId, (double) delta);
+        if (optionalNewKarmaScore.isEmpty()) { // this means that this post is not cached
+            cacheHandler.loadPostDataToCacheIfKarmaScoreIsHighEnough(postId);
+        }
+    }
+
+    @Transactional
+    public void changeVisibility(long postId, @NonNull Visibility visibility) throws PostNotFoundException {
+        final int rowsAffected = repository.changeVisibilityById(postId, visibility);
+        if (rowsAffected == 0) {
+            throw new PostNotFoundException();
+        }
+        if (visibility.equals(Visibility.ACTIVE)) { // if this post was made active it might high enough karma score
+            cacheHandler.loadPostDataToCacheIfKarmaScoreIsHighEnough(postId);
+        } else {
+            cache.deletePostFromCache(postId);
+        }
     }
 
     @Transactional
@@ -234,31 +263,27 @@ public class PostService {
         final var authentication = SecurityContextHolder.getContext().getAuthentication();
         final var userId = (long) authentication.getPrincipal();
 
-        var optionalPost = repository.findById(postId);
-        optionalPost.ifPresentOrElse(
+        var optionalPostDtoWithImageData = repository.findPostDtoWithImageDataByIdAndUserId(postId, userId);
+        optionalPostDtoWithImageData.ifPresentOrElse(
                 post -> {
-                    // Id is lazy loaded. User can modify only his own visibility and can't change deleted state.
-                    if (!post.getUser().getId().equals(userId) || post.getVisibility().equals(Visibility.DELETED)) {
+                    final boolean isVisibilityDeleted = post.getVisibility().equals(Visibility.DELETED);
+                    final boolean isUserAdmin = authentication.getAuthorities().contains(
+                            new SimpleGrantedAuthority(Role.ADMIN.name()));
+
+                    if (isVisibilityDeleted && !isUserAdmin) {
                         throw new AccessDeniedException("Access denied");
                     }
-                    post.setVisibility(visibility);
-                    repository.save(post);
-                    if (!visibility.equals(Visibility.ACTIVE)) {
+
+                    repository.changeVisibilityById(postId, visibility);
+
+                    // if this post was made active it might have high enough karma score
+                    if (visibility.equals(Visibility.ACTIVE)) {
+                        cacheHandler.loadToCacheIfKarmaScoreIsHighEnough(post);
+                    } else {
                         cache.deletePostFromCache(postId);
                     }
                 },
                 PostNotFoundException::new
         );
-    }
-
-    @Transactional
-    public void changeVisibility(long postId, @NonNull Visibility visibility) throws PostNotFoundException {
-        int rowsAffected = repository.changeVisibilityById(postId, visibility);
-        if (rowsAffected == 0) {
-            throw new PostNotFoundException();
-        }
-        if (!visibility.equals(Visibility.ACTIVE)) {
-            cache.deletePostFromCache(postId);
-        }
     }
 }
