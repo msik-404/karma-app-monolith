@@ -283,7 +283,9 @@ public class PostService {
                         cache.deletePostFromCache(postId);
                     }
                 },
-                PostNotFoundException::new
+                () -> {
+                    throw new PostNotFoundException();
+                }
         );
     }
 }
