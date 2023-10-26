@@ -3,15 +3,15 @@ package com.msik404.karmaapp.constraint.strategy;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.msik404.karmaapp.pair.Pair;
+import com.msik404.karmaapp.constraint.dto.ParseResult;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 @Component
-public class RoundBraceErrorMassageParseStrategy implements Strategy<String, Pair<String, String>> {
+public class RoundBraceErrorMassageParseStrategy implements Strategy<String, ParseResult> {
 
     @Override
-    public Pair<String, String> execute(@NonNull String errorMessage) {
+    public ParseResult execute(@NonNull String errorMessage) {
 
         Pattern pattern = Pattern.compile("\\((.*?)\\)");
         Matcher matcher = pattern.matcher(errorMessage);
@@ -24,6 +24,6 @@ public class RoundBraceErrorMassageParseStrategy implements Strategy<String, Pai
         if (matcher.find()) {
             value = matcher.group(1);
         }
-        return new Pair<>(fieldName, value);
+        return new ParseResult(fieldName, value);
     }
 }
