@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 import com.msik404.karmaapp.karma.exception.KarmaScoreAlreadyExistsException;
 import com.msik404.karmaapp.karma.exception.KarmaScoreNotFoundException;
-import com.msik404.karmaapp.pagin.Pagination;
+import com.msik404.karmaapp.position.ScrollPosition;
 import com.msik404.karmaapp.post.dto.PostCreationRequest;
 import com.msik404.karmaapp.post.dto.PostRatingResponse;
 import com.msik404.karmaapp.post.dto.PostResponse;
@@ -39,12 +39,12 @@ public class PostController {
             @RequestParam(value = "username", required = false) String username)
             throws InternalServerErrorException {
 
-        Pagination pagination = null;
+        ScrollPosition position = null;
         if (postId != null && karmaScore != null) {
-            pagination = new Pagination(postId, karmaScore);
+            position = new ScrollPosition(postId, karmaScore);
         }
 
-        return postService.findPaginatedPosts(size, List.of(Visibility.ACTIVE), pagination, username)
+        return postService.findPaginatedPosts(size, List.of(Visibility.ACTIVE), position, username)
                 .stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
@@ -61,12 +61,12 @@ public class PostController {
 
         List<Visibility> visibilities = createVisibilityList(active, hidden, false);
 
-        Pagination pagination = null;
+        ScrollPosition position = null;
         if (postId != null && karmaScore != null) {
-            pagination = new Pagination(postId, karmaScore);
+            position = new ScrollPosition(postId, karmaScore);
         }
 
-        return postService.findPaginatedOwnedPosts(size, visibilities, pagination)
+        return postService.findPaginatedOwnedPosts(size, visibilities, position)
                 .stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
@@ -80,12 +80,12 @@ public class PostController {
             @RequestParam(value = "username", required = false) String username)
         throws InternalServerErrorException {
 
-        Pagination pagination = null;
+        ScrollPosition position = null;
         if (postId != null && karmaScore != null) {
-            pagination = new Pagination(postId, karmaScore);
+            position = new ScrollPosition(postId, karmaScore);
         }
 
-        return postService.findPaginatedPostRatings(size, List.of(Visibility.ACTIVE), pagination, username);
+        return postService.findPaginatedPostRatings(size, List.of(Visibility.ACTIVE), position, username);
     }
 
     private List<Visibility> createVisibilityList(boolean active, boolean hidden, boolean deleted) {
@@ -116,12 +116,12 @@ public class PostController {
 
         List<Visibility> visibilities = createVisibilityList(active, hidden, false);
 
-        Pagination pagination = null;
+        ScrollPosition position = null;
         if (postId != null && karmaScore != null) {
-            pagination = new Pagination(postId, karmaScore);
+            position = new ScrollPosition(postId, karmaScore);
         }
 
-        return postService.findPaginatedPosts(size, visibilities, pagination, username)
+        return postService.findPaginatedPosts(size, visibilities, position, username)
                 .stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
@@ -139,12 +139,12 @@ public class PostController {
 
         List<Visibility> visibilities = createVisibilityList(active, hidden, false);
 
-        Pagination pagination = null;
+        ScrollPosition position = null;
         if (postId != null && karmaScore != null) {
-            pagination = new Pagination(postId, karmaScore);
+            position = new ScrollPosition(postId, karmaScore);
         }
 
-        return postService.findPaginatedPostRatings(size, visibilities, pagination, username);
+        return postService.findPaginatedPostRatings(size, visibilities, position, username);
     }
 
     @GetMapping("admin/posts")
@@ -160,12 +160,12 @@ public class PostController {
 
         List<Visibility> visibilities = createVisibilityList(active, hidden, deleted);
 
-        Pagination pagination = null;
+        ScrollPosition position = null;
         if (postId != null && karmaScore != null) {
-            pagination = new Pagination(postId, karmaScore);
+            position = new ScrollPosition(postId, karmaScore);
         }
 
-        return postService.findPaginatedPosts(size, visibilities, pagination, username)
+        return postService.findPaginatedPosts(size, visibilities, position, username)
                 .stream()
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
@@ -184,12 +184,12 @@ public class PostController {
 
         List<Visibility> visibilities = createVisibilityList(active, hidden, deleted);
 
-        Pagination pagination = null;
+        ScrollPosition position = null;
         if (postId != null && karmaScore != null) {
-            pagination = new Pagination(postId, karmaScore);
+            position = new ScrollPosition(postId, karmaScore);
         }
 
-        return postService.findPaginatedPostRatings(size, visibilities, pagination, username);
+        return postService.findPaginatedPostRatings(size, visibilities, position, username);
     }
 
     @GetMapping("guest/posts/{postId}/image")

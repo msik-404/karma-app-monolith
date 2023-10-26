@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import com.msik404.karmaapp.pagin.Pagination;
+import com.msik404.karmaapp.position.ScrollPosition;
 import com.msik404.karmaapp.post.PostComparator;
 import com.msik404.karmaapp.post.Visibility;
 import com.msik404.karmaapp.post.dto.PostDto;
@@ -62,11 +62,11 @@ public class PostRedisCacheHandlerService {
         return results;
     }
 
-    private int findNextSmallerThan(@NonNull List<PostDto> topPosts, @NonNull Pagination pagination) {
+    private int findNextSmallerThan(@NonNull List<PostDto> topPosts, @NonNull ScrollPosition position) {
 
         int value = Collections.binarySearch(
                 topPosts,
-                PostDto.builder().id(pagination.postId()).karmaScore(pagination.karmaScore()).build(),
+                PostDto.builder().id(position.postId()).karmaScore(position.karmaScore()).build(),
                 new PostComparator().reversed()
         );
 
@@ -82,23 +82,23 @@ public class PostRedisCacheHandlerService {
     public List<PostDto> findNextNHandler(
             int size,
             @NonNull List<Visibility> visibilities,
-            @NonNull Pagination pagination) {
+            @NonNull ScrollPosition position) {
 
         List<PostDto> results;
 
         if (isOnlyActive(visibilities)) {
             if (cache.isEmpty()) {
                 final List<PostDto> newValuesForCache = updateCache();
-                final int firstSmallerElementIdx = findNextSmallerThan(newValuesForCache, pagination);
+                final int firstSmallerElementIdx = findNextSmallerThan(newValuesForCache, position);
 
                 final int endBound = Math.min(firstSmallerElementIdx + size, newValuesForCache.size());
                 results = newValuesForCache.subList(firstSmallerElementIdx, endBound);
             } else {
-                results = cache.findNextNCached(size, pagination.karmaScore())
-                        .orElseGet(() -> repository.findNextNPosts(size, visibilities, pagination));
+                results = cache.findNextNCached(size, position.karmaScore())
+                        .orElseGet(() -> repository.findNextNPosts(size, visibilities, position));
             }
         } else {
-            results = repository.findNextNPosts(size, visibilities, pagination);
+            results = repository.findNextNPosts(size, visibilities, position);
         }
 
         return results;

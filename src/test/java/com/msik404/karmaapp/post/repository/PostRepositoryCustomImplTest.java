@@ -10,7 +10,7 @@ import com.msik404.karmaapp.constraint.ConstraintExceptionsHandler;
 import com.msik404.karmaapp.constraint.strategy.ConstraintViolationExceptionErrorMessageExtractionStrategy;
 import com.msik404.karmaapp.constraint.strategy.RoundBraceErrorMassageParseStrategy;
 import com.msik404.karmaapp.karma.KarmaScoreRepository;
-import com.msik404.karmaapp.pagin.Pagination;
+import com.msik404.karmaapp.position.ScrollPosition;
 import com.msik404.karmaapp.post.Post;
 import com.msik404.karmaapp.post.Visibility;
 import com.msik404.karmaapp.post.dto.PostDto;
@@ -201,7 +201,7 @@ class PostRepositoryCustomImplTest {
                 postRepository.findAll(), new HashSet<>(visibilities));
 
         final Post lastPost = groundTruthTopPosts.get(topSize - 1);
-        final var pagination = new Pagination(lastPost.getId(), lastPost.getKarmaScore());
+        final var pagination = new ScrollPosition(lastPost.getId(), lastPost.getKarmaScore());
 
         // when
         final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, pagination);
@@ -230,7 +230,7 @@ class PostRepositoryCustomImplTest {
                 postRepository.findAll(), new HashSet<>(visibilities));
 
         final Post lastPost = groundTruthTopPosts.get(topSize - 1);
-        final var pagination = new Pagination(lastPost.getId(), lastPost.getKarmaScore());
+        final var pagination = new ScrollPosition(lastPost.getId(), lastPost.getKarmaScore());
 
         // when
         final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, pagination);
@@ -251,7 +251,7 @@ class PostRepositoryCustomImplTest {
                 postRepository.findAll(), new HashSet<>(visibilities));
 
         final Post lastPost = groundTruthTopPosts.get(topSize - 1);
-        final var pagination = new Pagination(lastPost.getId(), lastPost.getKarmaScore());
+        final var pagination = new ScrollPosition(lastPost.getId(), lastPost.getKarmaScore());
 
         // when
         final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, pagination);
@@ -280,7 +280,7 @@ class PostRepositoryCustomImplTest {
                 postRepository.findAll(), Set.of(Visibility.ACTIVE));
 
         final Post lastPost = groundTruthTopPosts.get(topSize - 1);
-        final var pagination = new Pagination(lastPost.getId(), lastPost.getKarmaScore());
+        final var pagination = new ScrollPosition(lastPost.getId(), lastPost.getKarmaScore());
 
         // when
         final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, pagination);
@@ -309,7 +309,7 @@ class PostRepositoryCustomImplTest {
                 postRepository.findAll(), new HashSet<>(visibilities));
 
         final Post lastPost = groundTruthTopPosts.get(topSize - 1);
-        final var pagination = new Pagination(lastPost.getId(), lastPost.getKarmaScore());
+        final var pagination = new ScrollPosition(lastPost.getId(), lastPost.getKarmaScore());
 
         // when
         final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, pagination);
@@ -338,7 +338,7 @@ class PostRepositoryCustomImplTest {
 
         final int lastIdx = Math.min(topSize - 1, groundTruthTopPosts.size() - 1);
         final Post lastPost = groundTruthTopPosts.get(lastIdx);
-        final var pagination = new Pagination(lastPost.getId(), lastPost.getKarmaScore());
+        final var pagination = new ScrollPosition(lastPost.getId(), lastPost.getKarmaScore());
 
         // when
         final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, pagination);
@@ -403,7 +403,7 @@ class PostRepositoryCustomImplTest {
                 postRepository.findAll(), username, new HashSet<>(visibilities));
 
         final Post lastPost = groundTruthTopPostsOfUserOne.get(topSize - 1);
-        final var pagination = new Pagination(lastPost.getId(), lastPost.getKarmaScore());
+        final var pagination = new ScrollPosition(lastPost.getId(), lastPost.getKarmaScore());
 
         // when
         final List<PostDto> nextResults = postRepository.findNextNPostsWithUsername(
@@ -469,7 +469,7 @@ class PostRepositoryCustomImplTest {
                 postRepository.findAll(), username, new HashSet<>(visibilities));
 
         Post lastPost = groundTruthTopPostsOfUserOne.get(topSize - 1);
-        var pagination = new Pagination(lastPost.getId(), lastPost.getKarmaScore());
+        var pagination = new ScrollPosition(lastPost.getId(), lastPost.getKarmaScore());
 
         // when
         final List<PostDto> nextResults = postRepository.findNextNWithUserId(
@@ -538,7 +538,7 @@ class PostRepositoryCustomImplTest {
                 postRepository.findAll(), new HashSet<>(visibilities));
 
         final Post lastPost = groundTruthTopPosts.get(topSize - 1);
-        final var pagination = new Pagination(lastPost.getId(), lastPost.getKarmaScore());
+        final var pagination = new ScrollPosition(lastPost.getId(), lastPost.getKarmaScore());
 
         // when
         final List<PostRatingResponse> nextResults = postRepository.findNextNRatings(
@@ -619,7 +619,7 @@ class PostRepositoryCustomImplTest {
                 postRepository.findAll(), creatorUsername, new HashSet<>(visibilities));
 
         final Post lastPost = groundTruthTopPostsOfUserOne.get(topSize - 1);
-        final var pagination = new Pagination(lastPost.getId(), lastPost.getKarmaScore());
+        final var pagination = new ScrollPosition(lastPost.getId(), lastPost.getKarmaScore());
 
         // when
         final List<PostRatingResponse> nextCreatorResults = postRepository.findNextNRatingsWithUsername(

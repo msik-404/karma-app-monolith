@@ -13,7 +13,7 @@ import com.msik404.karmaapp.karma.KarmaScore;
 import com.msik404.karmaapp.karma.KarmaScoreService;
 import com.msik404.karmaapp.karma.exception.KarmaScoreAlreadyExistsException;
 import com.msik404.karmaapp.karma.exception.KarmaScoreNotFoundException;
-import com.msik404.karmaapp.pagin.Pagination;
+import com.msik404.karmaapp.position.ScrollPosition;
 import com.msik404.karmaapp.post.cache.PostRedisCache;
 import com.msik404.karmaapp.post.cache.PostRedisCacheHandlerService;
 import com.msik404.karmaapp.post.dto.PostCreationRequest;
@@ -67,7 +67,7 @@ class PostServiceTest {
     void findPaginatedPosts_PaginationIsNullAndUsernameIsNull_CacheHandlerFindTopNHandlerCalled() {
 
         // given
-        final Pagination pagination = null;
+        final ScrollPosition position = null;
         final String username = null;
 
         // these values won't influence results of these test
@@ -75,12 +75,12 @@ class PostServiceTest {
         final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
 
         // when
-        postService.findPaginatedPosts(size, visibilities, pagination, username);
+        postService.findPaginatedPosts(size, visibilities, position, username);
 
         // then
         verify(cacheHandler).findTopNHandler(size, visibilities);
-        verify(repository, never()).findNextNPostsWithUsername(size, visibilities, pagination, username);
-        verify(cacheHandler, never()).findNextNHandler(size, visibilities, pagination);
+        verify(repository, never()).findNextNPostsWithUsername(size, visibilities, position, username);
+        verify(cacheHandler, never()).findNextNHandler(size, visibilities, position);
         verify(repository, never()).findTopNPostsWithUsername(size, visibilities, username);
     }
 
@@ -88,7 +88,7 @@ class PostServiceTest {
     void findPaginatedPosts_PaginationIsNonNullAndUsernameIsNonNull_RepositoryFindNextNPostsWithUsernameCalled() {
 
         // given
-        final var pagination = new Pagination(0, 0);
+        final var pagination = new ScrollPosition(0, 0);
         final String username = "username";
 
         // these values won't influence results of these test
@@ -109,7 +109,7 @@ class PostServiceTest {
     void findPaginatedPosts_PaginationIsNonNullAndUsernameIsNull_CacheHandlerFindNextNHandlerCalled() {
 
         // given
-        final var pagination = new Pagination(0, 0);
+        final var pagination = new ScrollPosition(0, 0);
         final String username = null;
 
         // these values won't influence results of these test
@@ -130,7 +130,7 @@ class PostServiceTest {
     void findPaginatedPosts_PaginationIsNullAndUsernameIsNonNull_RepositoryFindTopNPostsWithUsernameCalled() {
 
         // given
-        final Pagination pagination = null;
+        final ScrollPosition position = null;
         final String username = "username";
 
         // these values won't influence results of these test
@@ -138,12 +138,12 @@ class PostServiceTest {
         final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
 
         // when
-        postService.findPaginatedPosts(size, visibilities, pagination, username);
+        postService.findPaginatedPosts(size, visibilities, position, username);
 
         // then
         verify(cacheHandler, never()).findTopNHandler(size, visibilities);
-        verify(repository, never()).findNextNPostsWithUsername(size, visibilities, pagination, username);
-        verify(cacheHandler, never()).findNextNHandler(size, visibilities, pagination);
+        verify(repository, never()).findNextNPostsWithUsername(size, visibilities, position, username);
+        verify(cacheHandler, never()).findNextNHandler(size, visibilities, position);
         verify(repository).findTopNPostsWithUsername(size, visibilities, username);
     }
 
@@ -151,7 +151,7 @@ class PostServiceTest {
     void findPaginatedOwnedPosts_PaginationIsNull_FindTopNWithUserIdCalled() {
 
         // given
-        final Pagination pagination = null;
+        final ScrollPosition position = null;
 
         final int size = 10;
         final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
@@ -165,18 +165,18 @@ class PostServiceTest {
         SecurityContextHolder.setContext(securityContext);
 
         // when
-        postService.findPaginatedOwnedPosts(size, visibilities, pagination);
+        postService.findPaginatedOwnedPosts(size, visibilities, position);
 
         // then
         verify(repository).findTopNWithUserId(size, visibilities, userId);
-        verify(repository, never()).findNextNWithUserId(size, visibilities, userId, pagination);
+        verify(repository, never()).findNextNWithUserId(size, visibilities, userId, position);
     }
 
     @Test
     void findPaginatedOwnedPosts_PaginationIsNonNull_FindNextNWithUserIdCalled() {
 
         // given
-        final var pagination = new Pagination(0, 0);
+        final var pagination = new ScrollPosition(0, 0);
 
         // these values won't influence results of these test
         final int size = 10;
@@ -202,7 +202,7 @@ class PostServiceTest {
     void findPaginatedPostRatings_PaginationIsNullAndUsernameIsNull_RepositoryFindTopNRatingsCalled() {
 
         // given
-        final Pagination pagination = null;
+        final ScrollPosition position = null;
         final String username = null;
 
         // these values won't influence results of these test
@@ -218,12 +218,12 @@ class PostServiceTest {
         SecurityContextHolder.setContext(securityContext);
 
         // when
-        postService.findPaginatedPostRatings(size, visibilities, pagination, username);
+        postService.findPaginatedPostRatings(size, visibilities, position, username);
 
         // then
         verify(repository).findTopNRatings(size, visibilities, userId);
-        verify(repository, never()).findNextNRatingsWithUsername(size, visibilities, userId, pagination, username);
-        verify(repository, never()).findNextNRatings(size, visibilities, userId, pagination);
+        verify(repository, never()).findNextNRatingsWithUsername(size, visibilities, userId, position, username);
+        verify(repository, never()).findNextNRatings(size, visibilities, userId, position);
         verify(repository, never()).findTopNRatingsWithUsername(size, visibilities, userId, username);
     }
 
@@ -231,7 +231,7 @@ class PostServiceTest {
     void findPaginatedPostRatings_PaginationIsNonNullAndUsernameIsNonNull_RepositoryFindNextNRatingsWithUsernameCalled() {
 
         // given
-        final var pagination = new Pagination(0, 0);
+        final var pagination = new ScrollPosition(0, 0);
         final String username = "username";
 
         // these values won't influence results of these test
@@ -260,7 +260,7 @@ class PostServiceTest {
     void findPaginatedPostRatings_PaginationIsNonNullAndUsernameIsNull_RepositoryFindNextNRatingsCalled() {
 
         // given
-        final var pagination = new Pagination(0, 0);
+        final var pagination = new ScrollPosition(0, 0);
         final String username = null;
 
         // these values won't influence results of these test
@@ -289,7 +289,7 @@ class PostServiceTest {
     void findPaginatedPostRatings_PaginationIsNullAndUsernameIsNonNull_RepositoryFindTopNRatingsWithUsernameCalled() {
 
         // given
-        final Pagination pagination = null;
+        final ScrollPosition position = null;
         final String username = "username";
 
         // these values won't influence results of these test
@@ -305,12 +305,12 @@ class PostServiceTest {
         SecurityContextHolder.setContext(securityContext);
 
         // when
-        postService.findPaginatedPostRatings(size, visibilities, pagination, username);
+        postService.findPaginatedPostRatings(size, visibilities, position, username);
 
         // then
         verify(repository, never()).findTopNRatings(size, visibilities, userId);
-        verify(repository, never()).findNextNRatingsWithUsername(size, visibilities, userId, pagination, username);
-        verify(repository, never()).findNextNRatings(size, visibilities, userId, pagination);
+        verify(repository, never()).findNextNRatingsWithUsername(size, visibilities, userId, position, username);
+        verify(repository, never()).findNextNRatings(size, visibilities, userId, position);
         verify(repository).findTopNRatingsWithUsername(size, visibilities, userId, username);
     }
 

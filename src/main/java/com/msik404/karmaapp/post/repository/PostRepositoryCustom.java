@@ -2,7 +2,7 @@ package com.msik404.karmaapp.post.repository;
 
 import java.util.List;
 
-import com.msik404.karmaapp.pagin.Pagination;
+import com.msik404.karmaapp.position.ScrollPosition;
 import com.msik404.karmaapp.post.Visibility;
 import com.msik404.karmaapp.post.dto.PostDto;
 import com.msik404.karmaapp.post.dto.PostRatingResponse;
@@ -19,7 +19,7 @@ public interface PostRepositoryCustom {
     List<PostDto> findNextNPosts(
             int size,
             @NonNull List<Visibility> visibilities,
-            @NonNull Pagination pagination) throws InternalServerErrorException;
+            @NonNull ScrollPosition position) throws InternalServerErrorException;
 
     List<PostDto> findTopNPostsWithUsername(
             int size,
@@ -30,7 +30,7 @@ public interface PostRepositoryCustom {
     List<PostDto> findNextNPostsWithUsername(
             int size,
             @NonNull List<Visibility> visibilities,
-            @NonNull Pagination pagination,
+            @NonNull ScrollPosition position,
             @NonNull String username
     ) throws InternalServerErrorException;
 
@@ -40,7 +40,7 @@ public interface PostRepositoryCustom {
             int size,
             @NonNull List<Visibility> visibilities,
             long userId,
-            @NonNull Pagination pagination);
+            @NonNull ScrollPosition position);
 
     List<PostRatingResponse> findTopNRatings(
             int size,
@@ -52,7 +52,7 @@ public interface PostRepositoryCustom {
             int size,
             @NonNull List<Visibility> visibilities,
             long userId,
-            @NonNull Pagination pagination) throws InternalServerErrorException;
+            @NonNull ScrollPosition position) throws InternalServerErrorException;
 
     List<PostRatingResponse> findTopNRatingsWithUsername(
             int size,
@@ -65,7 +65,7 @@ public interface PostRepositoryCustom {
             int size,
             @NonNull List<Visibility> visibilities,
             long userId,
-            @NonNull Pagination pagination,
+            @NonNull ScrollPosition position,
             @NonNull String username
     ) throws InternalServerErrorException;
 

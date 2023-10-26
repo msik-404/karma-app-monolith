@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.msik404.karmaapp.TestingImageDataCreator;
-import com.msik404.karmaapp.pagin.Pagination;
+import com.msik404.karmaapp.position.ScrollPosition;
 import com.msik404.karmaapp.post.Visibility;
 import com.msik404.karmaapp.post.dto.PostDto;
 import com.msik404.karmaapp.post.dto.PostDtoWithImageData;
@@ -136,7 +136,7 @@ class PostRedisCacheHandlerServiceTest {
         // given
         final int size = 3;
         final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
-        final var pagination = new Pagination(3, 10);
+        final var pagination = new ScrollPosition(3, 10);
 
         final boolean isCacheEmpty = false;
         when(cache.isEmpty()).thenReturn(isCacheEmpty);
@@ -158,7 +158,7 @@ class PostRedisCacheHandlerServiceTest {
         // given
         final int size = 3;
         final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
-        final var pagination = new Pagination(3, 10);
+        final var pagination = new ScrollPosition(3, 10);
 
         final boolean isCacheEmpty = false;
         when(cache.isEmpty()).thenReturn(isCacheEmpty);
@@ -194,7 +194,7 @@ class PostRedisCacheHandlerServiceTest {
         groundTruthPosts.add(PostDto.builder().id(7L).karmaScore(-5L).build());
 
         final PostDto lastPost = groundTruthPosts.get(topSize - 1);
-        final var pagination = new Pagination(
+        final var pagination = new ScrollPosition(
                 lastPost.getId(),
                 lastPost.getKarmaScore()
         );
@@ -238,7 +238,7 @@ class PostRedisCacheHandlerServiceTest {
         groundTruthPosts.add(PostDto.builder().id(6L).karmaScore(2L).build());
         groundTruthPosts.add(PostDto.builder().id(7L).karmaScore(-5L).build());
 
-        final var pagination = new Pagination(-1, 7);
+        final var pagination = new ScrollPosition(-1, 7);
 
         final boolean isCacheEmpty = true;
         when(cache.isEmpty()).thenReturn(isCacheEmpty);
@@ -268,7 +268,7 @@ class PostRedisCacheHandlerServiceTest {
         // given
         final int size = 3;
         final List<Visibility> visibilities = List.of(Visibility.DELETED);
-        final var pagination = new Pagination(3, 10);
+        final var pagination = new ScrollPosition(3, 10);
 
         when(repository.findNextNPosts(size, visibilities, pagination)).thenReturn(getPosts(size));
 

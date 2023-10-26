@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.msik404.karmaapp.pagin.Pagination;
+import com.msik404.karmaapp.position.ScrollPosition;
 import com.msik404.karmaapp.post.Post;
 import com.msik404.karmaapp.post.Visibility;
 import com.msik404.karmaapp.user.User;
@@ -35,15 +35,15 @@ public abstract class FindNPostPaginated<T> extends FindTemplate<T> {
      * Fancy method that set predicate used to perform stable sort on two columns.
      * In postgresql this could be rewritten as (karmaScore, postId) > (?, ?)
      *
-     * @param pagination object with variables required to perform stable sort. These variables are postId and karmaScore
+     * @param position object with variables required to perform stable sort. These variables are postId and karmaScore
      */
-    public void setPagination(@NonNull Pagination pagination) {
+    public void setPagination(@NonNull ScrollPosition position) {
 
         wherePredicateMap.put("paginationPredicate", cb.or(
-                cb.lessThan(postRoot.get("karmaScore"), pagination.karmaScore()),
+                cb.lessThan(postRoot.get("karmaScore"), position.karmaScore()),
                 cb.and(
-                        cb.equal(postRoot.get("karmaScore"), pagination.karmaScore()),
-                        cb.greaterThan(postRoot.get("id"), pagination.postId())
+                        cb.equal(postRoot.get("karmaScore"), position.karmaScore()),
+                        cb.greaterThan(postRoot.get("id"), position.postId())
                 )
         ));
     }

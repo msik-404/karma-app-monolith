@@ -12,7 +12,7 @@ import com.msik404.karmaapp.karma.KarmaKey;
 import com.msik404.karmaapp.karma.KarmaScoreService;
 import com.msik404.karmaapp.karma.exception.KarmaScoreAlreadyExistsException;
 import com.msik404.karmaapp.karma.exception.KarmaScoreNotFoundException;
-import com.msik404.karmaapp.pagin.Pagination;
+import com.msik404.karmaapp.position.ScrollPosition;
 import com.msik404.karmaapp.post.cache.PostRedisCache;
 import com.msik404.karmaapp.post.cache.PostRedisCacheHandlerService;
 import com.msik404.karmaapp.post.dto.PostCreationRequest;
@@ -49,18 +49,18 @@ public class PostService {
     public List<PostDto> findPaginatedPosts(
             int size,
             @NonNull List<Visibility> visibilities,
-            @Nullable Pagination pagination,
+            @Nullable ScrollPosition position,
             @Nullable String username)
             throws InternalServerErrorException {
 
         List<PostDto> results;
 
-        if (pagination == null && username == null) {
+        if (position == null && username == null) {
             results = cacheHandler.findTopNHandler(size, visibilities);
-        } else if (pagination != null && username != null) {
-            results = repository.findNextNPostsWithUsername(size, visibilities, pagination, username);
-        } else if (pagination != null) { // username == null
-            results = cacheHandler.findNextNHandler(size, visibilities, pagination);
+        } else if (position != null && username != null) {
+            results = repository.findNextNPostsWithUsername(size, visibilities, position, username);
+        } else if (position != null) { // username == null
+            results = cacheHandler.findNextNHandler(size, visibilities, position);
         } else { // username != null and pagination == null
             results = repository.findTopNPostsWithUsername(size, visibilities, username);
         }
@@ -72,7 +72,7 @@ public class PostService {
     public List<PostDto> findPaginatedOwnedPosts(
             int size,
             @NonNull List<Visibility> visibilities,
-            @Nullable Pagination pagination)
+            @Nullable ScrollPosition position)
             throws InternalServerErrorException {
 
         final var authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -80,10 +80,10 @@ public class PostService {
 
         List<PostDto> results;
 
-        if (pagination == null) {
+        if (position == null) {
             results = repository.findTopNWithUserId(size, visibilities, userId);
         } else {
-            results = repository.findNextNWithUserId(size, visibilities, userId, pagination);
+            results = repository.findNextNWithUserId(size, visibilities, userId, position);
         }
 
         return results;
@@ -93,7 +93,7 @@ public class PostService {
     public List<PostRatingResponse> findPaginatedPostRatings(
             int size,
             @NonNull List<Visibility> visibilities,
-            @Nullable Pagination pagination,
+            @Nullable ScrollPosition position,
             @Nullable String username)
             throws InternalServerErrorException {
 
@@ -102,12 +102,12 @@ public class PostService {
 
         List<PostRatingResponse> results;
 
-        if (pagination == null && username == null) {
+        if (position == null && username == null) {
             results = repository.findTopNRatings(size, visibilities, userId);
-        } else if (pagination != null && username != null) {
-            results = repository.findNextNRatingsWithUsername(size, visibilities, userId, pagination, username);
-        } else if (pagination != null) { // username == null
-            results = repository.findNextNRatings(size, visibilities, userId, pagination);
+        } else if (position != null && username != null) {
+            results = repository.findNextNRatingsWithUsername(size, visibilities, userId, position, username);
+        } else if (position != null) { // username == null
+            results = repository.findNextNRatings(size, visibilities, userId, position);
         } else { // username != null and pagination == null
             results = repository.findTopNRatingsWithUsername(size, visibilities, userId, username);
         }
