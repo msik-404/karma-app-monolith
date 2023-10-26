@@ -1,6 +1,7 @@
 package com.msik404.karmaapp.constraint.exception;
 
-public class UndefinedConstraintException extends RuntimeException {
+// todo: change name of this class to DuplicateUnexpectedFieldException
+public class UndefinedConstraintException extends AbstractDuplicateFieldRestException {
 
     public UndefinedConstraintException(String errorMessage) {
         super(errorMessage);

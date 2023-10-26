@@ -1,18 +1,14 @@
-package com.msik404.karmaapp.karma.exception;
+package com.msik404.karmaapp.constraint.exception;
 
 import com.msik404.karmaapp.exception.AbstractRestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.lang.NonNull;
 
-public class KarmaScoreAlreadyExistsException extends AbstractRestException {
+public abstract class AbstractDuplicateFieldRestException extends AbstractRestException {
 
-    public KarmaScoreAlreadyExistsException() {
-        super("KarmaScore with that userId and postId already exists");
-    }
-
-    public KarmaScoreAlreadyExistsException(String message) {
-        super(message);
+    public AbstractDuplicateFieldRestException(String errorMessage) {
+        super(errorMessage);
     }
 
     @NonNull
