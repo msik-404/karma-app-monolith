@@ -2,7 +2,7 @@ package com.msik404.karmaapp.user;
 
 import com.msik404.karmaapp.constraint.exception.DuplicateEmailException;
 import com.msik404.karmaapp.constraint.exception.DuplicateUsernameException;
-import com.msik404.karmaapp.constraint.exception.UndefinedConstraintException;
+import com.msik404.karmaapp.constraint.exception.DuplicateUnexpectedFieldException;
 import com.msik404.karmaapp.user.dto.UserUpdateRequestWithAdminPrivilege;
 import com.msik404.karmaapp.user.dto.UserUpdateRequestWithUserPrivilege;
 import com.msik404.karmaapp.user.exception.UserNotFoundException;
@@ -25,7 +25,7 @@ public class UserController {
     public ResponseEntity<UserUpdateRequestWithUserPrivilege> updateWithUserPrivilege(
             @PathVariable Long userId,
             @Valid @RequestBody UserUpdateRequestWithUserPrivilege request)
-            throws AccessDeniedException, DuplicateEmailException, UndefinedConstraintException, UserNotFoundException {
+            throws AccessDeniedException, DuplicateEmailException, DuplicateUnexpectedFieldException, UserNotFoundException {
 
         return ResponseEntity.ok(userService.updateWithUserPrivilege(userId, request));
     }
@@ -34,7 +34,7 @@ public class UserController {
     public ResponseEntity<UserUpdateRequestWithAdminPrivilege> updateWithAdminPrivilege(
             @PathVariable Long userId,
             @Valid @RequestBody UserUpdateRequestWithAdminPrivilege request)
-            throws DuplicateEmailException, DuplicateUsernameException, UndefinedConstraintException, UserNotFoundException {
+            throws DuplicateEmailException, DuplicateUsernameException, DuplicateUnexpectedFieldException, UserNotFoundException {
 
         return ResponseEntity.ok(userService.updateWithAdminPrivilege(userId, request));
     }

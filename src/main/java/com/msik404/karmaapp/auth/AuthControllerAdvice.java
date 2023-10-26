@@ -2,7 +2,7 @@ package com.msik404.karmaapp.auth;
 
 import com.msik404.karmaapp.constraint.exception.DuplicateEmailException;
 import com.msik404.karmaapp.constraint.exception.DuplicateUsernameException;
-import com.msik404.karmaapp.constraint.exception.UndefinedConstraintException;
+import com.msik404.karmaapp.constraint.exception.DuplicateUnexpectedFieldException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
@@ -81,8 +81,8 @@ public class AuthControllerAdvice extends ResponseEntityExceptionHandler {
                 HttpStatus.CONFLICT, ex.getMessage());
     }
 
-    @ExceptionHandler(UndefinedConstraintException.class)
-    public ProblemDetail undefinedConstraintException(UndefinedConstraintException ex) {
+    @ExceptionHandler(DuplicateUnexpectedFieldException.class)
+    public ProblemDetail undefinedConstraintException(DuplicateUnexpectedFieldException ex) {
         return ProblemDetail.forStatusAndDetail(
                 HttpStatus.CONFLICT, ex.getMessage());
     }

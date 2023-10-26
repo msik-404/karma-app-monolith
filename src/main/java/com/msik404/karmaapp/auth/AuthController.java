@@ -5,7 +5,7 @@ import com.msik404.karmaapp.auth.dto.LoginResponse;
 import com.msik404.karmaapp.auth.dto.RegisterRequest;
 import com.msik404.karmaapp.constraint.exception.DuplicateEmailException;
 import com.msik404.karmaapp.constraint.exception.DuplicateUsernameException;
-import com.msik404.karmaapp.constraint.exception.UndefinedConstraintException;
+import com.msik404.karmaapp.constraint.exception.DuplicateUnexpectedFieldException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +22,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<Void> register(@Valid @RequestBody RegisterRequest request)
-            throws DuplicateEmailException, DuplicateUsernameException, UndefinedConstraintException {
+            throws DuplicateEmailException, DuplicateUsernameException, DuplicateUnexpectedFieldException {
 
         authenticationService.register(request);
 

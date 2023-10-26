@@ -3,7 +3,7 @@ package com.msik404.karmaapp.user.repository;
 import com.msik404.karmaapp.constraint.ConstraintExceptionsHandler;
 import com.msik404.karmaapp.constraint.exception.DuplicateEmailException;
 import com.msik404.karmaapp.constraint.exception.DuplicateUsernameException;
-import com.msik404.karmaapp.constraint.exception.UndefinedConstraintException;
+import com.msik404.karmaapp.constraint.exception.DuplicateUnexpectedFieldException;
 import com.msik404.karmaapp.constraint.strategy.ConstraintViolationExceptionErrorMessageExtractionStrategy;
 import com.msik404.karmaapp.constraint.strategy.RoundBraceErrorMassageParseStrategy;
 import com.msik404.karmaapp.user.User;
@@ -46,7 +46,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 
     @Override
     public int updateNonNull(long userId, @NonNull UserUpdateRequestWithUserPrivilege dto)
-            throws DuplicateEmailException, DuplicateUsernameException, UndefinedConstraintException {
+            throws DuplicateEmailException, DuplicateUsernameException, DuplicateUnexpectedFieldException {
 
         var criteriaUpdate = cb.createCriteriaUpdate(User.class);
         var root = criteriaUpdate.from(User.class);

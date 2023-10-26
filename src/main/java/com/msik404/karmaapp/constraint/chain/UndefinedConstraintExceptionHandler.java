@@ -1,6 +1,6 @@
 package com.msik404.karmaapp.constraint.chain;
 
-import com.msik404.karmaapp.constraint.exception.UndefinedConstraintException;
+import com.msik404.karmaapp.constraint.exception.DuplicateUnexpectedFieldException;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
@@ -19,7 +19,7 @@ public class UndefinedConstraintExceptionHandler extends BaseExceptionHandler {
     public void handle(@NonNull String fieldName, @NonNull String errorMessage) throws RuntimeException {
 
         if (super.nextHandler.isEmpty()) {
-            throw new UndefinedConstraintException(getErrorMessage(fieldName, errorMessage));
+            throw new DuplicateUnexpectedFieldException(getErrorMessage(fieldName, errorMessage));
         }
     }
 

@@ -9,7 +9,7 @@ import com.msik404.karmaapp.auth.jwt.JwtService;
 import com.msik404.karmaapp.constraint.ConstraintExceptionsHandler;
 import com.msik404.karmaapp.constraint.exception.DuplicateEmailException;
 import com.msik404.karmaapp.constraint.exception.DuplicateUsernameException;
-import com.msik404.karmaapp.constraint.exception.UndefinedConstraintException;
+import com.msik404.karmaapp.constraint.exception.DuplicateUnexpectedFieldException;
 import com.msik404.karmaapp.constraint.strategy.DataIntegrityViolationExceptionErrorMessageExtractionStrategy;
 import com.msik404.karmaapp.constraint.strategy.RoundBraceErrorMassageParseStrategy;
 import com.msik404.karmaapp.user.Role;
@@ -39,7 +39,7 @@ public class AuthService {
     private final RoundBraceErrorMassageParseStrategy parseStrategy;
 
     public void register(@NonNull RegisterRequest request)
-            throws DuplicateEmailException, DuplicateUsernameException, UndefinedConstraintException {
+            throws DuplicateEmailException, DuplicateUsernameException, DuplicateUnexpectedFieldException {
 
         try {
             repository.save(User.builder()

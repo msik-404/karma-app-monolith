@@ -5,7 +5,7 @@ import com.msik404.karmaapp.constraint.chain.DuplicateUsernameExceptionHandler;
 import com.msik404.karmaapp.constraint.chain.UndefinedConstraintExceptionHandler;
 import com.msik404.karmaapp.constraint.exception.DuplicateEmailException;
 import com.msik404.karmaapp.constraint.exception.DuplicateUsernameException;
-import com.msik404.karmaapp.constraint.exception.UndefinedConstraintException;
+import com.msik404.karmaapp.constraint.exception.DuplicateUnexpectedFieldException;
 import com.msik404.karmaapp.pair.Pair;
 import com.msik404.karmaapp.strategy.Strategy;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ public class ConstraintExceptionsHandler {
             @NonNull RuntimeException ex,
             @NonNull Strategy<RuntimeException, String> extractionStrategy,
             @NonNull Strategy<String, Pair<String, String>> parseStrategy)
-            throws DuplicateEmailException, DuplicateUsernameException, UndefinedConstraintException {
+            throws DuplicateEmailException, DuplicateUsernameException, DuplicateUnexpectedFieldException {
 
         String errorMessage = extractionStrategy.execute(ex);
         Pair<String, String> parsedResults = parseStrategy.execute(errorMessage);
