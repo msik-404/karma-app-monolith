@@ -1,6 +1,6 @@
-package com.msik404.karmaapp.constraintExceptions.chain;
+package com.msik404.karmaapp.constraint.chain;
 
-import com.msik404.karmaapp.constraintExceptions.exception.UndefinedConstraintException;
+import com.msik404.karmaapp.constraint.exception.UndefinedConstraintException;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 

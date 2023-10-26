@@ -1,4 +1,4 @@
-package com.msik404.karmaapp.constraintExceptions.strategy;
+package com.msik404.karmaapp.constraint.strategy;
 
 import com.msik404.karmaapp.strategy.Strategy;
 import org.springframework.lang.NonNull;

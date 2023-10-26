@@ -6,9 +6,9 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.msik404.karmaapp.TestingDataCreator;
-import com.msik404.karmaapp.constraintExceptions.ConstraintExceptionsHandler;
-import com.msik404.karmaapp.constraintExceptions.strategy.ConstraintViolationExceptionErrorMessageExtractionStrategy;
-import com.msik404.karmaapp.constraintExceptions.strategy.RoundBraceErrorMassageParseStrategy;
+import com.msik404.karmaapp.constraint.ConstraintExceptionsHandler;
+import com.msik404.karmaapp.constraint.strategy.ConstraintViolationExceptionErrorMessageExtractionStrategy;
+import com.msik404.karmaapp.constraint.strategy.RoundBraceErrorMassageParseStrategy;
 import com.msik404.karmaapp.karma.KarmaScoreRepository;
 import com.msik404.karmaapp.pagin.Pagination;
 import com.msik404.karmaapp.post.Post;

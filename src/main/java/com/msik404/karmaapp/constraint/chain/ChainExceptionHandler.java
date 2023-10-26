@@ -1,4 +1,4 @@
-package com.msik404.karmaapp.constraintExceptions.chain;
+package com.msik404.karmaapp.constraint.chain;
 
 public interface ChainExceptionHandler {
 
