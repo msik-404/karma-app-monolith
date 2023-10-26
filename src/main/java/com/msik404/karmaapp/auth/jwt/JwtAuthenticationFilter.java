@@ -2,8 +2,8 @@ package com.msik404.karmaapp.auth.jwt;
 
 import java.io.IOException;
 
-import com.msik404.karmaapp.user.exception.UserNotFoundException;
 import com.msik404.karmaapp.user.UserService;
+import com.msik404.karmaapp.user.exception.UserNotFoundException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;

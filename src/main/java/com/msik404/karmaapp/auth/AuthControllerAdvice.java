@@ -1,8 +1,8 @@
 package com.msik404.karmaapp.auth;
 
 import com.msik404.karmaapp.constraint.exception.DuplicateEmailException;
-import com.msik404.karmaapp.constraint.exception.DuplicateUsernameException;
 import com.msik404.karmaapp.constraint.exception.DuplicateUnexpectedFieldException;
+import com.msik404.karmaapp.constraint.exception.DuplicateUsernameException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;

@@ -56,7 +56,7 @@ public class UserAndPostInit implements CommandLineRunner {
             List<User> usersToSave = new ArrayList<>();
             List<Post> postsToSave = new ArrayList<>();
             final int currLow = insertionIdx * MAX_SINGLE_INSERT_SIZE;
-            final int currHigh = Math.min((insertionIdx+1) * MAX_SINGLE_INSERT_SIZE, USER_AMOUNT);
+            final int currHigh = Math.min((insertionIdx + 1) * MAX_SINGLE_INSERT_SIZE, USER_AMOUNT);
             for (int userId = currLow; userId < currHigh; userId++) {
                 var user = getUserForInserting(String.format("username_%d", userId));
 

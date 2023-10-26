@@ -1,7 +1,8 @@
 package com.msik404.karmaapp.user.dto;
 
 import jakarta.validation.constraints.Email;
-import lombok.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.springframework.lang.Nullable;
 

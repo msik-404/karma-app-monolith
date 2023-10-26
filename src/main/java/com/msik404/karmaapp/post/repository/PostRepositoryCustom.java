@@ -14,7 +14,7 @@ public interface PostRepositoryCustom {
     List<PostDto> findTopNPosts(
             int size,
             @NonNull List<Visibility> visibilities
-            ) throws InternalServerErrorException;
+    ) throws InternalServerErrorException;
 
     List<PostDto> findNextNPosts(
             int size,

@@ -954,7 +954,7 @@ class PostServiceTest {
         final var authorities = Set.of(new SimpleGrantedAuthority(Role.ADMIN.name()));
         doReturn(authorities).when(authentication).getAuthorities();
         SecurityContextHolder.setContext(securityContext);
-        
+
         Optional<PostDtoWithImageData> result = Optional.of(post);
         when(repository.findPostDtoWithImageDataByIdAndUserId(postId, userId)).thenReturn(result);
 

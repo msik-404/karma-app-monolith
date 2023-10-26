@@ -384,7 +384,7 @@ class PostRedisCacheTest {
         final long postId = userId;
         final long karmaScore = 5;
 
-        final PostDto postToBeInserted  = getPostDtoForTesting(userId, postId, karmaScore);
+        final PostDto postToBeInserted = getPostDtoForTesting(userId, postId, karmaScore);
 
         final byte[] imageData = TestingImageDataCreator.getTestingImage();
 

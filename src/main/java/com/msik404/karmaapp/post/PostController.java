@@ -78,7 +78,7 @@ public class PostController {
             @RequestParam(value = "post_id", required = false) Long postId,
             @RequestParam(value = "karma_score", required = false) Long karmaScore,
             @RequestParam(value = "username", required = false) String username)
-        throws InternalServerErrorException {
+            throws InternalServerErrorException {
 
         ScrollPosition position = null;
         if (postId != null && karmaScore != null) {
@@ -156,7 +156,7 @@ public class PostController {
             @RequestParam(value = "post_id", required = false) Long postId,
             @RequestParam(value = "karma_score", required = false) Long karmaScore,
             @RequestParam(value = "username", required = false) String username)
-            throws  InternalServerErrorException {
+            throws InternalServerErrorException {
 
         List<Visibility> visibilities = createVisibilityList(active, hidden, deleted);
 

@@ -8,7 +8,7 @@ public class PostComparator implements Comparator<ComparablePost> {
     public int compare(ComparablePost postOne, ComparablePost postTwo) {
 
         if (postOne.getKarmaScore().equals(postTwo.getKarmaScore())) {
-            return - postOne.getId().compareTo(postTwo.getId());
+            return -postOne.getId().compareTo(postTwo.getId());
         }
         return postOne.getKarmaScore().compareTo(postTwo.getKarmaScore());
     }
