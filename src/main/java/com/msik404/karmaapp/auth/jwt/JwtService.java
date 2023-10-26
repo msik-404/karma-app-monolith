@@ -2,14 +2,15 @@ package com.msik404.karmaapp.auth.jwt;
 
 import java.util.Date;
 import java.util.Map;
-import java.util.Optional;
 
-import com.msik404.karmaapp.user.User;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,39 +19,48 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String secret;
 
+    private static final int TIME_TO_EXPIRE = 1000 * 60 * 60 * 1; // one hour
+
     /**
      * Generates new JWT.
      * Subject is set to user's Long type identifier which will be transformed to string.
      *
-     * @param user object representing user
-     * @param opt  additional claims which will be added to JWT
+     * @param clientId Psql id representing user id
+     * @param opt      additional claims which will be added to JWT
      * @return string with JWT
      */
+    @NonNull
     public String generateJwt(
-            @NonNull User user,
-            Optional<Map<String, Object>> opt) {
+            @NonNull Long clientId,
+            @Nullable Map<String, Object> opt) {
 
-        final long currentTime = System.currentTimeMillis();
+        long currentTime = System.currentTimeMillis();
         // one hour
-        final long expirationTime = currentTime + 1000 * 60 * 60 * 1;
+        long expirationTime = currentTime + TIME_TO_EXPIRE;
 
         JwtBuilder builder = Jwts.builder();
-        opt.ifPresent(builder::setClaims);
+
+        if (opt != null) {
+            builder.claims().add(opt);
+        }
+
         return builder
-                .setSubject(user.getId().toString())
-                .setIssuedAt(new Date(currentTime))
-                .setExpiration(new Date(expirationTime))
+                .subject(clientId.toString())
+                .issuedAt(new Date(currentTime))
+                .expiration(new Date(expirationTime))
                 .signWith(Keys.hmacShaKeyFor(secret.getBytes()))
                 .compact();
     }
 
-    public Claims extractAllClaims(@NonNull String jwt)
-            throws ExpiredJwtException, UnsupportedJwtException, MalformedJwtException, SignatureException, IllegalArgumentException {
+    public Claims extractAllClaims(
+            @NonNull String jwt
+    ) throws JwtException, IllegalArgumentException {
 
-        return Jwts.parserBuilder()
-                .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes()))
+        return Jwts.parser()
+                .verifyWith(Keys.hmacShaKeyFor(secret.getBytes()))
                 .build()
-                .parseClaimsJws(jwt)
-                .getBody();
+                .parseSignedClaims(jwt)
+                .getPayload();
     }
+
 }

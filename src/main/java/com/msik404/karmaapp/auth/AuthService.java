@@ -1,7 +1,5 @@
 package com.msik404.karmaapp.auth;
 
-import java.util.Optional;
-
 import com.msik404.karmaapp.auth.dto.LoginRequest;
 import com.msik404.karmaapp.auth.dto.LoginResponse;
 import com.msik404.karmaapp.auth.dto.RegisterRequest;
@@ -68,7 +66,7 @@ public class AuthService {
 
         var user = (User) authentication.getPrincipal();
 
-        return new LoginResponse(jwtService.generateJwt(user, Optional.empty()));
+        return new LoginResponse(jwtService.generateJwt(user.getId(), null));
     }
 
 }
