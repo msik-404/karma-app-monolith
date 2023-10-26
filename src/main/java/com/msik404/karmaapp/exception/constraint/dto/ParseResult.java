@@ -1,4 +1,4 @@
-package com.msik404.karmaapp.constraint.dto;
+package com.msik404.karmaapp.exception.constraint.dto;
 
 import org.springframework.lang.NonNull;
 

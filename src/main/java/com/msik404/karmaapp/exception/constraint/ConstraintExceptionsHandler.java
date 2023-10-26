@@ -1,13 +1,13 @@
-package com.msik404.karmaapp.constraint;
+package com.msik404.karmaapp.exception.constraint;
 
-import com.msik404.karmaapp.constraint.chain.DuplicateEmailExceptionHandler;
-import com.msik404.karmaapp.constraint.chain.DuplicateUsernameExceptionHandler;
-import com.msik404.karmaapp.constraint.chain.UndefinedConstraintExceptionHandler;
-import com.msik404.karmaapp.constraint.dto.ParseResult;
-import com.msik404.karmaapp.constraint.exception.DuplicateEmailException;
-import com.msik404.karmaapp.constraint.exception.DuplicateUnexpectedFieldException;
-import com.msik404.karmaapp.constraint.exception.DuplicateUsernameException;
-import com.msik404.karmaapp.constraint.strategy.Strategy;
+import com.msik404.karmaapp.exception.constraint.chain.DuplicateEmailExceptionHandler;
+import com.msik404.karmaapp.exception.constraint.chain.DuplicateUsernameExceptionHandler;
+import com.msik404.karmaapp.exception.constraint.chain.UndefinedConstraintExceptionHandler;
+import com.msik404.karmaapp.exception.constraint.dto.ParseResult;
+import com.msik404.karmaapp.exception.constraint.exception.DuplicateEmailException;
+import com.msik404.karmaapp.exception.constraint.exception.DuplicateUnexpectedFieldException;
+import com.msik404.karmaapp.exception.constraint.exception.DuplicateUsernameException;
+import com.msik404.karmaapp.exception.constraint.strategy.Strategy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;

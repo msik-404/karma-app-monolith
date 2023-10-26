@@ -1,4 +1,4 @@
-package com.msik404.karmaapp.constraint.exception;
+package com.msik404.karmaapp.exception.constraint.exception;
 
 public class DuplicateUnexpectedFieldException extends AbstractDuplicateFieldRestException {
 

@@ -1,4 +1,4 @@
-package com.msik404.karmaapp.constraint.strategy;
+package com.msik404.karmaapp.exception.constraint.strategy;
 
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;

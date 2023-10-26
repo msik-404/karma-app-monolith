@@ -1,4 +1,4 @@
-package com.msik404.karmaapp.constraint.exception;
+package com.msik404.karmaapp.exception.constraint.exception;
 
 import com.msik404.karmaapp.exception.AbstractRestException;
 import org.springframework.http.HttpStatus;

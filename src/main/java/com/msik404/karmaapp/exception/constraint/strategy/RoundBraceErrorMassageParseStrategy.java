@@ -1,9 +1,9 @@
-package com.msik404.karmaapp.constraint.strategy;
+package com.msik404.karmaapp.exception.constraint.strategy;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.msik404.karmaapp.constraint.dto.ParseResult;
+import com.msik404.karmaapp.exception.constraint.dto.ParseResult;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 

@@ -1,6 +1,6 @@
-package com.msik404.karmaapp.constraint.chain;
+package com.msik404.karmaapp.exception.constraint.chain;
 
-import com.msik404.karmaapp.constraint.exception.DuplicateUnexpectedFieldException;
+import com.msik404.karmaapp.exception.constraint.exception.DuplicateUnexpectedFieldException;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 

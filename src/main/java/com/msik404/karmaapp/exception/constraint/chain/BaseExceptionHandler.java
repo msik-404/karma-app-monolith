@@ -1,4 +1,4 @@
-package com.msik404.karmaapp.constraint.chain;
+package com.msik404.karmaapp.exception.constraint.chain;
 
 import java.util.Optional;
 
