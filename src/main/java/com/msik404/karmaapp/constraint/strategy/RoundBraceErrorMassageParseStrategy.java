@@ -4,7 +4,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.msik404.karmaapp.pair.Pair;
-import com.msik404.karmaapp.strategy.Strategy;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 

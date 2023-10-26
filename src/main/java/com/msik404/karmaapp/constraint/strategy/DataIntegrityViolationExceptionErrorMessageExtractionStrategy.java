@@ -1,6 +1,5 @@
 package com.msik404.karmaapp.constraint.strategy;
 
-import com.msik404.karmaapp.strategy.Strategy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;

@@ -7,7 +7,7 @@ import com.msik404.karmaapp.constraint.exception.DuplicateEmailException;
 import com.msik404.karmaapp.constraint.exception.DuplicateUsernameException;
 import com.msik404.karmaapp.constraint.exception.DuplicateUnexpectedFieldException;
 import com.msik404.karmaapp.pair.Pair;
-import com.msik404.karmaapp.strategy.Strategy;
+import com.msik404.karmaapp.constraint.strategy.Strategy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
