@@ -1,11 +1,6 @@
 package com.msik404.karmaapp.auth.dto;
 
-import lombok.Data;
+import org.springframework.lang.NonNull;
 
-@Data
-public class LoginResponse {
-
-    private final String jwt;
-
+public record LoginResponse(@NonNull String jwt) {
 }
-
