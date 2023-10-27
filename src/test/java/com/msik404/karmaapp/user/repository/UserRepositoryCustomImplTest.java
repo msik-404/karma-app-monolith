@@ -6,11 +6,11 @@ import com.msik404.karmaapp.TestingDataCreator;
 import com.msik404.karmaapp.exception.constraint.ConstraintExceptionsHandler;
 import com.msik404.karmaapp.exception.constraint.exception.DuplicateEmailException;
 import com.msik404.karmaapp.exception.constraint.exception.DuplicateUsernameException;
-import com.msik404.karmaapp.exception.constraint.strategy.ConstraintViolationExceptionErrorMessageExtractionStrategy;
-import com.msik404.karmaapp.exception.constraint.strategy.RoundBraceErrorMassageParseStrategy;
 import com.msik404.karmaapp.user.Role;
 import com.msik404.karmaapp.user.User;
 import com.msik404.karmaapp.user.dto.UserUpdateRequestWithAdminPrivilege;
+import com.msik404.karmaapp.user.dto.UserUpdateRequestWithUserPrivilege;
+import com.msik404.karmaapp.user.exception.NoFieldSetException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,10 +43,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ContextConfiguration(initializers = UserRepositoryCustomImplTest.DataSourceInitializer.class)
 @Import({
         BCryptPasswordEncoder.class,
-        UserCriteriaUpdater.class,
-        ConstraintExceptionsHandler.class,
-        ConstraintViolationExceptionErrorMessageExtractionStrategy.class,
-        RoundBraceErrorMassageParseStrategy.class,
+        ConstraintExceptionsHandler.class
 })
 class UserRepositoryCustomImplTest {
 
@@ -81,7 +78,8 @@ class UserRepositoryCustomImplTest {
     UserRepositoryCustomImplTest(
             BCryptPasswordEncoder bCryptPasswordEncoder,
             UserRepository userRepository,
-            TransactionTemplate transactionTemplate) {
+            TransactionTemplate transactionTemplate
+    ) {
 
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userRepository = userRepository;
@@ -99,10 +97,6 @@ class UserRepositoryCustomImplTest {
                 .email(TestingDataCreator.getTestingEmail(username))
                 .password(bCryptPasswordEncoder.encode(username))
                 .role(TEST_ROLE)
-                .accountNonExpired(true)
-                .accountNonLocked(true)
-                .credentialsNonExpired(true)
-                .enabled(true)
                 .build();
     }
 
@@ -120,26 +114,30 @@ class UserRepositoryCustomImplTest {
     void updateNonNull_UserIdIsOneAndDtoHasNullFields_NonNullFieldsAreUpdated() {
 
         // given
-        final String username = TestingDataCreator.getTestingUsername(testUserId);
+        String username = TestingDataCreator.getTestingUsername(testUserId);
 
-        final Optional<User> optionalUser = userRepository.findByUsername(username);
+        Optional<User> optionalUser = userRepository.findByUsername(username);
 
         assertTrue(optionalUser.isPresent());
 
-        final User oldUser = optionalUser.get();
-        final long persistedUserId = oldUser.getId();
+        User oldUser = optionalUser.get();
+        long persistedUserId = oldUser.getId();
 
-        final int newUserId = 2;
-        final String newUsername = TestingDataCreator.getTestingUsername(newUserId);
-        final String newEmail = TestingDataCreator.getTestingEmail(newUsername);
-        final Role newRole = Role.MOD;
+        int newUserId = 2;
+        String newUsername = TestingDataCreator.getTestingUsername(newUserId);
+        String newEmail = TestingDataCreator.getTestingEmail(newUsername);
+        String newPassword = newUsername;
+        Role newRole = Role.MOD;
 
-        final var dto = UserUpdateRequestWithAdminPrivilege.builder()
-                .username(newUsername)
-                .email(newEmail)
-                .password(newUsername)
-                .role(newRole)
-                .build();
+        var userUpdateWithUserPrivilege = new UserUpdateRequestWithUserPrivilege(
+                null,
+                null,
+                newUsername,
+                newEmail,
+                newPassword
+        );
+
+        var dto = new UserUpdateRequestWithAdminPrivilege(userUpdateWithUserPrivilege, newRole);
 
         // when
         transactionTemplate.execute(new TransactionCallbackWithoutResult() {
@@ -150,11 +148,11 @@ class UserRepositoryCustomImplTest {
         });
 
         // then
-        final Optional<User> optionalNewUser = userRepository.findByUsername(newUsername);
+        Optional<User> optionalNewUser = userRepository.findByUsername(newUsername);
 
         assertTrue(optionalNewUser.isPresent());
 
-        final User newUser = optionalNewUser.get();
+        User newUser = optionalNewUser.get();
 
         assertEquals(persistedUserId, newUser.getId());
         assertEquals(newUsername, newUser.getUsername());
@@ -174,20 +172,24 @@ class UserRepositoryCustomImplTest {
     void updateNonNull_UserIdIsOneAndDtoHasNullFieldsAndUsernameIsDuplicate_DuplicateUsernameExceptionIsThrown() {
 
         // given
-        final String username = TestingDataCreator.getTestingUsername(testUserId);
+        String username = TestingDataCreator.getTestingUsername(testUserId);
 
-        final Optional<User> optionalUser = userRepository.findByUsername(username);
+        Optional<User> optionalUser = userRepository.findByUsername(username);
 
         assertTrue(optionalUser.isPresent());
 
-        final long persistedUserId = optionalUser.get().getId();
-        final int newUserId = 2;
+        long persistedUserId = optionalUser.get().getId();
+        int newUserId = 2;
 
-        final User newUser = userRepository.save(getUserForTesting(newUserId));
+        User newUser = userRepository.save(getUserForTesting(newUserId));
 
-        final var dto = UserUpdateRequestWithAdminPrivilege.builder()
-                .username(newUser.getUsername())
-                .build();
+        var dto = new UserUpdateRequestWithUserPrivilege(
+                null,
+                null,
+                newUser.getUsername(),
+                null,
+                null
+        );
 
         // then
         assertThrows(UnexpectedRollbackException.class, () ->
@@ -205,19 +207,23 @@ class UserRepositoryCustomImplTest {
     void updateNonNull_UserIdIsOneAndDtoHasNullFieldsAndEmailIsDuplicate_DuplicateEmailExceptionIsThrown() {
 
         // given
-        final String username = TestingDataCreator.getTestingUsername(testUserId);
-        final Optional<User> optionalUser = userRepository.findByUsername(username);
+        String username = TestingDataCreator.getTestingUsername(testUserId);
+        Optional<User> optionalUser = userRepository.findByUsername(username);
 
         assertTrue(optionalUser.isPresent());
 
-        final long persistedUserId = optionalUser.get().getId();
+        long persistedUserId = optionalUser.get().getId();
 
-        final int newUserId = 2;
-        final User newUser = userRepository.save(getUserForTesting(newUserId));
+        int newUserId = 2;
+        User newUser = userRepository.save(getUserForTesting(newUserId));
 
-        final var dto = UserUpdateRequestWithAdminPrivilege.builder()
-                .email(newUser.getEmail())
-                .build();
+        var dto = new UserUpdateRequestWithUserPrivilege(
+                null,
+                null,
+                null,
+                newUser.getEmail(),
+                null
+        );
 
         // then
         assertThrows(UnexpectedRollbackException.class, () ->
@@ -230,4 +236,33 @@ class UserRepositoryCustomImplTest {
                 })
         );
     }
+
+    @Test
+    void updateNonNull_UpdateDtoHasOnlyNullField_NoFieldExceptionThrown() {
+
+        // given
+        String username = TestingDataCreator.getTestingUsername(testUserId);
+        Optional<User> optionalUser = userRepository.findByUsername(username);
+
+        assertTrue(optionalUser.isPresent());
+
+        long persistedUserId = optionalUser.get().getId();
+
+        var dto = new UserUpdateRequestWithAdminPrivilege(
+                new UserUpdateRequestWithUserPrivilege(null, null, null, null, null),
+                null
+        );
+
+        // then
+        assertDoesNotThrow(() ->
+                transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+                    @Override
+                    protected void doInTransactionWithoutResult(TransactionStatus transactionStatus) {
+                        // then                                       // when
+                        assertThrows(NoFieldSetException.class, () -> userRepository.updateNonNull(persistedUserId, dto));
+                    }
+                })
+        );
+    }
+
 }

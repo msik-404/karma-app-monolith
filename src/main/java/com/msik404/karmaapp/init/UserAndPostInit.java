@@ -39,10 +39,6 @@ public class UserAndPostInit implements CommandLineRunner {
                 .role(Role.USER)
                 .firstName(username)
                 .lastName(username)
-                .accountNonExpired(true)
-                .accountNonLocked(true)
-                .credentialsNonExpired(true)
-                .enabled(true)
                 .build();
     }
 

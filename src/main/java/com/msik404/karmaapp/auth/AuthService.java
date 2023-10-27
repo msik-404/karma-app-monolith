@@ -48,11 +48,6 @@ public class AuthService {
                     // Nullable
                     .firstName(request.getFirstName())
                     .lastName(request.getLastName())
-                    // basic values
-                    .accountNonExpired(true)
-                    .accountNonLocked(true)
-                    .credentialsNonExpired(true)
-                    .enabled(true)
                     .build());
         } catch (DataIntegrityViolationException ex) {
             constraintExceptionsHandler.handle(ex, extractionStrategy, parseStrategy);

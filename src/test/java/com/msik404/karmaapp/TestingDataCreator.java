@@ -101,10 +101,6 @@ public class TestingDataCreator {
                 .username(username)
                 .email(getTestingEmail(username))
                 .role(role)
-                .accountNonExpired(true)
-                .accountNonLocked(true)
-                .credentialsNonExpired(true)
-                .enabled(true)
                 .build();
     }
 

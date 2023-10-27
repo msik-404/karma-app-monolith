@@ -27,10 +27,6 @@ public class StaffUserInit implements CommandLineRunner {
                 .role(role)
                 .firstName(username)
                 .lastName(username)
-                .accountNonExpired(true)
-                .accountNonLocked(true)
-                .credentialsNonExpired(true)
-                .enabled(true)
                 .build();
     }
 

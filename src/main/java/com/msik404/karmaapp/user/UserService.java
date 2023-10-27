@@ -5,6 +5,7 @@ import com.msik404.karmaapp.exception.constraint.exception.DuplicateUnexpectedFi
 import com.msik404.karmaapp.exception.constraint.exception.DuplicateUsernameException;
 import com.msik404.karmaapp.user.dto.UserUpdateRequestWithAdminPrivilege;
 import com.msik404.karmaapp.user.dto.UserUpdateRequestWithUserPrivilege;
+import com.msik404.karmaapp.user.exception.NoFieldSetException;
 import com.msik404.karmaapp.user.exception.UserNotFoundException;
 import com.msik404.karmaapp.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +43,8 @@ public class UserService {
     public UserUpdateRequestWithUserPrivilege updateWithUserPrivilege(
             long userId,
             @NonNull UserUpdateRequestWithUserPrivilege request)
-            throws AccessDeniedException, DuplicateEmailException, DuplicateUsernameException, DuplicateUnexpectedFieldException, UserNotFoundException {
+            throws NoFieldSetException, AccessDeniedException, DuplicateEmailException, DuplicateUsernameException,
+            DuplicateUnexpectedFieldException, UserNotFoundException {
 
         if (!sameAsAuthenticatedUser(userId)) {
             throw new AccessDeniedException("Access denied");
@@ -60,7 +62,8 @@ public class UserService {
     public UserUpdateRequestWithAdminPrivilege updateWithAdminPrivilege(
             long userId,
             @NonNull UserUpdateRequestWithAdminPrivilege request)
-            throws DuplicateEmailException, DuplicateUsernameException, DuplicateUnexpectedFieldException, UserNotFoundException {
+            throws NoFieldSetException, DuplicateEmailException, DuplicateUsernameException,
+            DuplicateUnexpectedFieldException, UserNotFoundException {
 
         int rowsAffected = userRepository.updateNonNull(userId, request);
         if (rowsAffected == 0) {
