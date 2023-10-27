@@ -34,8 +34,8 @@ public class UserService {
 
     public Boolean sameAsAuthenticatedUser(long id) {
 
-        final var authentication = SecurityContextHolder.getContext().getAuthentication();
-        final var userId = (long) authentication.getPrincipal();
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        var userId = (long) authentication.getPrincipal();
         return userId == id;
     }
 
