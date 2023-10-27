@@ -2,10 +2,12 @@ package com.msik404.karmaapp.post.comparator;
 
 import java.util.Comparator;
 
+import org.springframework.lang.NonNull;
+
 public class PostComparator implements Comparator<ComparablePost> {
 
     @Override
-    public int compare(ComparablePost postOne, ComparablePost postTwo) {
+    public int compare(@NonNull ComparablePost postOne, @NonNull ComparablePost postTwo) {
 
         if (postOne.getKarmaScore().equals(postTwo.getKarmaScore())) {
             return -postOne.getId().compareTo(postTwo.getId());
