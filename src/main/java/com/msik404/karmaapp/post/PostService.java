@@ -49,19 +49,23 @@ public class PostService {
             int size,
             @NonNull List<Visibility> visibilities,
             @Nullable ScrollPosition position,
-            @Nullable String username)
+            @Nullable String creatorUsername)
             throws InternalServerErrorException {
 
         List<PostDto> results;
 
-        if (position == null && username == null) {
-            results = cacheHandler.findTopNHandler(size, visibilities);
-        } else if (position != null && username != null) {
-            results = repository.findNextNPostsWithUsername(size, visibilities, position, username);
-        } else if (position != null) { // username == null
-            results = cacheHandler.findNextNHandler(size, visibilities, position);
-        } else { // username != null and pagination == null
-            results = repository.findTopNPostsWithUsername(size, visibilities, username);
+        if (creatorUsername == null) {
+            if (position == null) {
+                results = cacheHandler.findTopNHandler(size, visibilities);
+            } else {
+                results = cacheHandler.findNextNHandler(size, visibilities, position);
+            }
+        } else {
+            if (position == null) {
+                results = repository.findTopNPostsWithUsername(size, visibilities, creatorUsername);
+            } else {
+                results = repository.findNextNPostsWithUsername(size, visibilities, position, creatorUsername);
+            }
         }
 
         return results;
@@ -74,8 +78,8 @@ public class PostService {
             @Nullable ScrollPosition position)
             throws InternalServerErrorException {
 
-        final var authentication = SecurityContextHolder.getContext().getAuthentication();
-        final var userId = (long) authentication.getPrincipal();
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        var userId = (long) authentication.getPrincipal();
 
         List<PostDto> results;
 
@@ -93,22 +97,27 @@ public class PostService {
             int size,
             @NonNull List<Visibility> visibilities,
             @Nullable ScrollPosition position,
-            @Nullable String username)
+            @Nullable String creatorUsername)
             throws InternalServerErrorException {
 
-        final var authentication = SecurityContextHolder.getContext().getAuthentication();
-        final var userId = (long) authentication.getPrincipal();
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        var clientId = (long) authentication.getPrincipal();
 
         List<PostRatingResponse> results;
 
-        if (position == null && username == null) {
-            results = repository.findTopNRatings(size, visibilities, userId);
-        } else if (position != null && username != null) {
-            results = repository.findNextNRatingsWithUsername(size, visibilities, userId, position, username);
-        } else if (position != null) { // username == null
-            results = repository.findNextNRatings(size, visibilities, userId, position);
-        } else { // username != null and pagination == null
-            results = repository.findTopNRatingsWithUsername(size, visibilities, userId, username);
+        if (creatorUsername == null) {
+            if (position == null) {
+                results = repository.findTopNRatings(size, visibilities, clientId);
+            } else {
+                results = repository.findNextNRatings(size, visibilities, clientId, position);
+            }
+        } else {
+            if (position == null) {
+                results = repository.findTopNRatingsWithUsername(size, visibilities, clientId, creatorUsername);
+            } else {
+                results = repository.findNextNRatingsWithUsername(
+                        size, visibilities, clientId, position, creatorUsername);
+            }
         }
 
         return results;
@@ -240,6 +249,7 @@ public class PostService {
         }
     }
 
+    // todo: make so mod cannot make deleted post hidden.
     @Transactional
     public void changeVisibility(long postId, @NonNull Visibility visibility) throws PostNotFoundException {
         final int rowsAffected = repository.changeVisibilityById(postId, visibility);
