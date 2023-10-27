@@ -11,7 +11,6 @@ import com.msik404.karmaapp.TestingImageDataCreator;
 import com.msik404.karmaapp.karma.KarmaKey;
 import com.msik404.karmaapp.karma.KarmaScore;
 import com.msik404.karmaapp.karma.KarmaScoreService;
-import com.msik404.karmaapp.karma.exception.KarmaScoreAlreadyExistsException;
 import com.msik404.karmaapp.karma.exception.KarmaScoreNotFoundException;
 import com.msik404.karmaapp.position.ScrollPosition;
 import com.msik404.karmaapp.post.cache.PostRedisCache;
@@ -39,8 +38,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.multipart.MultipartFile;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -694,7 +692,7 @@ class PostServiceTest {
     }
 
     @Test
-    void rate_IsNewRatingPositiveIsTrueAndOldRatingIsPositiveAndWasNotCached_ShouldThrowKarmaScoreAlreadyExistsException() {
+    void rate_IsNewRatingPositiveIsTrueAndOldRatingIsPositiveAndWasNotCached_ShouldEarlyReturn() {
 
         // given
         long postId = 1;
@@ -715,7 +713,7 @@ class PostServiceTest {
         when(karmaScoreService.findById(karmaKey)).thenReturn(karmaScore);
 
         // when
-        assertThrows(KarmaScoreAlreadyExistsException.class, () -> postService.rate(postId, isNewRatingPositive));
+        assertDoesNotThrow(() -> postService.rate(postId, isNewRatingPositive));
 
         // then
         verify(karmaScoreService).findById(karmaKey);

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.msik404.karmaapp.karma.exception.KarmaScoreAlreadyExistsException;
 import com.msik404.karmaapp.karma.exception.KarmaScoreNotFoundException;
 import com.msik404.karmaapp.position.ScrollPosition;
 import com.msik404.karmaapp.post.dto.PostCreationRequest;
@@ -212,7 +211,7 @@ public class PostController {
 
     @PostMapping("user/posts/{postId}/rate")
     public ResponseEntity<Void> rate(@PathVariable Long postId, @RequestParam("is_positive") boolean isPositive)
-            throws KarmaScoreAlreadyExistsException, PostNotFoundException {
+            throws PostNotFoundException {
 
         postService.rate(postId, isPositive);
         return ResponseEntity.ok(null);

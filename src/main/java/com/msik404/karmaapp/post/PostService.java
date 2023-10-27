@@ -10,7 +10,6 @@ import javax.imageio.ImageIO;
 
 import com.msik404.karmaapp.karma.KarmaKey;
 import com.msik404.karmaapp.karma.KarmaScoreService;
-import com.msik404.karmaapp.karma.exception.KarmaScoreAlreadyExistsException;
 import com.msik404.karmaapp.karma.exception.KarmaScoreNotFoundException;
 import com.msik404.karmaapp.position.ScrollPosition;
 import com.msik404.karmaapp.post.cache.PostRedisCache;
@@ -184,7 +183,7 @@ public class PostService {
      */
     @Transactional
     public void rate(long postId, boolean isNewRatingPositive)
-            throws KarmaScoreAlreadyExistsException, PostNotFoundException {
+            throws PostNotFoundException {
 
         final var authentication = SecurityContextHolder.getContext().getAuthentication();
         final var userId = (long) authentication.getPrincipal();
@@ -194,9 +193,7 @@ public class PostService {
             var karmaScore = karmaScoreService.findById(new KarmaKey(userId, postId));
             final boolean isOldRatingPositive = karmaScore.getIsPositive();
             if (isOldRatingPositive == isNewRatingPositive) {
-                throw new KarmaScoreAlreadyExistsException(String.format(
-                        "This post has been already rated %s by you",
-                        isNewRatingPositive ? "positively" : "negatively"));
+                return; // Requested visibility is already in place.
             }
             karmaScore.setIsPositive(isNewRatingPositive);
             delta = isOldRatingPositive ? -2L : 2L;
