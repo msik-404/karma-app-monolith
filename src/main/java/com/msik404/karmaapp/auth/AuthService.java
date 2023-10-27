@@ -57,7 +57,7 @@ public class AuthService {
     public LoginResponse login(@NonNull LoginRequest request) throws AuthenticationException {
 
         var authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+                new UsernamePasswordAuthenticationToken(request.username(), request.password()));
 
         var user = (User) authentication.getPrincipal();
 
