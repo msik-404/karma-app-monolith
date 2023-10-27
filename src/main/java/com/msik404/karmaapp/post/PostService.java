@@ -256,7 +256,7 @@ public class PostService {
         if (rowsAffected == 0) {
             throw new PostNotFoundException();
         }
-        if (visibility.equals(Visibility.ACTIVE)) { // if this post was made active it might high enough karma score
+        if (visibility.equals(Visibility.ACTIVE)) { // if this post was made active it might have high enough karma score
             cacheHandler.loadPostDataToCacheIfKarmaScoreIsHighEnough(postId);
         } else {
             cache.deletePostFromCache(postId);
