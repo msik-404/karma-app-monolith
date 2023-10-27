@@ -16,7 +16,6 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
 
     Optional<VisibilityOnlyDto> findVisibilityById(long postId);
 
-    // todo: fix this
     @Query("SELECT NEW com.msik404.karmaapp.post.dto.PostDtoWithImageData(p.id, p.user.id, u.username, p.headline, p.text, p.karmaScore, p.visibility, p.imageData) " +
             "FROM Post p JOIN p.user u WHERE p.id = :postId")
     Optional<PostDtoWithImageData> findPostDtoWithImageDataById(@Param("postId") long postId);
