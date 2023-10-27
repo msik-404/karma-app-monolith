@@ -115,16 +115,16 @@ class PostRepositoryCustomImplTest {
     void findTopNPosts_SizeIsTenAndVisibilityIsActive_EightActive() {
 
         // given
-        final int topSize = 10;
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        int topSize = 10;
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE);
 
         // when
-        final List<PostDto> topResults = postRepository.findTopNPosts(topSize, visibilities);
+        List<PostDto> topResults = postRepository.findTopNPosts(topSize, visibilities);
 
         // then
         assertEquals(8, topResults.size());
 
-        final List<Post> groundTruthTopPosts = TestingDataCreator.getTopPosts(
+        List<Post> groundTruthTopPosts = TestingDataCreator.getTopPosts(
                 postRepository.findAll(), new HashSet<>(visibilities));
 
         for (int i = 0; i < topResults.size(); i++) {
@@ -137,16 +137,16 @@ class PostRepositoryCustomImplTest {
     void findTopNPosts_SizeIsTenAndVisibilityIsActive_FiveActiveFound() {
 
         // given
-        final int topSize = 5;
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        int topSize = 5;
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE);
 
         // when
-        final List<PostDto> topResults = postRepository.findTopNPosts(topSize, visibilities);
+        List<PostDto> topResults = postRepository.findTopNPosts(topSize, visibilities);
 
         // then
         assertEquals(topSize, topResults.size());
 
-        final List<Post> groundTruthTopPosts = TestingDataCreator.getTopPosts(
+        List<Post> groundTruthTopPosts = TestingDataCreator.getTopPosts(
                 postRepository.findAll(), new HashSet<>(visibilities));
 
         for (int i = 0; i < topResults.size(); i++) {
@@ -159,16 +159,16 @@ class PostRepositoryCustomImplTest {
     void findTopNPosts_SizeIsOneAndVisibilityIsActive_OneActiveFound() {
 
         // given
-        final int topSize = 1;
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        int topSize = 1;
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE);
 
         // when
-        final List<PostDto> topResults = postRepository.findTopNPosts(topSize, visibilities);
+        List<PostDto> topResults = postRepository.findTopNPosts(topSize, visibilities);
 
         // then
         assertEquals(topSize, topResults.size());
 
-        final List<Post> groundTruthTopPosts = TestingDataCreator.getTopPosts(
+        List<Post> groundTruthTopPosts = TestingDataCreator.getTopPosts(
                 postRepository.findAll(), new HashSet<>(visibilities));
 
         assertEquals(groundTruthTopPosts.get(0).getId(), topResults.get(0).getId());
@@ -179,11 +179,11 @@ class PostRepositoryCustomImplTest {
     void findTopNPosts_SizeIsZeroAndVisibilityIsActive_zeroActiveFound() {
 
         // given
-        final int topSize = 0;
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        int topSize = 0;
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE);
 
         // when
-        final List<PostDto> topResults = postRepository.findTopNPosts(topSize, visibilities);
+        List<PostDto> topResults = postRepository.findTopNPosts(topSize, visibilities);
 
         // then
         assertEquals(topSize, topResults.size());
@@ -193,24 +193,24 @@ class PostRepositoryCustomImplTest {
     void findNextNPosts_NextSizeIsTwoAndTopSizeIsTwoAndVisibilityIsActive_TwoActiveAfterTopTwoActiveFound() {
 
         // given
-        final int nextSize = 2;
-        final int topSize = 2;
+        int nextSize = 2;
+        int topSize = 2;
 
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
-        final List<Post> groundTruthTopPosts = TestingDataCreator.getTopPosts(
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        List<Post> groundTruthTopPosts = TestingDataCreator.getTopPosts(
                 postRepository.findAll(), new HashSet<>(visibilities));
 
-        final Post lastPost = groundTruthTopPosts.get(topSize - 1);
-        final var pagination = new ScrollPosition(lastPost.getId(), lastPost.getKarmaScore());
+        Post lastPost = groundTruthTopPosts.get(topSize - 1);
+        var pagination = new ScrollPosition(lastPost.getId(), lastPost.getKarmaScore());
 
         // when
-        final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, pagination);
+        List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, pagination);
 
         // then
         assertEquals(nextSize, nextResults.size());
 
-        final int endBound = Math.min(topSize + nextSize, groundTruthTopPosts.size());
-        final List<Post> groundTruthNextPosts = groundTruthTopPosts.subList(topSize, endBound);
+        int endBound = Math.min(topSize + nextSize, groundTruthTopPosts.size());
+        List<Post> groundTruthNextPosts = groundTruthTopPosts.subList(topSize, endBound);
 
         for (int i = 0; i < nextResults.size(); i++) {
             assertEquals(groundTruthNextPosts.get(i).getId(), nextResults.get(i).getId());
@@ -222,18 +222,18 @@ class PostRepositoryCustomImplTest {
     void findNextNPosts_NextSizeIsZeroAndTopSizeIsTwoAndVisibilityIsActive_ZeroFound() {
 
         // given
-        final int nextSize = 0;
-        final int topSize = 2;
+        int nextSize = 0;
+        int topSize = 2;
 
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
-        final List<Post> groundTruthTopPosts = TestingDataCreator.getTopPosts(
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        List<Post> groundTruthTopPosts = TestingDataCreator.getTopPosts(
                 postRepository.findAll(), new HashSet<>(visibilities));
 
-        final Post lastPost = groundTruthTopPosts.get(topSize - 1);
-        final var pagination = new ScrollPosition(lastPost.getId(), lastPost.getKarmaScore());
+        Post lastPost = groundTruthTopPosts.get(topSize - 1);
+        var pagination = new ScrollPosition(lastPost.getId(), lastPost.getKarmaScore());
 
         // when
-        final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, pagination);
+        List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, pagination);
 
         // then
         assertEquals(nextSize, nextResults.size());
@@ -243,24 +243,24 @@ class PostRepositoryCustomImplTest {
     void findNextNPosts_NextSizeIsThreeAndTopSizeIsFiveAndVisibilityIsActive_ThreeActiveAfterTopSixActiveFound() {
 
         // given
-        final int nextSize = 3;
-        final int topSize = 5;
+        int nextSize = 3;
+        int topSize = 5;
 
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
-        final List<Post> groundTruthTopPosts = TestingDataCreator.getTopPosts(
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        List<Post> groundTruthTopPosts = TestingDataCreator.getTopPosts(
                 postRepository.findAll(), new HashSet<>(visibilities));
 
-        final Post lastPost = groundTruthTopPosts.get(topSize - 1);
-        final var pagination = new ScrollPosition(lastPost.getId(), lastPost.getKarmaScore());
+        Post lastPost = groundTruthTopPosts.get(topSize - 1);
+        var pagination = new ScrollPosition(lastPost.getId(), lastPost.getKarmaScore());
 
         // when
-        final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, pagination);
+        List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, pagination);
 
         // then
         assertEquals(nextSize, nextResults.size());
 
-        final int endBound = Math.min(topSize + nextSize, groundTruthTopPosts.size());
-        final List<Post> groundTruthNextPosts = groundTruthTopPosts.subList(topSize, endBound);
+        int endBound = Math.min(topSize + nextSize, groundTruthTopPosts.size());
+        List<Post> groundTruthNextPosts = groundTruthTopPosts.subList(topSize, endBound);
 
         for (int i = 0; i < nextResults.size(); i++) {
             assertEquals(groundTruthNextPosts.get(i).getId(), nextResults.get(i).getId());
@@ -272,24 +272,24 @@ class PostRepositoryCustomImplTest {
     void findNextNPosts_NextSizeIsThreeAndTopSizeIsSixAndVisibilityIsActive_TwoActiveAfterTopSixActiveFound() {
 
         // given
-        final int nextSize = 3;
-        final int topSize = 6;
+        int nextSize = 3;
+        int topSize = 6;
 
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
-        final List<Post> groundTruthTopPosts = TestingDataCreator.getTopPosts(
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        List<Post> groundTruthTopPosts = TestingDataCreator.getTopPosts(
                 postRepository.findAll(), Set.of(Visibility.ACTIVE));
 
-        final Post lastPost = groundTruthTopPosts.get(topSize - 1);
-        final var pagination = new ScrollPosition(lastPost.getId(), lastPost.getKarmaScore());
+        Post lastPost = groundTruthTopPosts.get(topSize - 1);
+        var pagination = new ScrollPosition(lastPost.getId(), lastPost.getKarmaScore());
 
         // when
-        final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, pagination);
+        List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, pagination);
 
         // then
         assertEquals(2, nextResults.size());
 
-        final int endBound = Math.min(topSize + nextSize, groundTruthTopPosts.size());
-        final List<Post> groundTruthNextPosts = groundTruthTopPosts.subList(topSize, endBound);
+        int endBound = Math.min(topSize + nextSize, groundTruthTopPosts.size());
+        List<Post> groundTruthNextPosts = groundTruthTopPosts.subList(topSize, endBound);
 
         for (int i = 0; i < nextResults.size(); i++) {
             assertEquals(groundTruthNextPosts.get(i).getId(), nextResults.get(i).getId());
@@ -301,24 +301,24 @@ class PostRepositoryCustomImplTest {
     void findNextNPosts_NextSizeIsThreeAndTopSizeIsSevenAndVisibilityIsActive_OneActiveAfterTopSevenActiveFound() {
 
         // given
-        final int nextSize = 3;
-        final int topSize = 7;
+        int nextSize = 3;
+        int topSize = 7;
 
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
-        final List<Post> groundTruthTopPosts = TestingDataCreator.getTopPosts(
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        List<Post> groundTruthTopPosts = TestingDataCreator.getTopPosts(
                 postRepository.findAll(), new HashSet<>(visibilities));
 
-        final Post lastPost = groundTruthTopPosts.get(topSize - 1);
-        final var pagination = new ScrollPosition(lastPost.getId(), lastPost.getKarmaScore());
+        Post lastPost = groundTruthTopPosts.get(topSize - 1);
+        var pagination = new ScrollPosition(lastPost.getId(), lastPost.getKarmaScore());
 
         // when
-        final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, pagination);
+        List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, pagination);
 
         // then
         assertEquals(1, nextResults.size());
 
-        final int endBound = Math.min(topSize + nextSize, groundTruthTopPosts.size());
-        final List<Post> groundTruthNextPosts = groundTruthTopPosts.subList(topSize, endBound);
+        int endBound = Math.min(topSize + nextSize, groundTruthTopPosts.size());
+        List<Post> groundTruthNextPosts = groundTruthTopPosts.subList(topSize, endBound);
         for (int i = 0; i < nextResults.size(); i++) {
             assertEquals(groundTruthNextPosts.get(i).getId(), nextResults.get(i).getId());
             assertEquals(groundTruthNextPosts.get(i).getKarmaScore(), nextResults.get(i).getKarmaScore());
@@ -329,19 +329,19 @@ class PostRepositoryCustomImplTest {
     void findNextNPosts_NextSizeIsThreeAndTopSizeIsTenAndVisibilityIsActive_ZeroFound() {
 
         // given
-        final int nextSize = 3;
-        final int topSize = 10;
+        int nextSize = 3;
+        int topSize = 10;
 
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
-        final List<Post> groundTruthTopPosts = TestingDataCreator.getTopPosts(
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        List<Post> groundTruthTopPosts = TestingDataCreator.getTopPosts(
                 postRepository.findAll(), new HashSet<>(visibilities));
 
-        final int lastIdx = Math.min(topSize - 1, groundTruthTopPosts.size() - 1);
-        final Post lastPost = groundTruthTopPosts.get(lastIdx);
-        final var pagination = new ScrollPosition(lastPost.getId(), lastPost.getKarmaScore());
+        int lastIdx = Math.min(topSize - 1, groundTruthTopPosts.size() - 1);
+        Post lastPost = groundTruthTopPosts.get(lastIdx);
+        var pagination = new ScrollPosition(lastPost.getId(), lastPost.getKarmaScore());
 
         // when
-        final List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, pagination);
+        List<PostDto> nextResults = postRepository.findNextNPosts(nextSize, visibilities, pagination);
 
         // then
         assertEquals(0, nextResults.size());
@@ -351,19 +351,19 @@ class PostRepositoryCustomImplTest {
     void findTopNPostsWithUsername_SizeIsFiveAndVisibilityIsActiveAndUsernameIsOne_ThreeActiveFound() {
 
         // given
-        final int topSize = 5;
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
-        final int userId = 1;
-        final String username = TestingDataCreator.getTestingUsername(userId);
+        int topSize = 5;
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        int userId = 1;
+        String username = TestingDataCreator.getTestingUsername(userId);
 
         // when
-        final List<PostDto> topResults = postRepository.findTopNPostsWithUsername(
+        List<PostDto> topResults = postRepository.findTopNPostsWithUsername(
                 topSize, visibilities, username);
 
         // then
         assertEquals(3, topResults.size());
 
-        final List<Post> groundTruthTopPostsOfUserOne = TestingDataCreator.getTopUsersPosts(
+        List<Post> groundTruthTopPostsOfUserOne = TestingDataCreator.getTopUsersPosts(
                 postRepository.findAll(), username, new HashSet<>(visibilities));
 
         for (int i = 0; i < topResults.size(); i++) {
@@ -376,12 +376,12 @@ class PostRepositoryCustomImplTest {
     void findTopNPostsWithUsername_SizeIsTwoAndVisibilityIsActiveAndUsernameIsNonExisting_ZeroActiveFound() {
 
         // given
-        final int topSize = 2;
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
-        final int userId = 404;
+        int topSize = 2;
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        int userId = 404;
 
         // when
-        final List<PostDto> topResults = postRepository.findTopNPostsWithUsername(
+        List<PostDto> topResults = postRepository.findTopNPostsWithUsername(
                 topSize, visibilities, TestingDataCreator.getTestingUsername(userId));
 
         // then
@@ -392,28 +392,28 @@ class PostRepositoryCustomImplTest {
     void findTopNPostsWithUsername_NextSizeIsTwoAndTopSizeIsOneAndVisibilityIsActiveAndUsernameIsOne_TwoActiveFound() {
 
         // given
-        final int nextSize = 2;
-        final int topSize = 1;
+        int nextSize = 2;
+        int topSize = 1;
 
-        final int userId = 1;
-        final String username = TestingDataCreator.getTestingUsername(userId);
+        int userId = 1;
+        String username = TestingDataCreator.getTestingUsername(userId);
 
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
-        final List<Post> groundTruthTopPostsOfUserOne = TestingDataCreator.getTopUsersPosts(
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        List<Post> groundTruthTopPostsOfUserOne = TestingDataCreator.getTopUsersPosts(
                 postRepository.findAll(), username, new HashSet<>(visibilities));
 
-        final Post lastPost = groundTruthTopPostsOfUserOne.get(topSize - 1);
-        final var pagination = new ScrollPosition(lastPost.getId(), lastPost.getKarmaScore());
+        Post lastPost = groundTruthTopPostsOfUserOne.get(topSize - 1);
+        var pagination = new ScrollPosition(lastPost.getId(), lastPost.getKarmaScore());
 
         // when
-        final List<PostDto> nextResults = postRepository.findNextNPostsWithUsername(
+        List<PostDto> nextResults = postRepository.findNextNPostsWithUsername(
                 nextSize, visibilities, pagination, username);
 
         // then
         assertEquals(nextSize, nextResults.size());
 
-        final int endBound = Math.min(topSize + nextSize, groundTruthTopPostsOfUserOne.size());
-        final List<Post> groundTruthNextPostsOfUserOne = groundTruthTopPostsOfUserOne.subList(topSize, endBound);
+        int endBound = Math.min(topSize + nextSize, groundTruthTopPostsOfUserOne.size());
+        List<Post> groundTruthNextPostsOfUserOne = groundTruthTopPostsOfUserOne.subList(topSize, endBound);
 
         for (int i = 0; i < nextResults.size(); i++) {
             assertEquals(groundTruthNextPostsOfUserOne.get(i).getId(), nextResults.get(i).getId());
@@ -425,23 +425,23 @@ class PostRepositoryCustomImplTest {
     void findTopNWithUserId_SizeIsFourVisibilityIsActiveOrIsHiddenAndUserIdIsOne_FourActiveFound() {
 
         // given
-        final int userId = 1;
-        final String username = TestingDataCreator.getTestingUsername(userId);
-        final Optional<User> optionalPersistedUserId = userRepository.findByUsername(username);
+        int userId = 1;
+        String username = TestingDataCreator.getTestingUsername(userId);
+        Optional<User> optionalPersistedUserId = userRepository.findByUsername(username);
         assertTrue(optionalPersistedUserId.isPresent());
-        final long persistedUserId = optionalPersistedUserId.get().getId();
+        long persistedUserId = optionalPersistedUserId.get().getId();
 
-        final int topSize = 4;
+        int topSize = 4;
 
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE, Visibility.HIDDEN);
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE, Visibility.HIDDEN);
 
         // when
-        final List<PostDto> topResults = postRepository.findTopNWithUserId(topSize, visibilities, persistedUserId);
+        List<PostDto> topResults = postRepository.findTopNWithUserId(topSize, visibilities, persistedUserId);
 
         // then
         assertEquals(topSize, topResults.size());
 
-        final List<Post> groundTruthTopPostsOfUserOne = TestingDataCreator.getTopUsersPosts(
+        List<Post> groundTruthTopPostsOfUserOne = TestingDataCreator.getTopUsersPosts(
                 postRepository.findAll(), username, new HashSet<>(visibilities));
 
         for (int i = 0; i < topSize; i++) {
@@ -454,32 +454,32 @@ class PostRepositoryCustomImplTest {
     void findNextNWithUserId_NextSizeIsFourAndTopSizeIsOneAndVisibilityIsActiveOrIsHiddenAndUserIdIsOne_ThreeActiveFound() {
 
         // given
-        final int userId = 1;
-        final String username = TestingDataCreator.getTestingUsername(userId);
-        final Optional<User> optionalPersistedUserId = userRepository.findByUsername(username);
+        int userId = 1;
+        String username = TestingDataCreator.getTestingUsername(userId);
+        Optional<User> optionalPersistedUserId = userRepository.findByUsername(username);
         assertTrue(optionalPersistedUserId.isPresent());
-        final long persistedUserId = optionalPersistedUserId.get().getId();
+        long persistedUserId = optionalPersistedUserId.get().getId();
 
-        final int nextSize = 4;
-        final int topSize = 1;
+        int nextSize = 4;
+        int topSize = 1;
 
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE, Visibility.HIDDEN);
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE, Visibility.HIDDEN);
 
-        final List<Post> groundTruthTopPostsOfUserOne = TestingDataCreator.getTopUsersPosts(
+        List<Post> groundTruthTopPostsOfUserOne = TestingDataCreator.getTopUsersPosts(
                 postRepository.findAll(), username, new HashSet<>(visibilities));
 
         Post lastPost = groundTruthTopPostsOfUserOne.get(topSize - 1);
-        var pagination = new ScrollPosition(lastPost.getId(), lastPost.getKarmaScore());
+        var position = new ScrollPosition(lastPost.getId(), lastPost.getKarmaScore());
 
         // when
-        final List<PostDto> nextResults = postRepository.findNextNWithUserId(
-                nextSize, visibilities, persistedUserId, pagination);
+        List<PostDto> nextResults = postRepository.findNextNWithUserId(
+                nextSize, visibilities, persistedUserId, position);
 
         // then
         assertEquals(3, nextResults.size());
 
-        final int endBound = Math.min(topSize + nextSize, groundTruthTopPostsOfUserOne.size());
-        final List<Post> groundTruthNextPostsOfUserOne = groundTruthTopPostsOfUserOne.subList(topSize, endBound);
+        int endBound = Math.min(topSize + nextSize, groundTruthTopPostsOfUserOne.size());
+        List<Post> groundTruthNextPostsOfUserOne = groundTruthTopPostsOfUserOne.subList(topSize, endBound);
 
         for (int i = 0; i < topSize; i++) {
             assertEquals(groundTruthNextPostsOfUserOne.get(i).getId(), nextResults.get(i).getId());
@@ -491,31 +491,31 @@ class PostRepositoryCustomImplTest {
     void findTopNRatings_SizeIsEightAndVisibilityIsActiveAndUsernameIsOne_EightActiveFound() {
 
         // given
-        final int userId = 1;
-        final String username = TestingDataCreator.getTestingUsername(userId);
-        final Optional<User> optionalUser = userRepository.findByUsername(username);
+        int userId = 1;
+        String username = TestingDataCreator.getTestingUsername(userId);
+        Optional<User> optionalUser = userRepository.findByUsername(username);
         assertTrue(optionalUser.isPresent());
-        final long persistedUserId = optionalUser.get().getId();
+        long persistedUserId = optionalUser.get().getId();
 
-        final int topSize = 8;
+        int topSize = 8;
 
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE);
 
         // when
-        final List<PostRatingResponse> topResults = postRepository.findTopNRatings(
+        List<PostRatingResponse> topResults = postRepository.findTopNRatings(
                 topSize, visibilities, persistedUserId);
 
         // then
         assertEquals(topSize, topResults.size());
 
-        final List<Post> groundTruthTopPosts = TestingDataCreator.getTopPosts(
+        List<Post> groundTruthTopPosts = TestingDataCreator.getTopPosts(
                 postRepository.findAll(), new HashSet<>(visibilities));
 
-        final List<PostRatingResponse> groundTruthTopRatings = TestingDataCreator.getTopPostRatingsOfUser(
+        List<PostRatingResponse> groundTruthTopRatings = TestingDataCreator.getTopPostRatingsOfUser(
                 groundTruthTopPosts, karmaScoreRepository.findAll(), persistedUserId);
 
         for (int i = 0; i < topResults.size(); i++) {
-            assertEquals(groundTruthTopPosts.get(i).getId(), topResults.get(i).getId());
+            assertEquals(groundTruthTopPosts.get(i).getId(), topResults.get(i).id());
             assertEquals(groundTruthTopRatings.get(i), topResults.get(i));
         }
     }
@@ -524,39 +524,39 @@ class PostRepositoryCustomImplTest {
     void findNextNRatings_NextSizeIsTwoAndTopSizeIsFourAndVisibilityIsActiveAndUserIdIsOne_TwoActiveFound() {
 
         // given
-        final int userId = 1;
-        final String username = TestingDataCreator.getTestingUsername(userId);
-        final Optional<User> optionalUser = userRepository.findByUsername(username);
+        int userId = 1;
+        String username = TestingDataCreator.getTestingUsername(userId);
+        Optional<User> optionalUser = userRepository.findByUsername(username);
         assertTrue(optionalUser.isPresent());
-        final long persistedUserId = optionalUser.get().getId();
+        long persistedUserId = optionalUser.get().getId();
 
-        final int nextSize = 2;
-        final int topSize = 4;
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        int nextSize = 2;
+        int topSize = 4;
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE);
 
-        final List<Post> groundTruthTopPosts = TestingDataCreator.getTopPosts(
+        List<Post> groundTruthTopPosts = TestingDataCreator.getTopPosts(
                 postRepository.findAll(), new HashSet<>(visibilities));
 
-        final Post lastPost = groundTruthTopPosts.get(topSize - 1);
-        final var pagination = new ScrollPosition(lastPost.getId(), lastPost.getKarmaScore());
+        Post lastPost = groundTruthTopPosts.get(topSize - 1);
+        var pagination = new ScrollPosition(lastPost.getId(), lastPost.getKarmaScore());
 
         // when
-        final List<PostRatingResponse> nextResults = postRepository.findNextNRatings(
+        List<PostRatingResponse> nextResults = postRepository.findNextNRatings(
                 nextSize, visibilities, persistedUserId, pagination);
 
         // then
         assertEquals(nextSize, nextResults.size());
 
-        final int endBound = Math.min(topSize + nextSize, groundTruthTopPosts.size());
-        final List<Post> groundTruthNextPosts = groundTruthTopPosts.subList(topSize, endBound);
+        int endBound = Math.min(topSize + nextSize, groundTruthTopPosts.size());
+        List<Post> groundTruthNextPosts = groundTruthTopPosts.subList(topSize, endBound);
 
-        final List<PostRatingResponse> groundTruthTopRatings = TestingDataCreator.getTopPostRatingsOfUser(
+        List<PostRatingResponse> groundTruthTopRatings = TestingDataCreator.getTopPostRatingsOfUser(
                 groundTruthTopPosts, karmaScoreRepository.findAll(), persistedUserId);
 
-        final List<PostRatingResponse> groundTruthNextRatings = groundTruthTopRatings.subList(topSize, endBound);
+        List<PostRatingResponse> groundTruthNextRatings = groundTruthTopRatings.subList(topSize, endBound);
 
         for (int i = 0; i < nextResults.size(); i++) {
-            assertEquals(groundTruthNextPosts.get(i).getId(), nextResults.get(i).getId());
+            assertEquals(groundTruthNextPosts.get(i).getId(), nextResults.get(i).id());
             assertEquals(groundTruthNextRatings.get(i), nextResults.get(i));
         }
     }
@@ -565,34 +565,34 @@ class PostRepositoryCustomImplTest {
     void findTopNRatingsWithUsername_SizeIsFiveAndVisibilityIsActiveOrIsHiddenOrIsDeletedAndUserIdIsOneAndUsernameIsTwo_FiveActiveFound() {
 
         // given
-        final int viewerUserId = 2;
-        final String viewerUsername = TestingDataCreator.getTestingUsername(viewerUserId);
-        final Optional<User> optionalUser = userRepository.findByUsername(viewerUsername);
+        int viewerUserId = 2;
+        String viewerUsername = TestingDataCreator.getTestingUsername(viewerUserId);
+        Optional<User> optionalUser = userRepository.findByUsername(viewerUsername);
         assertTrue(optionalUser.isPresent());
-        final long persistedViewerUserId = optionalUser.get().getId();
+        long persistedViewerUserId = optionalUser.get().getId();
 
-        final int topSize = 5;
+        int topSize = 5;
 
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE, Visibility.HIDDEN, Visibility.DELETED);
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE, Visibility.HIDDEN, Visibility.DELETED);
 
-        final int creatorUserId = 1;
-        final String creatorUsername = TestingDataCreator.getTestingUsername(creatorUserId);
+        int creatorUserId = 1;
+        String creatorUsername = TestingDataCreator.getTestingUsername(creatorUserId);
 
         // when
-        final List<PostRatingResponse> topCreatorsResults = postRepository.findTopNRatingsWithUsername(
+        List<PostRatingResponse> topCreatorsResults = postRepository.findTopNRatingsWithUsername(
                 topSize, visibilities, persistedViewerUserId, creatorUsername);
 
         // then
         assertEquals(topSize, topCreatorsResults.size());
 
-        final List<Post> groundTruthTopPostsOfUserOne = TestingDataCreator.getTopUsersPosts(
+        List<Post> groundTruthTopPostsOfUserOne = TestingDataCreator.getTopUsersPosts(
                 postRepository.findAll(), creatorUsername, new HashSet<>(visibilities));
 
-        final List<PostRatingResponse> groundTruthTopRatings = TestingDataCreator.getTopPostRatingsOfUser(
+        List<PostRatingResponse> groundTruthTopRatings = TestingDataCreator.getTopPostRatingsOfUser(
                 groundTruthTopPostsOfUserOne, karmaScoreRepository.findAll(), persistedViewerUserId);
 
         for (int i = 0; i < topCreatorsResults.size(); i++) {
-            assertEquals(groundTruthTopPostsOfUserOne.get(i).getId(), topCreatorsResults.get(i).getId());
+            assertEquals(groundTruthTopPostsOfUserOne.get(i).getId(), topCreatorsResults.get(i).id());
             assertEquals(groundTruthTopRatings.get(i), topCreatorsResults.get(i));
         }
     }
@@ -601,44 +601,44 @@ class PostRepositoryCustomImplTest {
     void findNextNRatingsWithUsername_NextSizeIsFourAndTopSizeIsOneAndVisibilityIsActiveOrIsHiddenOrIsDeletedAndUserIdIsOneAndUsernameIsTwo_FourActiveFound() {
 
         // given
-        final int viewerUserId = 2;
-        final String viewerUsername = TestingDataCreator.getTestingUsername(viewerUserId);
-        final Optional<User> optionalUser = userRepository.findByUsername(viewerUsername);
+        int viewerUserId = 2;
+        String viewerUsername = TestingDataCreator.getTestingUsername(viewerUserId);
+        Optional<User> optionalUser = userRepository.findByUsername(viewerUsername);
         assertTrue(optionalUser.isPresent());
-        final long persistedViewerUserId = optionalUser.get().getId();
+        long persistedViewerUserId = optionalUser.get().getId();
 
-        final int nextSize = 4;
-        final int topSize = 1;
+        int nextSize = 4;
+        int topSize = 1;
 
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE, Visibility.HIDDEN, Visibility.DELETED);
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE, Visibility.HIDDEN, Visibility.DELETED);
 
-        final int creatorUserId = 1;
-        final String creatorUsername = TestingDataCreator.getTestingUsername(creatorUserId);
+        int creatorUserId = 1;
+        String creatorUsername = TestingDataCreator.getTestingUsername(creatorUserId);
 
-        final List<Post> groundTruthTopPostsOfUserOne = TestingDataCreator.getTopUsersPosts(
+        List<Post> groundTruthTopPostsOfUserOne = TestingDataCreator.getTopUsersPosts(
                 postRepository.findAll(), creatorUsername, new HashSet<>(visibilities));
 
-        final Post lastPost = groundTruthTopPostsOfUserOne.get(topSize - 1);
-        final var pagination = new ScrollPosition(lastPost.getId(), lastPost.getKarmaScore());
+        Post lastPost = groundTruthTopPostsOfUserOne.get(topSize - 1);
+        var pagination = new ScrollPosition(lastPost.getId(), lastPost.getKarmaScore());
 
         // when
-        final List<PostRatingResponse> nextCreatorResults = postRepository.findNextNRatingsWithUsername(
+        List<PostRatingResponse> nextCreatorResults = postRepository.findNextNRatingsWithUsername(
                 nextSize, visibilities, persistedViewerUserId, pagination, creatorUsername
         );
 
         // then
         assertEquals(nextSize, nextCreatorResults.size());
 
-        final int endBound = Math.min(topSize + nextSize, groundTruthTopPostsOfUserOne.size());
-        final List<Post> groundTruthNextPostsOfUserOne = groundTruthTopPostsOfUserOne.subList(topSize, endBound);
+        int endBound = Math.min(topSize + nextSize, groundTruthTopPostsOfUserOne.size());
+        List<Post> groundTruthNextPostsOfUserOne = groundTruthTopPostsOfUserOne.subList(topSize, endBound);
 
-        final List<PostRatingResponse> groundTruthTopRatings = TestingDataCreator.getTopPostRatingsOfUser(
+        List<PostRatingResponse> groundTruthTopRatings = TestingDataCreator.getTopPostRatingsOfUser(
                 groundTruthTopPostsOfUserOne, karmaScoreRepository.findAll(), persistedViewerUserId);
 
-        final List<PostRatingResponse> groundTruthNextRatingsOfUserOne = groundTruthTopRatings.subList(topSize, endBound);
+        List<PostRatingResponse> groundTruthNextRatingsOfUserOne = groundTruthTopRatings.subList(topSize, endBound);
 
         for (int i = 0; i < nextCreatorResults.size(); i++) {
-            assertEquals(groundTruthNextPostsOfUserOne.get(i).getId(), nextCreatorResults.get(i).getId());
+            assertEquals(groundTruthNextPostsOfUserOne.get(i).getId(), nextCreatorResults.get(i).id());
             assertEquals(groundTruthNextRatingsOfUserOne.get(i), nextCreatorResults.get(i));
         }
     }
@@ -648,13 +648,13 @@ class PostRepositoryCustomImplTest {
     void addKarmaScoreToPost_PostIdIsTopAndScoreIsTenAndVisibilityIsActive_ScoreIsIncreased() {
 
         // given
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
-        final List<Post> groundTruthTopPosts = TestingDataCreator.getTopPosts(
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        List<Post> groundTruthTopPosts = TestingDataCreator.getTopPosts(
                 postRepository.findAll(), new HashSet<>(visibilities));
 
         Post topPost = groundTruthTopPosts.get(0);
 
-        final int scoreToAdd = 10;
+        int scoreToAdd = 10;
 
         // when
         transactionTemplate.execute(new TransactionCallbackWithoutResult() {
@@ -679,8 +679,8 @@ class PostRepositoryCustomImplTest {
     void changeVisibilityById_PostIdIsTopAndVisibilityIsActiveAndNewVisibilityIsDeleted_VisibilityIsDeleted() {
 
         // given
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
-        final List<Post> groundTruthTopPosts = TestingDataCreator.getTopPosts(
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        List<Post> groundTruthTopPosts = TestingDataCreator.getTopPosts(
                 postRepository.findAll(), new HashSet<>(visibilities));
 
         Post topPost = groundTruthTopPosts.get(0);

@@ -17,6 +17,7 @@ import com.msik404.karmaapp.position.ScrollPosition;
 import com.msik404.karmaapp.post.cache.PostRedisCache;
 import com.msik404.karmaapp.post.cache.PostRedisCacheHandlerService;
 import com.msik404.karmaapp.post.dto.PostCreationRequest;
+import com.msik404.karmaapp.post.dto.PostDto;
 import com.msik404.karmaapp.post.dto.PostDtoWithImageData;
 import com.msik404.karmaapp.post.exception.FileProcessingException;
 import com.msik404.karmaapp.post.exception.ImageNotFoundException;
@@ -67,12 +68,12 @@ class PostServiceTest {
     void findPaginatedPosts_PaginationIsNullAndUsernameIsNull_CacheHandlerFindTopNHandlerCalled() {
 
         // given
-        final ScrollPosition position = null;
-        final String username = null;
+        ScrollPosition position = null;
+        String username = null;
 
         // these values won't influence results of these test
-        final int size = 10;
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        int size = 10;
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE);
 
         // when
         postService.findPaginatedPosts(size, visibilities, position, username);
@@ -88,12 +89,12 @@ class PostServiceTest {
     void findPaginatedPosts_PaginationIsNonNullAndUsernameIsNonNull_RepositoryFindNextNPostsWithUsernameCalled() {
 
         // given
-        final var pagination = new ScrollPosition(0, 0);
-        final String username = "username";
+        var pagination = new ScrollPosition(0, 0);
+        String username = "username";
 
         // these values won't influence results of these test
-        final int size = 10;
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        int size = 10;
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE);
 
         // when
         postService.findPaginatedPosts(size, visibilities, pagination, username);
@@ -109,12 +110,12 @@ class PostServiceTest {
     void findPaginatedPosts_PaginationIsNonNullAndUsernameIsNull_CacheHandlerFindNextNHandlerCalled() {
 
         // given
-        final var pagination = new ScrollPosition(0, 0);
-        final String username = null;
+        var pagination = new ScrollPosition(0, 0);
+        String username = null;
 
         // these values won't influence results of these test
-        final int size = 10;
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        int size = 10;
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE);
 
         // when
         postService.findPaginatedPosts(size, visibilities, pagination, username);
@@ -130,12 +131,12 @@ class PostServiceTest {
     void findPaginatedPosts_PaginationIsNullAndUsernameIsNonNull_RepositoryFindTopNPostsWithUsernameCalled() {
 
         // given
-        final ScrollPosition position = null;
-        final String username = "username";
+        ScrollPosition position = null;
+        String username = "username";
 
         // these values won't influence results of these test
-        final int size = 10;
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        int size = 10;
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE);
 
         // when
         postService.findPaginatedPosts(size, visibilities, position, username);
@@ -151,16 +152,16 @@ class PostServiceTest {
     void findPaginatedOwnedPosts_PaginationIsNull_FindTopNWithUserIdCalled() {
 
         // given
-        final ScrollPosition position = null;
+        ScrollPosition position = null;
 
-        final int size = 10;
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        int size = 10;
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE);
 
         // mock authentication
-        final Authentication authentication = mock(Authentication.class);
-        final SecurityContext securityContext = mock(SecurityContext.class);
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        final long userId = 10L;
+        long userId = 10L;
         when(authentication.getPrincipal()).thenReturn(userId);
         SecurityContextHolder.setContext(securityContext);
 
@@ -176,17 +177,17 @@ class PostServiceTest {
     void findPaginatedOwnedPosts_PaginationIsNonNull_FindNextNWithUserIdCalled() {
 
         // given
-        final var pagination = new ScrollPosition(0, 0);
+        var pagination = new ScrollPosition(0, 0);
 
         // these values won't influence results of these test
-        final int size = 10;
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        int size = 10;
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE);
 
         // mock authentication
-        final Authentication authentication = mock(Authentication.class);
-        final SecurityContext securityContext = mock(SecurityContext.class);
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        final long userId = 10L;
+        long userId = 10L;
         when(authentication.getPrincipal()).thenReturn(userId);
         SecurityContextHolder.setContext(securityContext);
 
@@ -202,18 +203,18 @@ class PostServiceTest {
     void findPaginatedPostRatings_PaginationIsNullAndUsernameIsNull_RepositoryFindTopNRatingsCalled() {
 
         // given
-        final ScrollPosition position = null;
-        final String username = null;
+        ScrollPosition position = null;
+        String username = null;
 
         // these values won't influence results of these test
-        final int size = 10;
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        int size = 10;
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE);
 
         // mock authentication
-        final Authentication authentication = mock(Authentication.class);
-        final SecurityContext securityContext = mock(SecurityContext.class);
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        final long userId = 10L;
+        long userId = 10L;
         when(authentication.getPrincipal()).thenReturn(userId);
         SecurityContextHolder.setContext(securityContext);
 
@@ -231,18 +232,18 @@ class PostServiceTest {
     void findPaginatedPostRatings_PaginationIsNonNullAndUsernameIsNonNull_RepositoryFindNextNRatingsWithUsernameCalled() {
 
         // given
-        final var pagination = new ScrollPosition(0, 0);
-        final String username = "username";
+        var pagination = new ScrollPosition(0, 0);
+        String username = "username";
 
         // these values won't influence results of these test
-        final int size = 10;
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        int size = 10;
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE);
 
         // mock authentication
-        final Authentication authentication = mock(Authentication.class);
-        final SecurityContext securityContext = mock(SecurityContext.class);
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        final long userId = 10L;
+        long userId = 10L;
         when(authentication.getPrincipal()).thenReturn(userId);
         SecurityContextHolder.setContext(securityContext);
 
@@ -260,18 +261,18 @@ class PostServiceTest {
     void findPaginatedPostRatings_PaginationIsNonNullAndUsernameIsNull_RepositoryFindNextNRatingsCalled() {
 
         // given
-        final var pagination = new ScrollPosition(0, 0);
-        final String username = null;
+        var pagination = new ScrollPosition(0, 0);
+        String username = null;
 
         // these values won't influence results of these test
-        final int size = 10;
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        int size = 10;
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE);
 
         // mock authentication
-        final Authentication authentication = mock(Authentication.class);
-        final SecurityContext securityContext = mock(SecurityContext.class);
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        final long userId = 10L;
+        long userId = 10L;
         when(authentication.getPrincipal()).thenReturn(userId);
         SecurityContextHolder.setContext(securityContext);
 
@@ -289,18 +290,18 @@ class PostServiceTest {
     void findPaginatedPostRatings_PaginationIsNullAndUsernameIsNonNull_RepositoryFindTopNRatingsWithUsernameCalled() {
 
         // given
-        final ScrollPosition position = null;
-        final String username = "username";
+        ScrollPosition position = null;
+        String username = "username";
 
         // these values won't influence results of these test
-        final int size = 10;
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        int size = 10;
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE);
 
         // mock authentication
-        final Authentication authentication = mock(Authentication.class);
-        final SecurityContext securityContext = mock(SecurityContext.class);
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        final long userId = 10L;
+        long userId = 10L;
         when(authentication.getPrincipal()).thenReturn(userId);
         SecurityContextHolder.setContext(securityContext);
 
@@ -318,8 +319,8 @@ class PostServiceTest {
     void findImageByPostId_CacheHasRequestedImage_RepositoryShouldNotBeCalled() {
 
         // given
-        final long postId = 10;
-        final byte[] data = new byte[0];
+        long postId = 10;
+        byte[] data = new byte[0];
 
         when(cache.getCachedImage(postId)).thenReturn(Optional.of(data));
 
@@ -336,7 +337,7 @@ class PostServiceTest {
     void findImageByPostId_CacheDoesNotHaveRequestedImage_RepositoryShouldBeCalled() {
 
         // given
-        final long postId = 10;
+        long postId = 10;
 
         when(cache.getCachedImage(postId)).thenReturn(Optional.empty());
         when(repository.findImageById(postId)).thenReturn(Optional.of(() -> new byte[1]));
@@ -354,7 +355,7 @@ class PostServiceTest {
     void findImageByPostId_CacheDoesNotHaveRequestedImageNorRepository_ImageNotFoundExceptionShouldBeThrown() {
 
         // given
-        final long postId = 10;
+        long postId = 10;
 
         when(cache.getCachedImage(postId)).thenReturn(Optional.empty());
         when(repository.findImageById(postId)).thenReturn(Optional.empty());
@@ -372,7 +373,7 @@ class PostServiceTest {
     void findImageByPostId_CacheHasRequestedImageButItsDataIsEmpty_ImageNotFoundExceptionShouldBeThrown() {
 
         // given
-        final long postId = 10;
+        long postId = 10;
 
         when(cache.getCachedImage(postId)).thenReturn(Optional.empty());
         when(repository.findImageById(postId)).thenReturn(Optional.of(() -> new byte[0]));
@@ -544,25 +545,25 @@ class PostServiceTest {
     void rate_IsNewRatingPositiveIsTrueAndOldRatingIsNegativeAndWasNotCached_DeltaIsTwoAndShouldTryToLoadToCache() {
 
         // given
-        final long postId = 1;
-        final boolean isNewRatingPositive = true;
-        final boolean isOldRatingPositive = false;
-        final long delta = 2;
+        long postId = 1;
+        boolean isNewRatingPositive = true;
+        boolean isOldRatingPositive = false;
+        long delta = 2;
 
         // mock authentication
-        final Authentication authentication = mock(Authentication.class);
-        final SecurityContext securityContext = mock(SecurityContext.class);
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        final long userId = 10L;
+        long userId = 10L;
         when(authentication.getPrincipal()).thenReturn(userId);
         SecurityContextHolder.setContext(securityContext);
 
-        final var karmaKey = new KarmaKey(userId, postId);
-        final var karmaScore = KarmaScore.builder().id(karmaKey).isPositive(isOldRatingPositive).build();
+        var karmaKey = new KarmaKey(userId, postId);
+        var karmaScore = KarmaScore.builder().id(karmaKey).isPositive(isOldRatingPositive).build();
 
         when(karmaScoreService.findById(karmaKey)).thenReturn(karmaScore);
 
-        final int rowsAffected = 1;
+        int rowsAffected = 1;
         when(repository.addKarmaScoreToPost(postId, delta)).thenReturn(rowsAffected);
 
         when(cache.updateKarmaScoreIfPresent(postId, delta)).thenReturn(OptionalDouble.empty());
@@ -584,25 +585,25 @@ class PostServiceTest {
     void rate_IsNewRatingPositiveIsFalseAndOldRatingIsPositiveAndWasNotCached_DeltaIsMinusTwoAndShouldTryToLoadToCache() {
 
         // given
-        final long postId = 1;
-        final boolean isNewRatingPositive = false;
-        final boolean isOldRatingPositive = true;
-        final long delta = -2;
+        long postId = 1;
+        boolean isNewRatingPositive = false;
+        boolean isOldRatingPositive = true;
+        long delta = -2;
 
         // mock authentication
-        final Authentication authentication = mock(Authentication.class);
-        final SecurityContext securityContext = mock(SecurityContext.class);
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        final long userId = 10L;
+        long userId = 10L;
         when(authentication.getPrincipal()).thenReturn(userId);
         SecurityContextHolder.setContext(securityContext);
 
-        final var karmaKey = new KarmaKey(userId, postId);
-        final var karmaScore = KarmaScore.builder().id(karmaKey).isPositive(isOldRatingPositive).build();
+        var karmaKey = new KarmaKey(userId, postId);
+        var karmaScore = KarmaScore.builder().id(karmaKey).isPositive(isOldRatingPositive).build();
 
         when(karmaScoreService.findById(karmaKey)).thenReturn(karmaScore);
 
-        final int rowsAffected = 1;
+        int rowsAffected = 1;
         when(repository.addKarmaScoreToPost(postId, delta)).thenReturn(rowsAffected);
 
         when(cache.updateKarmaScoreIfPresent(postId, delta)).thenReturn(OptionalDouble.empty());
@@ -624,23 +625,23 @@ class PostServiceTest {
     void rate_IsNewRatingPositiveIsTrueAndOldRatingIsNullAndWasNotCached_DeltaIsOneAndShouldTryToLoadToCache() {
 
         // given
-        final long postId = 1;
-        final boolean isNewRatingPositive = true;
-        final long delta = 1;
+        long postId = 1;
+        boolean isNewRatingPositive = true;
+        long delta = 1;
 
         // mock authentication
-        final Authentication authentication = mock(Authentication.class);
-        final SecurityContext securityContext = mock(SecurityContext.class);
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        final long userId = 10L;
+        long userId = 10L;
         when(authentication.getPrincipal()).thenReturn(userId);
         SecurityContextHolder.setContext(securityContext);
 
-        final var karmaKey = new KarmaKey(userId, postId);
+        var karmaKey = new KarmaKey(userId, postId);
 
         when(karmaScoreService.findById(karmaKey)).thenThrow(KarmaScoreNotFoundException.class);
 
-        final int rowsAffected = 1;
+        int rowsAffected = 1;
         when(repository.addKarmaScoreToPost(postId, delta)).thenReturn(rowsAffected);
 
         when(cache.updateKarmaScoreIfPresent(postId, delta)).thenReturn(OptionalDouble.empty());
@@ -662,23 +663,23 @@ class PostServiceTest {
     void rate_IsNewRatingPositiveIsTrueAndOldRatingIsNullAndWasNotCachedAndPostIsNotFound_ShouldThrowPostNotFoundException() {
 
         // given
-        final long postId = 1;
-        final boolean isNewRatingPositive = true;
-        final long delta = 1;
+        long postId = 1;
+        boolean isNewRatingPositive = true;
+        long delta = 1;
 
         // mock authentication
-        final Authentication authentication = mock(Authentication.class);
-        final SecurityContext securityContext = mock(SecurityContext.class);
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        final long userId = 10L;
+        long userId = 10L;
         when(authentication.getPrincipal()).thenReturn(userId);
         SecurityContextHolder.setContext(securityContext);
 
-        final var karmaKey = new KarmaKey(userId, postId);
+        var karmaKey = new KarmaKey(userId, postId);
 
         when(karmaScoreService.findById(karmaKey)).thenThrow(KarmaScoreNotFoundException.class);
 
-        final int rowsAffected = 0;
+        int rowsAffected = 0;
         when(repository.addKarmaScoreToPost(postId, delta)).thenReturn(rowsAffected);
 
         // when
@@ -696,20 +697,20 @@ class PostServiceTest {
     void rate_IsNewRatingPositiveIsTrueAndOldRatingIsPositiveAndWasNotCached_ShouldThrowKarmaScoreAlreadyExistsException() {
 
         // given
-        final long postId = 1;
-        final boolean isNewRatingPositive = true;
-        final boolean isOldRatingPositive = true;
+        long postId = 1;
+        boolean isNewRatingPositive = true;
+        boolean isOldRatingPositive = true;
 
         // mock authentication
-        final Authentication authentication = mock(Authentication.class);
-        final SecurityContext securityContext = mock(SecurityContext.class);
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        final long userId = 10L;
+        long userId = 10L;
         when(authentication.getPrincipal()).thenReturn(userId);
         SecurityContextHolder.setContext(securityContext);
 
-        final var karmaKey = new KarmaKey(userId, postId);
-        final var karmaScore = KarmaScore.builder().id(karmaKey).isPositive(isOldRatingPositive).build();
+        var karmaKey = new KarmaKey(userId, postId);
+        var karmaScore = KarmaScore.builder().id(karmaKey).isPositive(isOldRatingPositive).build();
 
         when(karmaScoreService.findById(karmaKey)).thenReturn(karmaScore);
 
@@ -725,23 +726,23 @@ class PostServiceTest {
     void rate_IsNewRatingPositiveIsTrueAndOldRatingIsNullAndIsCached_DeltaIsOneAndShouldNotTryToLoadToCache() {
 
         // given
-        final long postId = 1;
-        final boolean isNewRatingPositive = true;
-        final long delta = 1;
+        long postId = 1;
+        boolean isNewRatingPositive = true;
+        long delta = 1;
 
         // mock authentication
-        final Authentication authentication = mock(Authentication.class);
-        final SecurityContext securityContext = mock(SecurityContext.class);
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        final long userId = 10L;
+        long userId = 10L;
         when(authentication.getPrincipal()).thenReturn(userId);
         SecurityContextHolder.setContext(securityContext);
 
-        final var karmaKey = new KarmaKey(userId, postId);
+        var karmaKey = new KarmaKey(userId, postId);
 
         when(karmaScoreService.findById(karmaKey)).thenThrow(KarmaScoreNotFoundException.class);
 
-        final int rowsAffected = 1;
+        int rowsAffected = 1;
         when(repository.addKarmaScoreToPost(postId, delta)).thenReturn(rowsAffected);
 
         when(cache.updateKarmaScoreIfPresent(postId, delta)).thenReturn(OptionalDouble.of(1));
@@ -761,23 +762,23 @@ class PostServiceTest {
     void unrate_PostExistsAndWasRatedPositivelyAndIsCached_KarmaScoreShouldBeFoundAndDeletedPostKarmaScoreShouldBeUpdatedAndCachedKarmaScoreShouldBeUpdatedAndShouldNotTryToLoadToCache() {
 
         // given
-        final long postId = 1;
-        final boolean isPositive = true;
+        long postId = 1;
+        boolean isPositive = true;
 
         // mock authentication
-        final Authentication authentication = mock(Authentication.class);
-        final SecurityContext securityContext = mock(SecurityContext.class);
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        final long userId = 10L;
+        long userId = 10L;
         when(authentication.getPrincipal()).thenReturn(userId);
         SecurityContextHolder.setContext(securityContext);
 
-        final var karmaKey = new KarmaKey(userId, postId);
-        final var karmaScore = KarmaScore.builder().id(karmaKey).isPositive(isPositive).build();
+        var karmaKey = new KarmaKey(userId, postId);
+        var karmaScore = KarmaScore.builder().id(karmaKey).isPositive(isPositive).build();
 
         when(karmaScoreService.findById(karmaKey)).thenReturn(karmaScore);
 
-        final long delta = -1;
+        long delta = -1;
         when(repository.addKarmaScoreToPost(postId, delta)).thenReturn(1);
 
         when(cache.updateKarmaScoreIfPresent(postId, delta)).thenReturn(OptionalDouble.of(1));
@@ -797,23 +798,23 @@ class PostServiceTest {
     void unrate_PostExistsAndWasRatedPositivelyAndIsNotCached_KarmaScoreShouldBeFoundAndDeletedPostKarmaScoreShouldBeUpdatedAndShouldTryToLoadToCache() {
 
         // given
-        final long postId = 1;
-        final boolean isPositive = true;
+        long postId = 1;
+        boolean isPositive = true;
 
         // mock authentication
-        final Authentication authentication = mock(Authentication.class);
-        final SecurityContext securityContext = mock(SecurityContext.class);
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        final long userId = 10L;
+        long userId = 10L;
         when(authentication.getPrincipal()).thenReturn(userId);
         SecurityContextHolder.setContext(securityContext);
 
-        final var karmaKey = new KarmaKey(userId, postId);
-        final var karmaScore = KarmaScore.builder().id(karmaKey).isPositive(isPositive).build();
+        var karmaKey = new KarmaKey(userId, postId);
+        var karmaScore = KarmaScore.builder().id(karmaKey).isPositive(isPositive).build();
 
         when(karmaScoreService.findById(karmaKey)).thenReturn(karmaScore);
 
-        final long delta = -1;
+        long delta = -1;
         when(repository.addKarmaScoreToPost(postId, delta)).thenReturn(1);
 
         when(cache.updateKarmaScoreIfPresent(postId, delta)).thenReturn(OptionalDouble.empty());
@@ -833,17 +834,17 @@ class PostServiceTest {
     void unrate_PostWasNotRated_KarmaScoreNotFoundExceptionShouldBeThrown() {
 
         // given
-        final long postId = 1;
+        long postId = 1;
 
         // mock authentication
-        final Authentication authentication = mock(Authentication.class);
-        final SecurityContext securityContext = mock(SecurityContext.class);
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        final long userId = 10L;
+        long userId = 10L;
         when(authentication.getPrincipal()).thenReturn(userId);
         SecurityContextHolder.setContext(securityContext);
 
-        final var karmaKey = new KarmaKey(userId, postId);
+        var karmaKey = new KarmaKey(userId, postId);
 
         when(karmaScoreService.findById(karmaKey)).thenThrow(KarmaScoreNotFoundException.class);
 
@@ -855,23 +856,23 @@ class PostServiceTest {
     void unrate_PostWasRatedPositivelyButPostWasNotFound_PostNotFoundExceptionShouldBeThrown() {
 
         // given
-        final long postId = 1;
-        final boolean isPositive = true;
+        long postId = 1;
+        boolean isPositive = true;
 
         // mock authentication
-        final Authentication authentication = mock(Authentication.class);
-        final SecurityContext securityContext = mock(SecurityContext.class);
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        final long userId = 10L;
+        long userId = 10L;
         when(authentication.getPrincipal()).thenReturn(userId);
         SecurityContextHolder.setContext(securityContext);
 
-        final var karmaKey = new KarmaKey(userId, postId);
-        final var karmaScore = KarmaScore.builder().id(karmaKey).isPositive(isPositive).build();
+        var karmaKey = new KarmaKey(userId, postId);
+        var karmaScore = KarmaScore.builder().id(karmaKey).isPositive(isPositive).build();
 
         when(karmaScoreService.findById(karmaKey)).thenReturn(karmaScore);
 
-        final long delta = -1;
+        long delta = -1;
         when(repository.addKarmaScoreToPost(postId, delta)).thenReturn(0);
 
         // then                                         // when
@@ -882,8 +883,8 @@ class PostServiceTest {
     void changeVisibility_PostExistsAndNewVisibilityIsHidden_PostVisibilityInRepositoryShouldBeUpdatedAndPostShouldBeDeletedFromCacheIfPresent() {
 
         // given
-        final int postId = 1;
-        final var visibility = Visibility.HIDDEN;
+        int postId = 1;
+        var visibility = Visibility.HIDDEN;
 
         when(repository.changeVisibilityById(postId, visibility)).thenReturn(1);
         when(cache.deletePostFromCache(postId)).thenReturn(true);
@@ -901,8 +902,8 @@ class PostServiceTest {
     void changeVisibility_PostExistsAndNewVisibilityIsActive_PostVisibilityInRepositoryShouldBeUpdatedAndPostShouldBeLoadedToCacheIfNotPresent() {
 
         // given
-        final int postId = 1;
-        final var visibility = Visibility.ACTIVE;
+        int postId = 1;
+        var visibility = Visibility.ACTIVE;
 
         when(repository.changeVisibilityById(postId, visibility)).thenReturn(1);
 
@@ -919,8 +920,8 @@ class PostServiceTest {
     void changeVisibility_PostDoesNotExistAndNewVisibilityIsDeleted_PostNotFoundExceptionShouldBeThrown() {
 
         // given
-        final int postId = 1;
-        final var visibility = Visibility.DELETED;
+        int postId = 1;
+        var visibility = Visibility.DELETED;
 
         when(repository.changeVisibilityById(postId, visibility)).thenReturn(0);
 
@@ -937,19 +938,20 @@ class PostServiceTest {
     void changeOwnedPostVisibility_PostExistsAndNewVisibilityIsDeletedAndOldVisibilityIsActiveAndUserRoleIsAdmin_VisibilityShouldUpdatedAndPostShouldBeDeletedFromCache() {
 
         // given
-        final var postId = 1;
-        final var visibility = Visibility.DELETED;
-        final var post = PostDtoWithImageData.builder().visibility(Visibility.ACTIVE).build();
+        var postId = 1;
+        var visibility = Visibility.DELETED;
+        var postDto = new PostDto(null, null, null, null, null, null, Visibility.ACTIVE);
+        var post = new PostDtoWithImageData(postDto, null);
 
         // mock authentication
-        final Authentication authentication = mock(Authentication.class);
-        final SecurityContext securityContext = mock(SecurityContext.class);
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
 
-        final long userId = 10L;
+        long userId = 10L;
         when(authentication.getPrincipal()).thenReturn(userId);
 
-        final var authorities = Set.of(new SimpleGrantedAuthority(Role.ADMIN.name()));
+        var authorities = Set.of(new SimpleGrantedAuthority(Role.ADMIN.name()));
         doReturn(authorities).when(authentication).getAuthorities();
         SecurityContextHolder.setContext(securityContext);
 
@@ -970,19 +972,20 @@ class PostServiceTest {
     void changeOwnedPostVisibility_PostExistsAndNewVisibilityIsActiveAndOldVisibilityIsDeletedAndUserRoleIsAdmin_VisibilityShouldUpdatedAndPostShouldBeDeletedFromCache() {
 
         // given
-        final var postId = 1;
-        final var visibility = Visibility.ACTIVE;
-        final var post = PostDtoWithImageData.builder().visibility(Visibility.DELETED).build();
+        var postId = 1;
+        var visibility = Visibility.ACTIVE;
+        var postDto = new PostDto(null, null, null, null, null, null, Visibility.ACTIVE);
+        var post = new PostDtoWithImageData(postDto, null);
 
         // mock authentication
-        final Authentication authentication = mock(Authentication.class);
-        final SecurityContext securityContext = mock(SecurityContext.class);
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
 
-        final long userId = 10L;
+        long userId = 10L;
         when(authentication.getPrincipal()).thenReturn(userId);
 
-        final var authorities = Set.of(new SimpleGrantedAuthority(Role.ADMIN.name()));
+        var authorities = Set.of(new SimpleGrantedAuthority(Role.ADMIN.name()));
         doReturn(authorities).when(authentication).getAuthorities();
         SecurityContextHolder.setContext(securityContext);
 
@@ -1003,19 +1006,20 @@ class PostServiceTest {
     void changeOwnedPostVisibility_PostExistsAndNewVisibilityIsActiveAndOldVisibilityIsDeletedAndUserRoleIsUser_ShouldThrowAccessDeniedException() {
 
         // given
-        final var postId = 1;
-        final var visibility = Visibility.ACTIVE;
-        final var post = PostDtoWithImageData.builder().visibility(Visibility.DELETED).build();
+        var postId = 1;
+        var visibility = Visibility.ACTIVE;
+        var postDto = new PostDto(null, null, null, null, null, null, Visibility.ACTIVE);
+        var post = new PostDtoWithImageData(postDto, null);
 
         // mock authentication
-        final Authentication authentication = mock(Authentication.class);
-        final SecurityContext securityContext = mock(SecurityContext.class);
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
 
-        final long userId = 10L;
+        long userId = 10L;
         when(authentication.getPrincipal()).thenReturn(userId);
 
-        final var authorities = Set.of(new SimpleGrantedAuthority(Role.USER.name()));
+        var authorities = Set.of(new SimpleGrantedAuthority(Role.USER.name()));
         doReturn(authorities).when(authentication).getAuthorities();
         SecurityContextHolder.setContext(securityContext);
 
@@ -1036,14 +1040,14 @@ class PostServiceTest {
     void changeOwnedPostVisibility_PostExistsAndNewVisibilityIsActiveAndOldVisibilityIsDeletedAndUserRoleIsUser_PostNotFoundException() {
 
         // given
-        final var postId = 1;
-        final var visibility = Visibility.ACTIVE;
+        var postId = 1;
+        var visibility = Visibility.ACTIVE;
 
         // mock authentication
-        final Authentication authentication = mock(Authentication.class);
-        final SecurityContext securityContext = mock(SecurityContext.class);
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        final long userId = 10L;
+        long userId = 10L;
         when(authentication.getPrincipal()).thenReturn(userId);
         SecurityContextHolder.setContext(securityContext);
 

@@ -10,7 +10,7 @@ import com.msik404.karmaapp.karma.KarmaKey;
 import com.msik404.karmaapp.karma.KarmaScore;
 import com.msik404.karmaapp.karma.KarmaScoreRepository;
 import com.msik404.karmaapp.post.Post;
-import com.msik404.karmaapp.post.PostComparator;
+import com.msik404.karmaapp.post.comparator.PostComparator;
 import com.msik404.karmaapp.post.Visibility;
 import com.msik404.karmaapp.post.dto.PostRatingResponse;
 import com.msik404.karmaapp.post.repository.PostRepository;

@@ -5,8 +5,9 @@ import java.util.List;
 import java.util.Optional;
 
 import com.msik404.karmaapp.position.ScrollPosition;
-import com.msik404.karmaapp.post.PostComparator;
+import com.msik404.karmaapp.post.comparator.PostComparator;
 import com.msik404.karmaapp.post.Visibility;
+import com.msik404.karmaapp.post.comparator.BasicComparablePost;
 import com.msik404.karmaapp.post.dto.PostDto;
 import com.msik404.karmaapp.post.dto.PostDtoWithImageData;
 import com.msik404.karmaapp.post.repository.PostRepository;
@@ -49,8 +50,8 @@ public class PostRedisCacheHandlerService {
 
         if (isOnlyActive(visibilities)) {
             if (cache.isEmpty()) {
-                final List<PostDto> newValuesForCache = updateCache();
-                final int endBound = Math.min(size, newValuesForCache.size());
+                List<PostDto> newValuesForCache = updateCache();
+                int endBound = Math.min(size, newValuesForCache.size());
                 results = newValuesForCache.subList(0, endBound);
             } else {
                 results = cache.findTopNCached(size).orElseGet(() -> repository.findTopNPosts(size, visibilities));
@@ -66,7 +67,7 @@ public class PostRedisCacheHandlerService {
 
         int value = Collections.binarySearch(
                 topPosts,
-                PostDto.builder().id(position.postId()).karmaScore(position.karmaScore()).build(),
+                new BasicComparablePost(position.postId(), position.karmaScore()),
                 new PostComparator().reversed()
         );
 
@@ -88,10 +89,10 @@ public class PostRedisCacheHandlerService {
 
         if (isOnlyActive(visibilities)) {
             if (cache.isEmpty()) {
-                final List<PostDto> newValuesForCache = updateCache();
-                final int firstSmallerElementIdx = findNextSmallerThan(newValuesForCache, position);
+                List<PostDto> newValuesForCache = updateCache();
+                int firstSmallerElementIdx = findNextSmallerThan(newValuesForCache, position);
 
-                final int endBound = Math.min(firstSmallerElementIdx + size, newValuesForCache.size());
+                int endBound = Math.min(firstSmallerElementIdx + size, newValuesForCache.size());
                 results = newValuesForCache.subList(firstSmallerElementIdx, endBound);
             } else {
                 results = cache.findNextNCached(size, position.karmaScore())
@@ -107,29 +108,19 @@ public class PostRedisCacheHandlerService {
     @Transactional(readOnly = true)
     public boolean loadToCacheIfKarmaScoreIsHighEnough(@NonNull PostDtoWithImageData post) {
 
-        final Optional<Boolean> optionalIsHighEnough = cache.isKarmaScoreGreaterThanLowestScoreInZSet(
-                post.getKarmaScore());
+        Optional<Boolean> optionalIsHighEnough = cache.isKarmaScoreGreaterThanLowestScoreInZSet(
+                post.postDto().getKarmaScore());
 
         if (optionalIsHighEnough.isEmpty()) {
             return false;
         }
 
-        final boolean isHighEnough = optionalIsHighEnough.get();
+        boolean isHighEnough = optionalIsHighEnough.get();
         if (!isHighEnough) {
             return false;
         }
 
-        final var postDto = PostDto.builder()
-                .id(post.getId())
-                .userId(post.getUserId())
-                .username(post.getUsername())
-                .headline(post.getHeadline())
-                .text(post.getText())
-                .karmaScore(post.getKarmaScore())
-                .visibility(post.getVisibility())
-                .build();
-
-        return cache.insertPost(postDto, post.getImageData());
+        return cache.insertPost(post.postDto(), post.imageData());
     }
 
     @Transactional(readOnly = true)

@@ -266,7 +266,7 @@ public class PostService {
         var optionalPostDtoWithImageData = repository.findPostDtoWithImageDataByIdAndUserId(postId, userId);
         optionalPostDtoWithImageData.ifPresentOrElse(
                 post -> {
-                    final boolean isVisibilityDeleted = post.getVisibility().equals(Visibility.DELETED);
+                    final boolean isVisibilityDeleted = post.postDto().getVisibility().equals(Visibility.DELETED);
                     final boolean isUserAdmin = authentication.getAuthorities().contains(
                             new SimpleGrantedAuthority(Role.ADMIN.name()));
 

@@ -1,4 +1,4 @@
-package com.msik404.karmaapp.post;
+package com.msik404.karmaapp.post.comparator;
 
 import java.util.Comparator;
 

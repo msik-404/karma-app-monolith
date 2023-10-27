@@ -16,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.lang.NonNull;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -33,11 +34,17 @@ class PostRedisCacheHandlerServiceTest {
     @InjectMocks
     private PostRedisCacheHandlerService cacheHandler;
 
+    @NonNull
+    PostDto getPost(long id, long karmaScore) {
+        return new PostDto(id, null, null, null, null, karmaScore, null);
+    }
+
+    @NonNull
     List<PostDto> getPosts(int size) {
 
         List<PostDto> posts = new ArrayList<>(size);
-        for (int i = 0; i < size; i++) {
-            posts.add(PostDto.builder().id((long) i).build());
+        for (long i = 0; i < size; i++) {
+            posts.add(new PostDto(i, null, null, null, null, null, null));
         }
         return posts;
     }
@@ -46,14 +53,14 @@ class PostRedisCacheHandlerServiceTest {
     void findTopNHandler_SizeIsThreeAndVisibilityIsActiveAndCacheHasRequestedPosts_RepositoryShouldNotBeUsed() {
 
         // given
-        final int size = 3;
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        int size = 3;
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE);
 
-        final boolean isCacheEmpty = false;
+        boolean isCacheEmpty = false;
         when(cache.isEmpty()).thenReturn(isCacheEmpty);
 
-        final int cacheSize = 3;
-        final List<PostDto> cacheResults = getPosts(cacheSize);
+        int cacheSize = 3;
+        List<PostDto> cacheResults = getPosts(cacheSize);
         when(cache.findTopNCached(size)).thenReturn(Optional.of(cacheResults));
 
         // when
@@ -69,13 +76,13 @@ class PostRedisCacheHandlerServiceTest {
     void findTopNHandler_SizeIsThreeAndVisibilityIsActiveAndCacheHasNotEnoughPostsButIsNotEmpty_RepositoryShouldBeUsed() {
 
         // given
-        final int size = 3;
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        int size = 3;
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE);
 
-        final List<PostDto> repoResults = getPosts(size);
+        List<PostDto> repoResults = getPosts(size);
         when(repository.findTopNPosts(size, visibilities)).thenReturn(repoResults);
 
-        final boolean isCacheEmpty = false;
+        boolean isCacheEmpty = false;
         when(cache.isEmpty()).thenReturn(isCacheEmpty);
 
         when(cache.findTopNCached(size)).thenReturn(Optional.empty());
@@ -93,14 +100,14 @@ class PostRedisCacheHandlerServiceTest {
     void findTopNHandler_SizeIsSevenAndVisibilityIsActiveAndCacheIsEmpty_CacheShouldBeUpdated() {
 
         // given
-        final int size = 7;
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        int size = 7;
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE);
 
-        final boolean isCacheEmpty = true;
+        boolean isCacheEmpty = true;
         when(cache.isEmpty()).thenReturn(isCacheEmpty);
 
-        final int updatedCacheSize = 5;
-        final List<PostDto> updatedCachePosts = getPosts(updatedCacheSize);
+        int updatedCacheSize = 5;
+        List<PostDto> updatedCachePosts = getPosts(updatedCacheSize);
         when(cacheHandler.updateCache()).thenReturn(updatedCachePosts);
 
         // when
@@ -116,8 +123,8 @@ class PostRedisCacheHandlerServiceTest {
     void findTopNHandler_SizeIsThreeAndVisibilityIsActiveOrIsHiddenAndCacheHasRequestedPosts_RepositoryShouldBeUsed() {
 
         // given
-        final int size = 3;
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE, Visibility.HIDDEN);
+        int size = 3;
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE, Visibility.HIDDEN);
 
         when(repository.findTopNPosts(size, visibilities)).thenReturn(getPosts(size));
 
@@ -134,11 +141,11 @@ class PostRedisCacheHandlerServiceTest {
     void findNextNHandler_SizeIsThreeAndVisibilityIsActiveAndProperPaginationIsSetAndCacheHasRequestedPosts_RepositoryShouldNotBeUsed() {
 
         // given
-        final int size = 3;
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
-        final var pagination = new ScrollPosition(3, 10);
+        int size = 3;
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        var pagination = new ScrollPosition(3, 10);
 
-        final boolean isCacheEmpty = false;
+        boolean isCacheEmpty = false;
         when(cache.isEmpty()).thenReturn(isCacheEmpty);
 
         when(cache.findNextNCached(size, pagination.karmaScore())).thenReturn(Optional.of(getPosts(size)));
@@ -156,11 +163,11 @@ class PostRedisCacheHandlerServiceTest {
     void findNextNHandler_SizeIsThreeAndVisibilityIsActiveAndProperPaginationIsSetAndCacheDoesNotHaveRequestedPostsButIsNotEmpty_RepositoryShouldBeUsed() {
 
         // given
-        final int size = 3;
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
-        final var pagination = new ScrollPosition(3, 10);
+        int size = 3;
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        var pagination = new ScrollPosition(3, 10);
 
-        final boolean isCacheEmpty = false;
+        boolean isCacheEmpty = false;
         when(cache.isEmpty()).thenReturn(isCacheEmpty);
 
         when(cache.findNextNCached(size, pagination.karmaScore())).thenReturn(Optional.empty());
@@ -179,27 +186,27 @@ class PostRedisCacheHandlerServiceTest {
     void findNextNHandler_SizeIsThreeAndVisibilityIsActiveAndProperPaginationIsSetAndCacheHasRequestedPosts_CacheShouldBeUpdated() {
 
         // given
-        final int topSize = 3;
-        final int size = 3;
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        int topSize = 3;
+        int size = 3;
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE);
 
         List<PostDto> groundTruthPosts = new ArrayList<>();
-        groundTruthPosts.add(PostDto.builder().id(3L).karmaScore(10L).build());
-        groundTruthPosts.add(PostDto.builder().id(1L).karmaScore(8L).build());
-        groundTruthPosts.add(PostDto.builder().id(2L).karmaScore(8L).build());
-        groundTruthPosts.add(PostDto.builder().id(5L).karmaScore(8L).build());
-        groundTruthPosts.add(PostDto.builder().id(0L).karmaScore(6L).build());
-        groundTruthPosts.add(PostDto.builder().id(4L).karmaScore(4L).build());
-        groundTruthPosts.add(PostDto.builder().id(6L).karmaScore(2L).build());
-        groundTruthPosts.add(PostDto.builder().id(7L).karmaScore(-5L).build());
+        groundTruthPosts.add(getPost(3, 10));
+        groundTruthPosts.add(getPost(1, 8));
+        groundTruthPosts.add(getPost(2, 8));
+        groundTruthPosts.add(getPost(5, 8));
+        groundTruthPosts.add(getPost(0, 6));
+        groundTruthPosts.add(getPost(4, 4));
+        groundTruthPosts.add(getPost(6, 2));
+        groundTruthPosts.add(getPost(7, -5));
 
-        final PostDto lastPost = groundTruthPosts.get(topSize - 1);
-        final var pagination = new ScrollPosition(
+        PostDto lastPost = groundTruthPosts.get(topSize - 1);
+        var pagination = new ScrollPosition(
                 lastPost.getId(),
                 lastPost.getKarmaScore()
         );
 
-        final boolean isCacheEmpty = true;
+        boolean isCacheEmpty = true;
         when(cache.isEmpty()).thenReturn(isCacheEmpty);
         when(cacheHandler.updateCache()).thenReturn(groundTruthPosts);
 
@@ -213,7 +220,7 @@ class PostRedisCacheHandlerServiceTest {
 
         assertEquals(size, results.size());
 
-        final List<PostDto> groundTruthNextPosts = groundTruthPosts.subList(topSize, topSize + size);
+        List<PostDto> groundTruthNextPosts = groundTruthPosts.subList(topSize, topSize + size);
         for (int i = 0; i < results.size(); i++) {
             assertEquals(groundTruthNextPosts.get(i), results.get(i));
         }
@@ -225,22 +232,22 @@ class PostRedisCacheHandlerServiceTest {
     void findNextNHandler_SizeIsThreeAndVisibilityIsActiveAndArbitraryPaginationIsSetAndCacheHasRequestedPosts_CacheShouldBeUpdated() {
 
         // given
-        final int size = 6;
-        final List<Visibility> visibilities = List.of(Visibility.ACTIVE);
+        int size = 6;
+        List<Visibility> visibilities = List.of(Visibility.ACTIVE);
 
         List<PostDto> groundTruthPosts = new ArrayList<>();
-        groundTruthPosts.add(PostDto.builder().id(3L).karmaScore(10L).build());
-        groundTruthPosts.add(PostDto.builder().id(1L).karmaScore(8L).build());
-        groundTruthPosts.add(PostDto.builder().id(2L).karmaScore(8L).build());
-        groundTruthPosts.add(PostDto.builder().id(5L).karmaScore(8L).build());
-        groundTruthPosts.add(PostDto.builder().id(0L).karmaScore(6L).build());
-        groundTruthPosts.add(PostDto.builder().id(4L).karmaScore(4L).build());
-        groundTruthPosts.add(PostDto.builder().id(6L).karmaScore(2L).build());
-        groundTruthPosts.add(PostDto.builder().id(7L).karmaScore(-5L).build());
+        groundTruthPosts.add(getPost(3, 10));
+        groundTruthPosts.add(getPost(1, 8));
+        groundTruthPosts.add(getPost(2, 8));
+        groundTruthPosts.add(getPost(5, 8));
+        groundTruthPosts.add(getPost(0, 6));
+        groundTruthPosts.add(getPost(4, 4));
+        groundTruthPosts.add(getPost(6, 2));
+        groundTruthPosts.add(getPost(7, -5));
 
-        final var pagination = new ScrollPosition(-1, 7);
+        var pagination = new ScrollPosition(-1, 7);
 
-        final boolean isCacheEmpty = true;
+        boolean isCacheEmpty = true;
         when(cache.isEmpty()).thenReturn(isCacheEmpty);
         when(cacheHandler.updateCache()).thenReturn(groundTruthPosts);
 
@@ -252,8 +259,8 @@ class PostRedisCacheHandlerServiceTest {
         verify(cacheHandler).updateCache();
         verify(cache, never()).findNextNCached(size, pagination.karmaScore());
 
-        final int startIdx = 4;
-        final List<PostDto> groundTruthNextPosts = groundTruthPosts.subList(startIdx, groundTruthPosts.size());
+        int startIdx = 4;
+        List<PostDto> groundTruthNextPosts = groundTruthPosts.subList(startIdx, groundTruthPosts.size());
 
         assertEquals(groundTruthNextPosts.size(), results.size());
 
@@ -266,9 +273,9 @@ class PostRedisCacheHandlerServiceTest {
     void findNextNHandler_SizeIsThreeAndVisibilityIsDeletedAndProperPaginationIsSetAndCacheCannotBeUsed_RepositoryShouldBeUsed() {
 
         // given
-        final int size = 3;
-        final List<Visibility> visibilities = List.of(Visibility.DELETED);
-        final var pagination = new ScrollPosition(3, 10);
+        int size = 3;
+        List<Visibility> visibilities = List.of(Visibility.DELETED);
+        var pagination = new ScrollPosition(3, 10);
 
         when(repository.findNextNPosts(size, visibilities, pagination)).thenReturn(getPosts(size));
 
@@ -280,37 +287,30 @@ class PostRedisCacheHandlerServiceTest {
         verify(repository).findNextNPosts(size, visibilities, pagination);
     }
 
-
     @Test
     void loadPostDataToCacheIfKarmaScoreIsHighEnough_DtoIsFoundAndContainsImageDataAndScoreIsHighEnoughForCaching_DtoWithImageShouldBeCached() {
 
         // given
-        final long postId = 404;
-        final long karmaScore = 400;
-        final var post = PostDtoWithImageData.builder()
-                .id(postId)
-                .userId(405L)
-                .username("username")
-                .headline("headline")
-                .text("text")
-                .karmaScore(karmaScore)
-                .visibility(Visibility.ACTIVE)
-                .imageData(TestingImageDataCreator.getTestingImage())
-                .build();
+        long postId = 404;
+        long karmaScore = 400;
+        var postDto = new PostDto(
+                postId,
+                405L,
+                "username",
+                "headline",
+                "text",
+                karmaScore,
+                Visibility.ACTIVE
+        );
 
-        final var postDto = PostDto.builder()
-                .id(post.getId())
-                .userId(post.getUserId())
-                .username(post.getUsername())
-                .headline(post.getHeadline())
-                .text(post.getText())
-                .karmaScore(post.getKarmaScore())
-                .visibility(post.getVisibility())
-                .build();
+        var post = new PostDtoWithImageData(
+                postDto,
+                TestingImageDataCreator.getTestingImage()
+        );
 
         when(repository.findPostDtoWithImageDataById(postId)).thenReturn(Optional.of(post));
         when(cache.isKarmaScoreGreaterThanLowestScoreInZSet(karmaScore)).thenReturn(Optional.of(true));
-        when(cache.insertPost(postDto, post.getImageData())).thenReturn(true);
+        when(cache.insertPost(postDto, post.imageData())).thenReturn(true);
 
         // when
         assertTrue(cacheHandler.loadPostDataToCacheIfKarmaScoreIsHighEnough(postId));
@@ -318,39 +318,33 @@ class PostRedisCacheHandlerServiceTest {
         // then
         verify(repository).findPostDtoWithImageDataById(postId);
         verify(cache).isKarmaScoreGreaterThanLowestScoreInZSet(karmaScore);
-        verify(cache).insertPost(postDto, post.getImageData());
+        verify(cache).insertPost(postDto, post.imageData());
     }
 
     @Test
     void loadPostDataToCacheIfKarmaScoreIsHighEnough_DtoIsFoundAndDoesNotContainImageDataAndScoreIsHighEnoughForCaching_DtoWithImageShouldBeCached() {
 
         // given
-        final long postId = 404;
-        final long karmaScore = 400;
-        final var post = PostDtoWithImageData.builder()
-                .id(postId)
-                .userId(405L)
-                .username("username")
-                .headline("headline")
-                .text("text")
-                .karmaScore(karmaScore)
-                .visibility(Visibility.ACTIVE)
-                .imageData(null)
-                .build();
+        long postId = 404;
+        long karmaScore = 400;
+        var postDto = new PostDto(
+                postId,
+                405L,
+                "username",
+                "headline",
+                "text",
+                karmaScore,
+                Visibility.ACTIVE
+        );
 
-        final var postDto = PostDto.builder()
-                .id(post.getId())
-                .userId(post.getUserId())
-                .username(post.getUsername())
-                .headline(post.getHeadline())
-                .text(post.getText())
-                .karmaScore(post.getKarmaScore())
-                .visibility(post.getVisibility())
-                .build();
+        var post = new PostDtoWithImageData(
+                postDto,
+                TestingImageDataCreator.getTestingImage()
+        );
 
         when(repository.findPostDtoWithImageDataById(postId)).thenReturn(Optional.of(post));
         when(cache.isKarmaScoreGreaterThanLowestScoreInZSet(karmaScore)).thenReturn(Optional.of(true));
-        when(cache.insertPost(postDto, post.getImageData())).thenReturn(true);
+        when(cache.insertPost(postDto, post.imageData())).thenReturn(true);
 
         // when
         assertTrue(cacheHandler.loadPostDataToCacheIfKarmaScoreIsHighEnough(postId));
@@ -358,35 +352,29 @@ class PostRedisCacheHandlerServiceTest {
         // then
         verify(repository).findPostDtoWithImageDataById(postId);
         verify(cache).isKarmaScoreGreaterThanLowestScoreInZSet(karmaScore);
-        verify(cache).insertPost(postDto, post.getImageData());
+        verify(cache).insertPost(postDto, post.imageData());
     }
 
     @Test
     void loadPostDataToCacheIfKarmaScoreIsHighEnough_DtoIsFoundAndContainsImageDataAndScoreIsNotHighEnoughForCaching_DtoWithImageShouldNotBeCached() {
 
         // given
-        final long postId = 404;
-        final long karmaScore = 400;
-        final var post = PostDtoWithImageData.builder()
-                .id(postId)
-                .userId(405L)
-                .username("username")
-                .headline("headline")
-                .text("text")
-                .karmaScore(karmaScore)
-                .visibility(Visibility.ACTIVE)
-                .imageData(TestingImageDataCreator.getTestingImage())
-                .build();
+        long postId = 404;
+        long karmaScore = 400;
+        var postDto = new PostDto(
+                postId,
+                405L,
+                "username",
+                "headline",
+                "text",
+                karmaScore,
+                Visibility.ACTIVE
+        );
 
-        final var postDto = PostDto.builder()
-                .id(post.getId())
-                .userId(post.getUserId())
-                .username(post.getUsername())
-                .headline(post.getHeadline())
-                .text(post.getText())
-                .karmaScore(post.getKarmaScore())
-                .visibility(post.getVisibility())
-                .build();
+        var post = new PostDtoWithImageData(
+                postDto,
+                TestingImageDataCreator.getTestingImage()
+        );
 
         when(repository.findPostDtoWithImageDataById(postId)).thenReturn(Optional.of(post));
         when(cache.isKarmaScoreGreaterThanLowestScoreInZSet(karmaScore)).thenReturn(Optional.of(false));
@@ -397,35 +385,29 @@ class PostRedisCacheHandlerServiceTest {
         // then
         verify(repository).findPostDtoWithImageDataById(postId);
         verify(cache).isKarmaScoreGreaterThanLowestScoreInZSet(karmaScore);
-        verify(cache, never()).insertPost(postDto, post.getImageData());
+        verify(cache, never()).insertPost(postDto, post.imageData());
     }
 
     @Test
     void loadPostDataToCacheIfKarmaScoreIsHighEnough_DtoIsFoundAndContainsImageDataAndCacheIsEmpty_DtoWithImageShouldNotBeCached() {
 
         // given
-        final long postId = 404;
-        final long karmaScore = 400;
-        final var post = PostDtoWithImageData.builder()
-                .id(postId)
-                .userId(405L)
-                .username("username")
-                .headline("headline")
-                .text("text")
-                .karmaScore(karmaScore)
-                .visibility(Visibility.ACTIVE)
-                .imageData(TestingImageDataCreator.getTestingImage())
-                .build();
+        long postId = 404;
+        long karmaScore = 400;
+        var postDto = new PostDto(
+                postId,
+                405L,
+                "username",
+                "headline",
+                "text",
+                karmaScore,
+                Visibility.ACTIVE
+        );
 
-        final var postDto = PostDto.builder()
-                .id(post.getId())
-                .userId(post.getUserId())
-                .username(post.getUsername())
-                .headline(post.getHeadline())
-                .text(post.getText())
-                .karmaScore(post.getKarmaScore())
-                .visibility(post.getVisibility())
-                .build();
+        var post = new PostDtoWithImageData(
+                postDto,
+                TestingImageDataCreator.getTestingImage()
+        );
 
         when(repository.findPostDtoWithImageDataById(postId)).thenReturn(Optional.of(post));
         when(cache.isKarmaScoreGreaterThanLowestScoreInZSet(karmaScore)).thenReturn(Optional.empty());
@@ -436,14 +418,14 @@ class PostRedisCacheHandlerServiceTest {
         // then
         verify(repository).findPostDtoWithImageDataById(postId);
         verify(cache).isKarmaScoreGreaterThanLowestScoreInZSet(karmaScore);
-        verify(cache, never()).insertPost(postDto, post.getImageData());
+        verify(cache, never()).insertPost(postDto, post.imageData());
     }
 
     @Test
     void loadPostDataToCacheIfKarmaScoreIsHighEnough_DtoIsNotFound_DtoWithImageShouldNotBeCached() {
 
         // given
-        final long postId = 404L;
+        long postId = 404L;
         when(repository.findPostDtoWithImageDataById(postId)).thenReturn(Optional.empty());
 
         // when

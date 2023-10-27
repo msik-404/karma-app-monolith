@@ -4,6 +4,7 @@ package com.msik404.karmaapp.post;
 import java.util.Set;
 
 import com.msik404.karmaapp.karma.KarmaScore;
+import com.msik404.karmaapp.post.comparator.ComparablePost;
 import com.msik404.karmaapp.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
