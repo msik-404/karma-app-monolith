@@ -143,8 +143,8 @@ public class PostService {
         final var userId = (long) authentication.getPrincipal();
 
         var newPost = Post.builder()
-                .headline(request.getHeadline())
-                .text(request.getText())
+                .headline(request.headline())
+                .text(request.text())
                 .karmaScore(0L)
                 .visibility(Visibility.ACTIVE)
                 .user(userRepository.getReferenceById(userId));

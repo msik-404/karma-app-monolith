@@ -390,16 +390,14 @@ class PostServiceTest {
     void create_ImageIsNotEmpty_PostWithImageShouldBeSavedAndImageShouldBeCached() {
 
         // given
-        var request = new PostCreationRequest();
-        request.setHeadline("headline");
-        request.setText("text");
+        var request = new PostCreationRequest("headline", "text");
 
         // mock image
-        final MultipartFile image = mock(MultipartFile.class);
+        MultipartFile image = mock(MultipartFile.class);
         when(image.isEmpty()).thenReturn(false);
 
-        final byte[] imageData = TestingImageDataCreator.getTestingImage();
-        final var inputStream = new ByteArrayInputStream(imageData);
+        byte[] imageData = TestingImageDataCreator.getTestingImage();
+        var inputStream = new ByteArrayInputStream(imageData);
 
         try {
             when(image.getInputStream()).thenReturn(inputStream);
@@ -408,10 +406,10 @@ class PostServiceTest {
         }
 
         // mock authentication
-        final Authentication authentication = mock(Authentication.class);
-        final SecurityContext securityContext = mock(SecurityContext.class);
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        final long userId = 10L;
+        long userId = 10L;
         when(authentication.getPrincipal()).thenReturn(userId);
         SecurityContextHolder.setContext(securityContext);
 
@@ -419,8 +417,8 @@ class PostServiceTest {
 
         Post groundTruthPost = Post.builder()
                 .id(11L)
-                .headline(request.getHeadline())
-                .text(request.getText())
+                .headline(request.headline())
+                .text(request.text())
                 .karmaScore(0L)
                 .visibility(Visibility.ACTIVE)
                 .user(groundTruthUser)
@@ -451,14 +449,14 @@ class PostServiceTest {
     void create_ImageIsNotEmptyButInvalid_FileProcessingExceptionShouldBeThrown() {
 
         // given
-        final var request = new PostCreationRequest();
+        var request = new PostCreationRequest(null, null);
 
         // mock image
-        final MultipartFile image = mock(MultipartFile.class);
+        MultipartFile image = mock(MultipartFile.class);
         when(image.isEmpty()).thenReturn(false);
 
-        final byte[] imageData = "sampleImageData".getBytes();
-        final var inputStream = new ByteArrayInputStream(imageData);
+        byte[] imageData = "sampleImageData".getBytes();
+        var inputStream = new ByteArrayInputStream(imageData);
 
         try {
             when(image.getInputStream()).thenReturn(inputStream);
@@ -467,10 +465,10 @@ class PostServiceTest {
         }
 
         // mock authentication
-        final Authentication authentication = mock(Authentication.class);
-        final SecurityContext securityContext = mock(SecurityContext.class);
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        final long userId = 10L;
+        long userId = 10L;
         when(authentication.getPrincipal()).thenReturn(userId);
         SecurityContextHolder.setContext(securityContext);
 
@@ -478,8 +476,8 @@ class PostServiceTest {
 
         Post groundTruthPost = Post.builder()
                 .id(11L)
-                .headline(request.getHeadline())
-                .text(request.getText())
+                .headline(request.headline())
+                .text(request.text())
                 .karmaScore(0L)
                 .visibility(Visibility.ACTIVE)
                 .user(groundTruthUser)
@@ -499,17 +497,17 @@ class PostServiceTest {
     void create_ImageIsEmpty_PostWithoutImageShouldBeSavedAndImageShouldNotBeCached() {
 
         // given
-        final var request = new PostCreationRequest();
+        var request = new PostCreationRequest("headline", "text");
 
         // mock image
-        final MultipartFile image = mock(MultipartFile.class);
+        MultipartFile image = mock(MultipartFile.class);
         when(image.isEmpty()).thenReturn(true);
 
         // mock authentication
-        final Authentication authentication = mock(Authentication.class);
-        final SecurityContext securityContext = mock(SecurityContext.class);
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        final long userId = 10L;
+        long userId = 10L;
         when(authentication.getPrincipal()).thenReturn(userId);
         SecurityContextHolder.setContext(securityContext);
 
@@ -517,8 +515,8 @@ class PostServiceTest {
 
         Post groundTruthPost = Post.builder()
                 .id(11L)
-                .headline(request.getHeadline())
-                .text(request.getText())
+                .headline(request.headline())
+                .text(request.text())
                 .karmaScore(0L)
                 .visibility(Visibility.ACTIVE)
                 .user(groundTruthUser)
