@@ -7,10 +7,6 @@ import org.springframework.lang.NonNull;
 
 public class KarmaScoreAlreadyExistsException extends AbstractRestException {
 
-    public KarmaScoreAlreadyExistsException() {
-        super("KarmaScore with that userId and postId already exists");
-    }
-
     public KarmaScoreAlreadyExistsException(String message) {
         super(message);
     }
