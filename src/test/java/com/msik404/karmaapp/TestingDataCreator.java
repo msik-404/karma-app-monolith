@@ -76,12 +76,10 @@ public class TestingDataCreator {
                 .filter(karmaScore -> karmaScore.getId().getUserId().equals(userId))
                 .collect(Collectors.toMap(karmaScore -> karmaScore.getId().getPostId(), KarmaScore::getIsPositive));
 
-        return topPosts.stream().map(post ->
-                PostRatingResponse.builder()
-                        .id(post.getId())
-                        .wasRatedPositively(userRatingsMap.getOrDefault(post.getId(), null))
-                        .build()
-        ).toList();
+        return topPosts.stream().map(post -> new PostRatingResponse(
+                post.getId(),
+                userRatingsMap.getOrDefault(post.getId(), null)
+        )).toList();
     }
 
     public static String getTestingUsername(long userId) {

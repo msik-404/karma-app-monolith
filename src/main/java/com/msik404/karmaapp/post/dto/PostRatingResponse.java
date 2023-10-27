@@ -1,14 +1,7 @@
 package com.msik404.karmaapp.post.dto;
 
-import lombok.Builder;
-import lombok.Data;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
-@Data
-@Builder
-public class PostRatingResponse {
-
-    private Long id;
-
-    private Boolean wasRatedPositively;
-
+public record PostRatingResponse(@NonNull long id, @Nullable Boolean wasRatedPositively) {
 }
