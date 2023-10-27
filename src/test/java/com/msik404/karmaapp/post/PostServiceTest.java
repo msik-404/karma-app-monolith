@@ -1006,7 +1006,15 @@ class PostServiceTest {
         // given
         var postId = 1;
         var visibility = Visibility.ACTIVE;
-        var postDto = new PostDto(null, null, null, null, null, null, Visibility.ACTIVE);
+        var postDto = new PostDto(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                Visibility.DELETED
+        );
         var post = new PostDtoWithImageData(postDto, null);
 
         // mock authentication
