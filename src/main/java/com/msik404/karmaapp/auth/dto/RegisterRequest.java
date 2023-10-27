@@ -2,19 +2,12 @@ package com.msik404.karmaapp.auth.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
+import org.springframework.lang.Nullable;
 
-@Data
-public class RegisterRequest {
-
-    @NotNull
-    private final String username;
-    @NotNull
-    @Email
-    private final String email;
-    @NotNull
-    private final String password;
-
-    private final String firstName;
-    private final String lastName;
+public record RegisterRequest(
+        @NotNull String username,
+        @NotNull @Email String email,
+        @NotNull String password,
+        @Nullable String firstName,
+        @Nullable String lastName) {
 }

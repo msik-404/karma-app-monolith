@@ -41,13 +41,13 @@ public class AuthService {
 
         try {
             repository.save(User.builder()
-                    .username(request.getUsername())
-                    .email(request.getEmail())
-                    .password(bCryptPasswordEncoder.encode(request.getPassword()))
+                    .username(request.username())
+                    .email(request.email())
+                    .password(bCryptPasswordEncoder.encode(request.password()))
                     .role(Role.USER)
                     // Nullable
-                    .firstName(request.getFirstName())
-                    .lastName(request.getLastName())
+                    .firstName(request.firstName())
+                    .lastName(request.lastName())
                     .build());
         } catch (DataIntegrityViolationException ex) {
             constraintExceptionsHandler.handle(ex, extractionStrategy, parseStrategy);
