@@ -1,7 +1,7 @@
 package com.msik404.karmaapp.post.dto;
 
-import com.msik404.karmaapp.post.comparator.ComparablePost;
 import com.msik404.karmaapp.post.Visibility;
+import com.msik404.karmaapp.post.comparator.ComparablePost;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

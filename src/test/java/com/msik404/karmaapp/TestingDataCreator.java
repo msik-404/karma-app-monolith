@@ -10,8 +10,8 @@ import com.msik404.karmaapp.karma.KarmaKey;
 import com.msik404.karmaapp.karma.KarmaScore;
 import com.msik404.karmaapp.karma.KarmaScoreRepository;
 import com.msik404.karmaapp.post.Post;
-import com.msik404.karmaapp.post.comparator.PostComparator;
 import com.msik404.karmaapp.post.Visibility;
+import com.msik404.karmaapp.post.comparator.PostComparator;
 import com.msik404.karmaapp.post.dto.PostRatingResponse;
 import com.msik404.karmaapp.post.repository.PostRepository;
 import com.msik404.karmaapp.user.Role;
@@ -102,14 +102,20 @@ public class TestingDataCreator {
                 .build();
     }
 
+    @NonNull
     private static Post getPostForTesting(@NonNull Visibility visibility, @NonNull User user, long karmaScore) {
 
         // I ignore fields which will not be useful for query testing.
-        return Post.builder()
-                .visibility(visibility)
-                .user(user)
-                .karmaScore(karmaScore)
-                .build();
+        return new Post(
+                null,
+                null,
+                null,
+                karmaScore,
+                visibility,
+                user,
+                null,
+                null
+        );
     }
 
     private static KarmaScore getKarmaScoreForTesting(@NonNull Post post, @NonNull User user, boolean isPositive) {

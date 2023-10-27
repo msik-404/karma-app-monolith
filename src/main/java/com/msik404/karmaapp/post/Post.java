@@ -8,9 +8,10 @@ import com.msik404.karmaapp.post.comparator.ComparablePost;
 import com.msik404.karmaapp.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 @Entity
 // I chose this index because of required sorting in this method of pagination.
@@ -20,7 +21,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Post implements ComparablePost {
 
     @Id
@@ -48,5 +48,14 @@ public class Post implements ComparablePost {
     @Lob
     @Basic(fetch = FetchType.LAZY)
     private byte[] imageData;
+
+    public Post(@Nullable String headline, @Nullable String text, @NonNull User user) {
+
+        this.headline = headline;
+        this.text = text;
+        this.karmaScore = 0L;
+        this.visibility = Visibility.ACTIVE;
+        this.user = user;
+    }
 
 }

@@ -125,12 +125,12 @@ public class PostService {
 
         return cache.getCachedImage(postId).orElseGet(() -> {
 
-            final Optional<ImageOnlyDto> optionalPostImageDataProjection = repository.findImageById(postId);
+            Optional<ImageOnlyDto> optionalPostImageDataProjection = repository.findImageById(postId);
 
-            final ImageOnlyDto postImageDataProjection = optionalPostImageDataProjection
+            ImageOnlyDto postImageDataProjection = optionalPostImageDataProjection
                     .orElseThrow(ImageNotFoundException::new);
 
-            final byte[] imageData = postImageDataProjection.imageData();
+            byte[] imageData = postImageDataProjection.imageData();
             if (imageData.length == 0) {
                 throw new ImageNotFoundException();
             }
@@ -144,15 +144,10 @@ public class PostService {
             @NonNull PostCreationRequest request,
             @NonNull MultipartFile image) throws FileProcessingException {
 
-        final var authentication = SecurityContextHolder.getContext().getAuthentication();
-        final var userId = (long) authentication.getPrincipal();
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        var clientId = (long) authentication.getPrincipal();
 
-        var newPost = Post.builder()
-                .headline(request.headline())
-                .text(request.text())
-                .karmaScore(0L)
-                .visibility(Visibility.ACTIVE)
-                .user(userRepository.getReferenceById(userId));
+        var newPost = new Post(request.headline(), request.text(), userRepository.getReferenceById(clientId));
 
         try {
             if (!image.isEmpty()) {
@@ -166,13 +161,13 @@ public class PostService {
                 // Write the compressed image data to the ByteArrayOutputStream
                 ImageIO.write(bufferedImage, "jpeg", byteArrayOutputStream);
                 // Set the compressed image data to the newPost
-                newPost.imageData(byteArrayOutputStream.toByteArray());
+                newPost.setImageData(byteArrayOutputStream.toByteArray());
             }
         } catch (IOException ex) {
             throw new FileProcessingException();
         }
 
-        final Post persistedPost = repository.save(newPost.build());
+        Post persistedPost = repository.save(newPost);
         if (persistedPost.getImageData() != null) {
             cache.cacheImage(persistedPost.getId(), persistedPost.getImageData());
         }

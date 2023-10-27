@@ -59,13 +59,14 @@ public class UserAndPostInit implements CommandLineRunner {
                 var maxPosts = random.nextInt(MAX_POSTS_PER_USER - MIN_POSTS_PER_USER) + MIN_POSTS_PER_USER;
 
                 for (int postId = 0; postId < maxPosts; postId++) {
-                    var post = Post.builder()
-                            .headline(String.format("Example headline: %d of user: %d", postId, userId))
-                            .text(String.format("Example text: %d of user: %d", postId, userId))
-                            .karmaScore(random.nextLong(MAX_KARMA_SCORE) - random.nextLong(MAX_KARMA_SCORE))
-                            .visibility(VISIBILITY_OPTIONS[random.nextInt(VISIBILITY_OPTIONS.length)])
-                            .user(user)
-                            .build();
+
+                    var post = new Post(
+                            String.format("Example headline: %d of user: %d", postId, userId),
+                            String.format("Example text: %d of user: %d", postId, userId),
+                            user
+                    );
+                    post.setKarmaScore(random.nextLong(MAX_KARMA_SCORE) - random.nextLong(MAX_KARMA_SCORE));
+                    post.setVisibility(VISIBILITY_OPTIONS[random.nextInt(VISIBILITY_OPTIONS.length)]);
 
                     postsToSave.add(post);
                 }

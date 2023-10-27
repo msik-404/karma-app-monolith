@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Optional;
 
 import com.msik404.karmaapp.position.ScrollPosition;
-import com.msik404.karmaapp.post.comparator.PostComparator;
 import com.msik404.karmaapp.post.Visibility;
 import com.msik404.karmaapp.post.comparator.BasicComparablePost;
+import com.msik404.karmaapp.post.comparator.PostComparator;
 import com.msik404.karmaapp.post.dto.PostDto;
 import com.msik404.karmaapp.post.dto.PostDtoWithImageData;
 import com.msik404.karmaapp.post.repository.PostRepository;

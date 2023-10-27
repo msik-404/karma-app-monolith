@@ -15,6 +15,7 @@ import com.msik404.karmaapp.karma.exception.KarmaScoreNotFoundException;
 import com.msik404.karmaapp.position.ScrollPosition;
 import com.msik404.karmaapp.post.cache.PostRedisCache;
 import com.msik404.karmaapp.post.cache.PostRedisCacheHandlerService;
+import com.msik404.karmaapp.post.dto.ImageOnlyDto;
 import com.msik404.karmaapp.post.dto.PostCreationRequest;
 import com.msik404.karmaapp.post.dto.PostDto;
 import com.msik404.karmaapp.post.dto.PostDtoWithImageData;
@@ -338,7 +339,7 @@ class PostServiceTest {
         long postId = 10;
 
         when(cache.getCachedImage(postId)).thenReturn(Optional.empty());
-        when(repository.findImageById(postId)).thenReturn(Optional.of(() -> new byte[1]));
+        when(repository.findImageById(postId)).thenReturn(Optional.of(new ImageOnlyDto(new byte[1])));
 
         // when
         postService.findImageByPostId(postId);
@@ -374,7 +375,7 @@ class PostServiceTest {
         long postId = 10;
 
         when(cache.getCachedImage(postId)).thenReturn(Optional.empty());
-        when(repository.findImageById(postId)).thenReturn(Optional.of(() -> new byte[0]));
+        when(repository.findImageById(postId)).thenReturn(Optional.of(new ImageOnlyDto(new byte[1])));
 
         // when
         assertThrows(ImageNotFoundException.class, () -> postService.findImageByPostId(postId));
@@ -414,15 +415,16 @@ class PostServiceTest {
 
         User groundTruthUser = User.builder().id(10L).build();
 
-        Post groundTruthPost = Post.builder()
-                .id(11L)
-                .headline(request.headline())
-                .text(request.text())
-                .karmaScore(0L)
-                .visibility(Visibility.ACTIVE)
-                .user(groundTruthUser)
-                .imageData(TestingImageDataCreator.jpegCompress(imageData))
-                .build();
+        var groundTruthPost = new Post(
+                11L,
+                request.headline(),
+                request.text(),
+                0L,
+                Visibility.ACTIVE,
+                groundTruthUser,
+                null,
+                TestingImageDataCreator.jpegCompress(imageData)
+        );
 
         when(userRepository.getReferenceById(userId)).thenReturn(groundTruthUser);
 
@@ -473,14 +475,16 @@ class PostServiceTest {
 
         User groundTruthUser = User.builder().id(10L).build();
 
-        Post groundTruthPost = Post.builder()
-                .id(11L)
-                .headline(request.headline())
-                .text(request.text())
-                .karmaScore(0L)
-                .visibility(Visibility.ACTIVE)
-                .user(groundTruthUser)
-                .build();
+        var groundTruthPost = new Post(
+                11L,
+                request.headline(),
+                request.text(),
+                0L,
+                Visibility.ACTIVE,
+                groundTruthUser,
+                null,
+                null
+        );
 
         when(userRepository.getReferenceById(userId)).thenReturn(groundTruthUser);
 
@@ -512,14 +516,16 @@ class PostServiceTest {
 
         User groundTruthUser = User.builder().id(10L).build();
 
-        Post groundTruthPost = Post.builder()
-                .id(11L)
-                .headline(request.headline())
-                .text(request.text())
-                .karmaScore(0L)
-                .visibility(Visibility.ACTIVE)
-                .user(groundTruthUser)
-                .build();
+        var groundTruthPost = new Post(
+                11L,
+                request.headline(),
+                request.text(),
+                0L,
+                Visibility.ACTIVE,
+                groundTruthUser,
+                null,
+                null
+        );
 
         when(userRepository.getReferenceById(userId)).thenReturn(groundTruthUser);
         when(repository.save(any(Post.class))).thenReturn(groundTruthPost);
