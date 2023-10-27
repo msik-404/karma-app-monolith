@@ -17,17 +17,13 @@ import com.msik404.karmaapp.position.ScrollPosition;
 import com.msik404.karmaapp.post.cache.PostRedisCache;
 import com.msik404.karmaapp.post.cache.PostRedisCacheHandlerService;
 import com.msik404.karmaapp.post.dto.*;
-import com.msik404.karmaapp.post.exception.FileProcessingException;
-import com.msik404.karmaapp.post.exception.ImageNotFoundException;
-import com.msik404.karmaapp.post.exception.InternalServerErrorException;
-import com.msik404.karmaapp.post.exception.PostNotFoundException;
+import com.msik404.karmaapp.post.exception.*;
 import com.msik404.karmaapp.post.repository.PostRepository;
 import com.msik404.karmaapp.user.Role;
 import com.msik404.karmaapp.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -293,20 +289,22 @@ public class PostService {
 
     @Transactional
     public void changeOwnedPostVisibility(long postId, @NonNull Visibility visibility)
-            throws AccessDeniedException, PostNotFoundException {
+            throws PostNotFoundException, PostNotFoundOrClientIsNotOwnerException, InsufficientRoleException {
 
-        final var authentication = SecurityContextHolder.getContext().getAuthentication();
-        final var userId = (long) authentication.getPrincipal();
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        var clientId = (long) authentication.getPrincipal();
 
-        var optionalPostDtoWithImageData = repository.findPostDtoWithImageDataByIdAndUserId(postId, userId);
+        var optionalPostDtoWithImageData = repository.findPostDtoWithImageDataByIdAndUserId(postId, clientId);
         optionalPostDtoWithImageData.ifPresentOrElse(
                 post -> {
                     final boolean isVisibilityDeleted = post.postDto().getVisibility().equals(Visibility.DELETED);
-                    final boolean isUserAdmin = authentication.getAuthorities().contains(
-                            new SimpleGrantedAuthority(Role.ADMIN.name()));
+                    final boolean isUserAdmin = authentication.getAuthorities()
+                            .contains(new SimpleGrantedAuthority(Role.ADMIN.name()));
 
                     if (isVisibilityDeleted && !isUserAdmin) {
-                        throw new AccessDeniedException("Access denied");
+                        throw new InsufficientRoleException(
+                                "Access denied. You must be Admin to activate deleted post."
+                        );
                     }
 
                     repository.changeVisibilityById(postId, visibility);
@@ -319,7 +317,7 @@ public class PostService {
                     }
                 },
                 () -> {
-                    throw new PostNotFoundException();
+                    throw new PostNotFoundOrClientIsNotOwnerException();
                 }
         );
     }
