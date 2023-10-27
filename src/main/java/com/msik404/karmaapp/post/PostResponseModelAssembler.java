@@ -17,16 +17,17 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @Component
 public class PostResponseModelAssembler implements RepresentationModelAssembler<PostDto, EntityModel<PostResponse>> {
 
+    @NonNull
     private PostResponse postResponseBuilder(@NonNull PostDto postDto) {
 
-        return PostResponse.builder()
-                .id(postDto.getId())
-                .username(postDto.getUsername())
-                .headline(postDto.getHeadline())
-                .text(postDto.getText())
-                .karmaScore(postDto.getKarmaScore())
-                .visibility(postDto.getVisibility())
-                .build();
+        return new PostResponse(
+                postDto.getId(),
+                postDto.getUsername(),
+                postDto.getHeadline(),
+                postDto.getText(),
+                postDto.getKarmaScore(),
+                postDto.getVisibility()
+        );
     }
 
     @Override
