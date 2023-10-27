@@ -2,21 +2,21 @@ package com.msik404.karmaapp.post;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalDouble;
 
 import javax.imageio.ImageIO;
 
+import com.msik404.karmaapp.auth.InsufficientRoleException;
 import com.msik404.karmaapp.karma.KarmaKey;
 import com.msik404.karmaapp.karma.KarmaScoreService;
 import com.msik404.karmaapp.karma.exception.KarmaScoreNotFoundException;
 import com.msik404.karmaapp.position.ScrollPosition;
 import com.msik404.karmaapp.post.cache.PostRedisCache;
 import com.msik404.karmaapp.post.cache.PostRedisCacheHandlerService;
-import com.msik404.karmaapp.post.dto.PostCreationRequest;
-import com.msik404.karmaapp.post.dto.PostDto;
-import com.msik404.karmaapp.post.dto.PostRatingResponse;
+import com.msik404.karmaapp.post.dto.*;
 import com.msik404.karmaapp.post.exception.FileProcessingException;
 import com.msik404.karmaapp.post.exception.ImageNotFoundException;
 import com.msik404.karmaapp.post.exception.InternalServerErrorException;
@@ -28,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -128,12 +129,12 @@ public class PostService {
 
         return cache.getCachedImage(postId).orElseGet(() -> {
 
-            final Optional<PostImageDataProjection> optionalPostImageDataProjection = repository.findImageById(postId);
+            final Optional<ImageOnlyDto> optionalPostImageDataProjection = repository.findImageById(postId);
 
-            final PostImageDataProjection postImageDataProjection = optionalPostImageDataProjection
+            final ImageOnlyDto postImageDataProjection = optionalPostImageDataProjection
                     .orElseThrow(ImageNotFoundException::new);
 
-            final byte[] imageData = postImageDataProjection.getImageData();
+            final byte[] imageData = postImageDataProjection.imageData();
             if (imageData.length == 0) {
                 throw new ImageNotFoundException();
             }
@@ -249,13 +250,40 @@ public class PostService {
         }
     }
 
-    // todo: make so mod cannot make deleted post hidden.
+    @Transactional(readOnly = true)
+    public Visibility findVisibility(long postId) throws PostNotFoundException {
+
+        Optional<VisibilityOnlyDto> optionalVisibility = repository.findVisibilityById(postId);
+        if (optionalVisibility.isEmpty()) {
+            throw new PostNotFoundException();
+        }
+        return optionalVisibility.get().visibility();
+    }
+
     @Transactional
-    public void changeVisibility(long postId, @NonNull Visibility visibility) throws PostNotFoundException {
+    public void changeVisibility(
+            long postId,
+            @NonNull Visibility visibility
+    ) throws PostNotFoundException, InsufficientRoleException {
+
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        Collection<? extends GrantedAuthority> clientAuthorities = authentication.getAuthorities();
+        boolean isAdmin = clientAuthorities.contains(new SimpleGrantedAuthority(Role.ADMIN.name()));
+
+        if (!isAdmin) {
+            Visibility persistedVisibility = findVisibility(postId);
+            if (persistedVisibility.equals(Visibility.DELETED)) {
+                throw new InsufficientRoleException(
+                        "Access denied. You must be admin to change deleted post status to hidden status."
+                );
+            }
+        }
+
         final int rowsAffected = repository.changeVisibilityById(postId, visibility);
         if (rowsAffected == 0) {
             throw new PostNotFoundException();
         }
+
         if (visibility.equals(Visibility.ACTIVE)) { // if this post was made active it might have high enough karma score
             cacheHandler.loadPostDataToCacheIfKarmaScoreIsHighEnough(postId);
         } else {
