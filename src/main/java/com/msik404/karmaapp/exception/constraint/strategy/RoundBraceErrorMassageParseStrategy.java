@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class RoundBraceErrorMassageParseStrategy implements Strategy<String, ParseResult> {
 
+    @NonNull
     @Override
     public ParseResult execute(@NonNull String errorMessage) {
 
@@ -24,6 +25,9 @@ public class RoundBraceErrorMassageParseStrategy implements Strategy<String, Par
         if (matcher.find()) {
             value = matcher.group(1);
         }
+
+        assert fieldName != null && value != null;
+
         return new ParseResult(fieldName, value);
     }
 }

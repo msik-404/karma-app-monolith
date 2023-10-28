@@ -21,6 +21,7 @@ public class UndefinedConstraintExceptionHandler extends BaseExceptionHandler {
         if (super.nextHandler.isEmpty()) {
             throw new DuplicateUnexpectedFieldException(getErrorMessage(fieldName, errorMessage));
         }
+        super.nextHandler.get().handle(fieldName, errorMessage);
     }
 
 }
