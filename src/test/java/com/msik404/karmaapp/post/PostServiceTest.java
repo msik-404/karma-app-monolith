@@ -8,6 +8,7 @@ import java.util.OptionalDouble;
 import java.util.Set;
 
 import com.msik404.karmaapp.TestingImageDataCreator;
+import com.msik404.karmaapp.auth.exception.InsufficientRoleException;
 import com.msik404.karmaapp.karma.KarmaKey;
 import com.msik404.karmaapp.karma.KarmaScore;
 import com.msik404.karmaapp.karma.KarmaScoreService;
@@ -22,6 +23,7 @@ import com.msik404.karmaapp.post.dto.PostDtoWithImageData;
 import com.msik404.karmaapp.post.exception.FileProcessingException;
 import com.msik404.karmaapp.post.exception.ImageNotFoundException;
 import com.msik404.karmaapp.post.exception.PostNotFoundException;
+import com.msik404.karmaapp.post.exception.PostNotFoundOrClientIsNotOwnerException;
 import com.msik404.karmaapp.post.repository.PostRepository;
 import com.msik404.karmaapp.user.Role;
 import com.msik404.karmaapp.user.User;
@@ -32,7 +34,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
@@ -375,7 +376,7 @@ class PostServiceTest {
         long postId = 10;
 
         when(cache.getCachedImage(postId)).thenReturn(Optional.empty());
-        when(repository.findImageById(postId)).thenReturn(Optional.of(new ImageOnlyDto(new byte[1])));
+        when(repository.findImageById(postId)).thenReturn(Optional.of(new ImageOnlyDto(new byte[0])));
 
         // when
         assertThrows(ImageNotFoundException.class, () -> postService.findImageByPostId(postId));
@@ -563,7 +564,7 @@ class PostServiceTest {
         SecurityContextHolder.setContext(securityContext);
 
         var karmaKey = new KarmaKey(userId, postId);
-        var karmaScore = KarmaScore.builder().id(karmaKey).isPositive(isOldRatingPositive).build();
+        var karmaScore = new KarmaScore(karmaKey, null, null, isOldRatingPositive);
 
         when(karmaScoreService.findById(karmaKey)).thenReturn(karmaScore);
 
@@ -603,7 +604,7 @@ class PostServiceTest {
         SecurityContextHolder.setContext(securityContext);
 
         var karmaKey = new KarmaKey(userId, postId);
-        var karmaScore = KarmaScore.builder().id(karmaKey).isPositive(isOldRatingPositive).build();
+        var karmaScore = new KarmaScore(karmaKey, null, null, isOldRatingPositive);
 
         when(karmaScoreService.findById(karmaKey)).thenReturn(karmaScore);
 
@@ -714,7 +715,7 @@ class PostServiceTest {
         SecurityContextHolder.setContext(securityContext);
 
         var karmaKey = new KarmaKey(userId, postId);
-        var karmaScore = KarmaScore.builder().id(karmaKey).isPositive(isOldRatingPositive).build();
+        var karmaScore = new KarmaScore(karmaKey, null, null, isOldRatingPositive);
 
         when(karmaScoreService.findById(karmaKey)).thenReturn(karmaScore);
 
@@ -778,7 +779,7 @@ class PostServiceTest {
         SecurityContextHolder.setContext(securityContext);
 
         var karmaKey = new KarmaKey(userId, postId);
-        var karmaScore = KarmaScore.builder().id(karmaKey).isPositive(isPositive).build();
+        var karmaScore = new KarmaScore(karmaKey, null, null, isPositive);
 
         when(karmaScoreService.findById(karmaKey)).thenReturn(karmaScore);
 
@@ -814,7 +815,7 @@ class PostServiceTest {
         SecurityContextHolder.setContext(securityContext);
 
         var karmaKey = new KarmaKey(userId, postId);
-        var karmaScore = KarmaScore.builder().id(karmaKey).isPositive(isPositive).build();
+        var karmaScore = new KarmaScore(karmaKey, null, null, isPositive);
 
         when(karmaScoreService.findById(karmaKey)).thenReturn(karmaScore);
 
@@ -872,7 +873,7 @@ class PostServiceTest {
         SecurityContextHolder.setContext(securityContext);
 
         var karmaKey = new KarmaKey(userId, postId);
-        var karmaScore = KarmaScore.builder().id(karmaKey).isPositive(isPositive).build();
+        var karmaScore = new KarmaScore(karmaKey, null, null, isPositive);
 
         when(karmaScoreService.findById(karmaKey)).thenReturn(karmaScore);
 
@@ -893,6 +894,14 @@ class PostServiceTest {
         when(repository.changeVisibilityById(postId, visibility)).thenReturn(1);
         when(cache.deletePostFromCache(postId)).thenReturn(true);
 
+        // mock authentication
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        var authorities = Set.of(new SimpleGrantedAuthority(Role.ADMIN.name()));
+        doReturn(authorities).when(authentication).getAuthorities();
+        SecurityContextHolder.setContext(securityContext);
+
         // when
         postService.changeVisibility(postId, visibility);
 
@@ -910,6 +919,14 @@ class PostServiceTest {
         var visibility = Visibility.ACTIVE;
 
         when(repository.changeVisibilityById(postId, visibility)).thenReturn(1);
+
+        // mock authentication
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        var authorities = Set.of(new SimpleGrantedAuthority(Role.ADMIN.name()));
+        doReturn(authorities).when(authentication).getAuthorities();
+        SecurityContextHolder.setContext(securityContext);
 
         // when
         postService.changeVisibility(postId, visibility);
@@ -1007,7 +1024,7 @@ class PostServiceTest {
     }
 
     @Test
-    void changeOwnedPostVisibility_PostExistsAndNewVisibilityIsActiveAndOldVisibilityIsDeletedAndUserRoleIsUser_ShouldThrowAccessDeniedException() {
+    void changeOwnedPostVisibility_PostExistsAndNewVisibilityIsActiveAndOldVisibilityIsDeletedAndUserRoleIsUser_ShouldThrowInsufficientRoleException() {
 
         // given
         var postId = 1;
@@ -1039,7 +1056,7 @@ class PostServiceTest {
         when(repository.findPostDtoWithImageDataByIdAndUserId(postId, userId)).thenReturn(result);
 
         // when
-        assertThrows(AccessDeniedException.class, () -> postService.changeOwnedPostVisibility(postId, visibility));
+        assertThrows(InsufficientRoleException.class, () -> postService.changeOwnedPostVisibility(postId, visibility));
 
         // then
         verify(repository).findPostDtoWithImageDataByIdAndUserId(postId, userId);
@@ -1049,7 +1066,7 @@ class PostServiceTest {
     }
 
     @Test
-    void changeOwnedPostVisibility_PostExistsAndNewVisibilityIsActiveAndOldVisibilityIsDeletedAndUserRoleIsUser_PostNotFoundException() {
+    void changeOwnedPostVisibility_PostExistsAndNewVisibilityIsActiveAndOldVisibilityIsDeletedAndUserRoleIsUser_PostNotFoundOrClientIsNotOwnerException() {
 
         // given
         var postId = 1;
@@ -1067,7 +1084,7 @@ class PostServiceTest {
         when(repository.findPostDtoWithImageDataByIdAndUserId(postId, userId)).thenReturn(result);
 
         // when
-        assertThrows(PostNotFoundException.class, () -> postService.changeOwnedPostVisibility(postId, visibility));
+        assertThrows(PostNotFoundOrClientIsNotOwnerException.class, () -> postService.changeOwnedPostVisibility(postId, visibility));
 
         // then
         verify(repository).findPostDtoWithImageDataByIdAndUserId(postId, userId);

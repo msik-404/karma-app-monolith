@@ -15,8 +15,9 @@ import lombok.NoArgsConstructor;
 public class KarmaKey implements Serializable {
 
     @Column(name = "user_id")
-    private Long userId;
+    private long userId;
 
     @Column(name = "post_id")
-    private Long postId;
+    private long postId;
+
 }

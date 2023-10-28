@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.msik404.karmaapp.karma.KarmaKey;
 import com.msik404.karmaapp.karma.KarmaScore;
 import com.msik404.karmaapp.karma.KarmaScoreRepository;
 import com.msik404.karmaapp.post.Post;
@@ -49,6 +48,7 @@ public class TestingDataCreator {
         createFirstAdminPostsData(savedUsers);
     }
 
+    @NonNull
     public static List<Post> getTopPosts(@NonNull List<Post> posts, @NonNull Set<Visibility> visibilities) {
 
         return posts.stream()
@@ -57,6 +57,7 @@ public class TestingDataCreator {
                 .collect(Collectors.toList());
     }
 
+    @NonNull
     public static List<Post> getTopUsersPosts(
             @NonNull List<Post> posts, @NonNull String username, @NonNull Set<Visibility> visibilities) {
 
@@ -67,14 +68,15 @@ public class TestingDataCreator {
                 .collect(Collectors.toList());
     }
 
+    @NonNull
     public static List<PostRatingResponse> getTopPostRatingsOfUser(
             @NonNull List<Post> topPosts,
             @NonNull List<KarmaScore> karmaScores,
             long userId) {
 
         Map<Long, Boolean> userRatingsMap = karmaScores.stream()
-                .filter(karmaScore -> karmaScore.getId().getUserId().equals(userId))
-                .collect(Collectors.toMap(karmaScore -> karmaScore.getId().getPostId(), KarmaScore::getIsPositive));
+                .filter(karmaScore -> karmaScore.getId().getUserId() == userId)
+                .collect(Collectors.toMap(karmaScore -> karmaScore.getId().getPostId(), KarmaScore::isPositive));
 
         return topPosts.stream().map(post -> new PostRatingResponse(
                 post.getId(),
@@ -82,14 +84,17 @@ public class TestingDataCreator {
         )).toList();
     }
 
+    @NonNull
     public static String getTestingUsername(long userId) {
         return String.format("username_%d", userId);
     }
 
+    @NonNull
     public static String getTestingEmail(@NonNull String username) {
         return String.format("%s@mail.com", username);
     }
 
+    @NonNull
     public static User getUserForTesting(long userId, @NonNull Role role) {
 
         String username = getTestingUsername(userId);
@@ -118,16 +123,13 @@ public class TestingDataCreator {
         );
     }
 
+    @NonNull
     private static KarmaScore getKarmaScoreForTesting(@NonNull Post post, @NonNull User user, boolean isPositive) {
 
-        return com.msik404.karmaapp.karma.KarmaScore.builder()
-                .id(new KarmaKey(user.getId(), post.getId()))
-                .post(post)
-                .user(user)
-                .isPositive(isPositive)
-                .build();
+        return new KarmaScore(user, post, isPositive);
     }
 
+    @NonNull
     private List<User> createUsers() {
 
         List<User> usersForTesting = new ArrayList<>(USER_AMOUNT + MOD_AMOUNT + ADMIN_AMOUNT);

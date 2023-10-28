@@ -42,6 +42,7 @@ public class PostService {
     private final PostRedisCacheHandlerService cacheHandler;
 
     @Transactional(readOnly = true)
+    @NonNull
     public List<PostDto> findPaginatedPosts(
             int size,
             @NonNull List<Visibility> visibilities,
@@ -69,6 +70,7 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
+    @NonNull
     public List<PostDto> findPaginatedOwnedPosts(
             int size,
             @NonNull List<Visibility> visibilities,
@@ -90,6 +92,7 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
+    @NonNull
     public List<PostRatingResponse> findPaginatedPostRatings(
             int size,
             @NonNull List<Visibility> visibilities,
@@ -121,6 +124,7 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
+    @NonNull
     public byte[] findImageByPostId(long postId) throws ImageNotFoundException {
 
         return cache.getCachedImage(postId).orElseGet(() -> {
@@ -186,28 +190,28 @@ public class PostService {
     public void rate(long postId, boolean isNewRatingPositive)
             throws PostNotFoundException {
 
-        final var authentication = SecurityContextHolder.getContext().getAuthentication();
-        final var userId = (long) authentication.getPrincipal();
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        var userId = (long) authentication.getPrincipal();
 
         long delta = isNewRatingPositive ? 1L : -1L;
         try {
             var karmaScore = karmaScoreService.findById(new KarmaKey(userId, postId));
-            final boolean isOldRatingPositive = karmaScore.getIsPositive();
+            boolean isOldRatingPositive = karmaScore.isPositive();
             if (isOldRatingPositive == isNewRatingPositive) {
                 return; // Requested visibility is already in place.
             }
-            karmaScore.setIsPositive(isNewRatingPositive);
+            karmaScore.setPositive(isNewRatingPositive);
             delta = isOldRatingPositive ? -2L : 2L;
         } catch (KarmaScoreNotFoundException ex) {
             karmaScoreService.create(userId, postId, isNewRatingPositive);
         }
 
-        final int rowsAffected = repository.addKarmaScoreToPost(postId, delta);
+        int rowsAffected = repository.addKarmaScoreToPost(postId, delta);
         if (rowsAffected == 0) {
             throw new PostNotFoundException();
         }
 
-        final OptionalDouble optionalNewKarmaScore = cache.updateKarmaScoreIfPresent(postId, (double) delta);
+        OptionalDouble optionalNewKarmaScore = cache.updateKarmaScoreIfPresent(postId, (double) delta);
         if (optionalNewKarmaScore.isEmpty()) { // this means that this post is not cached
             cacheHandler.loadPostDataToCacheIfKarmaScoreIsHighEnough(postId);
         }
@@ -218,17 +222,18 @@ public class PostService {
      * @throws KarmaScoreNotFoundException This exception is thrown when KarmaScore entity is not found
      */
     @Transactional
+    @NonNull
     public void unrate(long postId) throws KarmaScoreNotFoundException, PostNotFoundException {
 
-        final var authentication = SecurityContextHolder.getContext().getAuthentication();
-        final var userId = (long) authentication.getPrincipal();
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        var userId = (long) authentication.getPrincipal();
 
-        final var karmaKey = new KarmaKey(userId, postId);
-        final var karmaScore = karmaScoreService.findById(karmaKey);
+        var karmaKey = new KarmaKey(userId, postId);
+        var karmaScore = karmaScoreService.findById(karmaKey);
 
-        final long delta = karmaScore.getIsPositive() ? -1L : 1L;
+        long delta = karmaScore.isPositive() ? -1L : 1L;
 
-        final int rowsAffected = repository.addKarmaScoreToPost(postId, delta);
+        int rowsAffected = repository.addKarmaScoreToPost(postId, delta);
         if (rowsAffected == 0) {
             throw new PostNotFoundException();
         }
@@ -242,6 +247,7 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
+    @NonNull
     public Visibility findVisibility(long postId) throws PostNotFoundException {
 
         Optional<VisibilityOnlyDto> optionalVisibility = repository.findVisibilityById(postId);
@@ -252,6 +258,7 @@ public class PostService {
     }
 
     @Transactional
+    @NonNull
     public void changeVisibility(
             long postId,
             @NonNull Visibility visibility
@@ -270,7 +277,7 @@ public class PostService {
             }
         }
 
-        final int rowsAffected = repository.changeVisibilityById(postId, visibility);
+        int rowsAffected = repository.changeVisibilityById(postId, visibility);
         if (rowsAffected == 0) {
             throw new PostNotFoundException();
         }
@@ -283,6 +290,7 @@ public class PostService {
     }
 
     @Transactional
+    @NonNull
     public void changeOwnedPostVisibility(long postId, @NonNull Visibility visibility)
             throws PostNotFoundException, PostNotFoundOrClientIsNotOwnerException, InsufficientRoleException {
 
@@ -292,8 +300,8 @@ public class PostService {
         var optionalPostDtoWithImageData = repository.findPostDtoWithImageDataByIdAndUserId(postId, clientId);
         optionalPostDtoWithImageData.ifPresentOrElse(
                 post -> {
-                    final boolean isVisibilityDeleted = post.postDto().getVisibility().equals(Visibility.DELETED);
-                    final boolean isUserAdmin = authentication.getAuthorities()
+                    boolean isVisibilityDeleted = post.postDto().getVisibility().equals(Visibility.DELETED);
+                    boolean isUserAdmin = authentication.getAuthorities()
                             .contains(new SimpleGrantedAuthority(Role.ADMIN.name()));
 
                     if (isVisibilityDeleted && !isUserAdmin) {

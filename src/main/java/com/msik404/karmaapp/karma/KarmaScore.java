@@ -4,16 +4,15 @@ import com.msik404.karmaapp.post.Post;
 import com.msik404.karmaapp.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.lang.NonNull;
 
 @Entity
 @Table(name = "karma_scores")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class KarmaScore {
 
     @EmbeddedId
@@ -29,6 +28,14 @@ public class KarmaScore {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    private Boolean isPositive;
+    private boolean isPositive;
+
+    public KarmaScore(@NonNull User user, @NonNull Post post, boolean isPositive) {
+
+        this.id = new KarmaKey(user.getId(), post.getId());
+        this.user = user;
+        this.post = post;
+        this.isPositive = isPositive;
+    }
 
 }

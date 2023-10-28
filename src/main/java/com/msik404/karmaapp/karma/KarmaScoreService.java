@@ -22,11 +22,11 @@ public class KarmaScoreService {
     // WARNING THERE MAY BE possible errors when entity with that KarmaKey exists
     public KarmaScore create(long userId, long postId, boolean isPositive) {
 
-        var karmaScore = KarmaScore.builder()
-                .id(new KarmaKey(userId, postId))
-                .user(entityManager.getReference(User.class, userId))
-                .post(entityManager.getReference(Post.class, postId))
-                .isPositive(isPositive).build();
+        var karmaScore = new KarmaScore(
+                entityManager.getReference(User.class, userId),
+                entityManager.getReference(Post.class, postId),
+                isPositive
+        );
         return repository.save(karmaScore);
     }
 
