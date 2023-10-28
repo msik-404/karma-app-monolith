@@ -4,22 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.msik404.karmaapp.auth.exception.InsufficientRoleException;
 import com.msik404.karmaapp.karma.exception.KarmaScoreNotFoundException;
 import com.msik404.karmaapp.position.ScrollPosition;
 import com.msik404.karmaapp.post.dto.PostCreationRequest;
 import com.msik404.karmaapp.post.dto.PostRatingResponse;
 import com.msik404.karmaapp.post.dto.PostResponse;
-import com.msik404.karmaapp.post.exception.FileProcessingException;
-import com.msik404.karmaapp.post.exception.ImageNotFoundException;
-import com.msik404.karmaapp.post.exception.InternalServerErrorException;
-import com.msik404.karmaapp.post.exception.PostNotFoundException;
+import com.msik404.karmaapp.post.exception.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -87,6 +85,7 @@ public class PostController {
         return postService.findPaginatedPostRatings(size, List.of(Visibility.ACTIVE), position, username);
     }
 
+    @NonNull
     private List<Visibility> createVisibilityList(boolean active, boolean hidden, boolean deleted) {
 
         List<Visibility> visibilities = new ArrayList<>();
@@ -225,42 +224,54 @@ public class PostController {
     }
 
     @PostMapping("user/posts/{postId}/hide")
-    public ResponseEntity<Void> hideByUser(@PathVariable Long postId) throws AccessDeniedException, PostNotFoundException {
+    public ResponseEntity<Void> hideByUser(
+            @PathVariable Long postId
+    ) throws InsufficientRoleException, PostNotFoundOrClientIsNotOwnerException, PostNotFoundException {
 
         postService.changeOwnedPostVisibility(postId, Visibility.HIDDEN);
         return ResponseEntity.ok(null);
     }
 
     @PostMapping("user/posts/{postId}/unhide")
-    public ResponseEntity<Void> unhideByUser(@PathVariable Long postId) throws AccessDeniedException, PostNotFoundException {
+    public ResponseEntity<Void> unhideByUser(
+            @PathVariable Long postId
+    ) throws InsufficientRoleException, PostNotFoundOrClientIsNotOwnerException, PostNotFoundException {
 
         postService.changeOwnedPostVisibility(postId, Visibility.ACTIVE);
         return ResponseEntity.ok(null);
     }
 
     @PostMapping("mod/posts/{postId}/hide")
-    public ResponseEntity<Void> hideByMod(@PathVariable Long postId) throws PostNotFoundException {
+    public ResponseEntity<Void> hideByMod(
+            @PathVariable Long postId
+    ) throws InsufficientRoleException, PostNotFoundException {
 
         postService.changeVisibility(postId, Visibility.HIDDEN);
         return ResponseEntity.ok(null);
     }
 
     @PostMapping("user/posts/{postId}/delete")
-    public ResponseEntity<Void> deleteByUser(@PathVariable Long postId) throws AccessDeniedException, PostNotFoundException {
+    public ResponseEntity<Void> deleteByUser(
+            @PathVariable Long postId
+    ) throws InsufficientRoleException, PostNotFoundOrClientIsNotOwnerException, PostNotFoundException {
 
         postService.changeOwnedPostVisibility(postId, Visibility.DELETED);
         return ResponseEntity.ok(null);
     }
 
     @PostMapping("admin/posts/{postId}/delete")
-    public ResponseEntity<Void> deleteByAdmin(@PathVariable Long postId) throws AccessDeniedException, PostNotFoundException {
+    public ResponseEntity<Void> deleteByAdmin(
+            @PathVariable Long postId
+    ) throws InsufficientRoleException, PostNotFoundException {
 
         postService.changeVisibility(postId, Visibility.DELETED);
         return ResponseEntity.ok(null);
     }
 
     @PostMapping("admin/posts/{postId}/activate")
-    public ResponseEntity<Void> activateByAdmin(@PathVariable Long postId) throws AccessDeniedException, PostNotFoundException {
+    public ResponseEntity<Void> activateByAdmin(
+            @PathVariable Long postId
+    ) throws InsufficientRoleException, PostNotFoundException {
 
         postService.changeVisibility(postId, Visibility.ACTIVE);
         return ResponseEntity.ok(null);
