@@ -10,7 +10,6 @@ import com.msik404.karmaapp.user.exception.UserNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,14 +21,13 @@ public class UserController {
 
     private final UserService userService;
 
-    @PutMapping("user/users/{userId}")
+    @PutMapping("user/users")
     public ResponseEntity<UserUpdateRequestWithUserPrivilege> updateWithUserPrivilege(
-            @PathVariable Long userId,
             @Valid @RequestBody UserUpdateRequestWithUserPrivilege request)
-            throws AccessDeniedException, NoFieldSetException, DuplicateEmailException,
+            throws NoFieldSetException, DuplicateEmailException,
             DuplicateUnexpectedFieldException, UserNotFoundException {
 
-        return ResponseEntity.ok(userService.updateWithUserPrivilege(userId, request));
+        return ResponseEntity.ok(userService.updateWithUserPrivilege(request));
     }
 
     @PutMapping("admin/users/{userId}")

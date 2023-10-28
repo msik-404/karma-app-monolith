@@ -10,7 +10,6 @@ import com.msik404.karmaapp.user.exception.UserNotFoundException;
 import com.msik404.karmaapp.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -32,25 +31,16 @@ public class UserService {
                 () -> new UsernameNotFoundException("User with that username was not found"));
     }
 
-    public Boolean sameAsAuthenticatedUser(long id) {
-
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        var userId = (long) authentication.getPrincipal();
-        return userId == id;
-    }
-
     @Transactional
     public UserUpdateRequestWithUserPrivilege updateWithUserPrivilege(
-            long userId,
             @NonNull UserUpdateRequestWithUserPrivilege request)
-            throws NoFieldSetException, AccessDeniedException, DuplicateEmailException, DuplicateUsernameException,
+            throws NoFieldSetException, DuplicateEmailException, DuplicateUsernameException,
             DuplicateUnexpectedFieldException, UserNotFoundException {
 
-        if (!sameAsAuthenticatedUser(userId)) {
-            throw new AccessDeniedException("Access denied");
-        }
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        var clientId = (long) authentication.getPrincipal();
 
-        int rowsAffected = userRepository.updateNonNull(userId, request);
+        int rowsAffected = userRepository.updateNonNull(clientId, request);
         if (rowsAffected == 0) {
             throw new UserNotFoundException();
         }
