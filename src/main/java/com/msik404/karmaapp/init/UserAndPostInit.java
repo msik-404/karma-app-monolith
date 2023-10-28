@@ -47,16 +47,16 @@ public class UserAndPostInit implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
 
         var random = new Random();
 
-        final int insertsAmount = Math.ceilDiv(USER_AMOUNT, MAX_SINGLE_INSERT_SIZE);
+        int insertsAmount = Math.ceilDiv(USER_AMOUNT, MAX_SINGLE_INSERT_SIZE);
         for (int insertionIdx = 0; insertionIdx < insertsAmount; insertionIdx++) {
             List<User> usersToSave = new ArrayList<>();
             List<Post> postsToSave = new ArrayList<>();
-            final int currLow = insertionIdx * MAX_SINGLE_INSERT_SIZE;
-            final int currHigh = Math.min((insertionIdx + 1) * MAX_SINGLE_INSERT_SIZE, USER_AMOUNT);
+            int currLow = insertionIdx * MAX_SINGLE_INSERT_SIZE;
+            int currHigh = Math.min((insertionIdx + 1) * MAX_SINGLE_INSERT_SIZE, USER_AMOUNT);
             for (int userId = currLow; userId < currHigh; userId++) {
                 var user = getUserForInserting(String.format("username_%d", userId));
 
@@ -67,7 +67,8 @@ public class UserAndPostInit implements CommandLineRunner {
                     var post = new Post(
                             String.format("Example headline: %d of user: %d", postId, userId),
                             String.format("Example text: %d of user: %d", postId, userId),
-                            user
+                            user,
+                            null
                     );
                     post.setKarmaScore(random.nextLong(MAX_KARMA_SCORE) - random.nextLong(MAX_KARMA_SCORE));
                     post.setVisibility(VISIBILITY_OPTIONS[random.nextInt(VISIBILITY_OPTIONS.length)]);

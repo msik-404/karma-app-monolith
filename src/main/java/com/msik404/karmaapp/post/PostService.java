@@ -151,9 +151,8 @@ public class PostService {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         var clientId = (long) authentication.getPrincipal();
 
-        var newPost = new Post(request.headline(), request.text(), userRepository.getReferenceById(clientId));
-
         try {
+            byte[] imageData = null;
             if (!image.isEmpty()) {
                 // Load the image from the multipart file
                 var bufferedImage = ImageIO.read(image.getInputStream());
@@ -165,15 +164,16 @@ public class PostService {
                 // Write the compressed image data to the ByteArrayOutputStream
                 ImageIO.write(bufferedImage, "jpeg", byteArrayOutputStream);
                 // Set the compressed image data to the newPost
-                newPost.setImageData(byteArrayOutputStream.toByteArray());
+                imageData = byteArrayOutputStream.toByteArray();
             }
+            repository.save(new Post(
+                    request.headline(),
+                    request.text(),
+                    userRepository.getReferenceById(clientId),
+                    imageData
+            ));
         } catch (IOException ex) {
             throw new FileProcessingException();
-        }
-
-        Post persistedPost = repository.save(newPost);
-        if (persistedPost.getImageData() != null) {
-            cache.cacheImage(persistedPost.getId(), persistedPost.getImageData());
         }
     }
 

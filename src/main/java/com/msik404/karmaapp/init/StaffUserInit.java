@@ -32,7 +32,7 @@ public class StaffUserInit implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
 
         if (repository.findByUsername(ADMIN_USERNAME).isEmpty()) {
             repository.save(getUserForInserting(ADMIN_USERNAME, Role.ADMIN));

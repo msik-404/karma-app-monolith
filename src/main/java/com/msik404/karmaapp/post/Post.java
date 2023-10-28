@@ -49,13 +49,14 @@ public class Post implements ComparablePost {
     @Basic(fetch = FetchType.LAZY)
     private byte[] imageData;
 
-    public Post(@Nullable String headline, @Nullable String text, @NonNull User user) {
+    public Post(@Nullable String headline, @Nullable String text, @NonNull User user, @Nullable byte[] imageData) {
 
         this.headline = headline;
         this.text = text;
         this.karmaScore = 0L;
         this.visibility = Visibility.ACTIVE;
         this.user = user;
+        this.imageData = imageData;
     }
 
 }
