@@ -20,14 +20,15 @@ public class StaffUserInit implements CommandLineRunner {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     User getUserForInserting(@NonNull String username, @NonNull Role role) {
-        return User.builder()
-                .username(username)
-                .email(String.format("karma-app.%s@gmail.com", username))
-                .password(bCryptPasswordEncoder.encode(username))
-                .role(role)
-                .firstName(username)
-                .lastName(username)
-                .build();
+
+        return new User(
+                username,
+                String.format("karma-app.%s@gmail.com", username),
+                bCryptPasswordEncoder.encode(username),
+                role,
+                username,
+                username
+        );
     }
 
     @Override

@@ -40,15 +40,14 @@ public class AuthService {
             throws DuplicateEmailException, DuplicateUsernameException, DuplicateUnexpectedFieldException {
 
         try {
-            repository.save(User.builder()
-                    .username(request.username())
-                    .email(request.email())
-                    .password(bCryptPasswordEncoder.encode(request.password()))
-                    .role(Role.USER)
-                    // Nullable
-                    .firstName(request.firstName())
-                    .lastName(request.lastName())
-                    .build());
+            repository.save(new User(
+                    request.username(),
+                    request.email(),
+                    bCryptPasswordEncoder.encode(request.password()),
+                    Role.USER,
+                    request.firstName(),
+                    request.lastName()
+            ));
         } catch (DataIntegrityViolationException ex) {
             constraintExceptionsHandler.handle(ex, extractionStrategy, parseStrategy);
         }

@@ -414,7 +414,17 @@ class PostServiceTest {
         when(authentication.getPrincipal()).thenReturn(userId);
         SecurityContextHolder.setContext(securityContext);
 
-        User groundTruthUser = User.builder().id(10L).build();
+        var groundTruthUser = new User(
+                10L,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
 
         var groundTruthPost = new Post(
                 11L,
@@ -474,7 +484,17 @@ class PostServiceTest {
         when(authentication.getPrincipal()).thenReturn(userId);
         SecurityContextHolder.setContext(securityContext);
 
-        User groundTruthUser = User.builder().id(10L).build();
+        var groundTruthUser = new User(
+                10L,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
 
         var groundTruthPost = new Post(
                 11L,
@@ -515,7 +535,17 @@ class PostServiceTest {
         when(authentication.getPrincipal()).thenReturn(userId);
         SecurityContextHolder.setContext(securityContext);
 
-        User groundTruthUser = User.builder().id(10L).build();
+        var groundTruthUser = new User(
+                10L,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
 
         var groundTruthPost = new Post(
                 11L,

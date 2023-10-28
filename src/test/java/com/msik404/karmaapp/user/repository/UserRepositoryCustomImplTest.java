@@ -90,14 +90,14 @@ class UserRepositoryCustomImplTest {
 
         final String username = TestingDataCreator.getTestingUsername(userId);
 
-        return User.builder()
-                .firstName(username)
-                .lastName(username)
-                .username(username)
-                .email(TestingDataCreator.getTestingEmail(username))
-                .password(bCryptPasswordEncoder.encode(username))
-                .role(TEST_ROLE)
-                .build();
+        return new User(
+                username,
+                TestingDataCreator.getTestingEmail(username),
+                bCryptPasswordEncoder.encode(username),
+                TEST_ROLE,
+                username,
+                username
+        );
     }
 
     @BeforeEach

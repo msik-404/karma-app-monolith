@@ -8,9 +8,10 @@ import com.msik404.karmaapp.post.Post;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,7 +21,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class User implements UserDetails {
 
     @Id
@@ -46,6 +46,22 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "user")
     private Set<KarmaScore> karmaScores;
+
+    public User(
+            @NonNull String username,
+            @NonNull String email,
+            @NonNull String password,
+            @NonNull Role role,
+            @Nullable String firstName,
+            @Nullable String lastName) {
+
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

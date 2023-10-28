@@ -100,11 +100,15 @@ public class TestingDataCreator {
         String username = getTestingUsername(userId);
 
         // I ignore fields which will not be useful for query testing.
-        return User.builder()
-                .username(username)
-                .email(getTestingEmail(username))
-                .role(role)
-                .build();
+
+        return new User(
+                username,
+                getTestingEmail(username),
+                null,
+                role,
+                null,
+                null
+        );
     }
 
     @NonNull

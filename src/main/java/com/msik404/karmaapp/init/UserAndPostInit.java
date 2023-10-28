@@ -32,14 +32,18 @@ public class UserAndPostInit implements CommandLineRunner {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     User getUserForInserting(@NonNull String username) {
-        return User.builder()
-                .username(username)
-                .email(String.format("karma-app.%s@gmail.com", username))
-                .password(bCryptPasswordEncoder.encode(username))
-                .role(Role.USER)
-                .firstName(username)
-                .lastName(username)
-                .build();
+
+        return new User(
+                null,
+                username,
+                username,
+                username,
+                String.format("karma-app.%s@gmail.com", username),
+                bCryptPasswordEncoder.encode(username),
+                Role.USER,
+                null,
+                null
+        );
     }
 
     @Override
