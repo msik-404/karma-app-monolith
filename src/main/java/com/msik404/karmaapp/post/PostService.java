@@ -9,7 +9,7 @@ import java.util.OptionalDouble;
 
 import javax.imageio.ImageIO;
 
-import com.msik404.karmaapp.auth.InsufficientRoleException;
+import com.msik404.karmaapp.auth.exception.InsufficientRoleException;
 import com.msik404.karmaapp.karma.KarmaKey;
 import com.msik404.karmaapp.karma.KarmaScoreService;
 import com.msik404.karmaapp.karma.exception.KarmaScoreNotFoundException;

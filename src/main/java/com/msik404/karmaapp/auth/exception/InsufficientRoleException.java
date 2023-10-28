@@ -1,4 +1,4 @@
-package com.msik404.karmaapp.auth;
+package com.msik404.karmaapp.auth.exception;
 
 import com.msik404.karmaapp.exception.AbstractRestException;
 import org.springframework.http.HttpStatus;
