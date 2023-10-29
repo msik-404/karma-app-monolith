@@ -20,9 +20,9 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UserAndPostInit implements CommandLineRunner {
 
-    private static final int USER_AMOUNT = 3_000;
+    private static final int USER_AMOUNT = 300;
     private static final int MAX_SINGLE_INSERT_SIZE = 100;
-    private static final int MAX_KARMA_SCORE = 10_000;
+    private static final int MAX_KARMA_SCORE = 100;
     private static final int MAX_POSTS_PER_USER = 10;
     private static final int MIN_POSTS_PER_USER = 3;
     private static final Visibility[] VISIBILITY_OPTIONS = Visibility.class.getEnumConstants();
@@ -80,5 +80,7 @@ public class UserAndPostInit implements CommandLineRunner {
             userRepository.saveAll(usersToSave); // Save users in batch
             postRepository.saveAll(postsToSave); // Save posts in batch
         }
+
+        System.out.println("DONE");
     }
 }
