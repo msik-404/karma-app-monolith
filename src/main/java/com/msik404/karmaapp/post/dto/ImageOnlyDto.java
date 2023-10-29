@@ -1,6 +1,6 @@
 package com.msik404.karmaapp.post.dto;
 
-import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
-public record ImageOnlyDto(@NonNull byte[] imageData) {
+public record ImageOnlyDto(@Nullable byte[] imageData) {
 }

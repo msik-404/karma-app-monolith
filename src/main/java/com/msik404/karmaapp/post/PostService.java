@@ -131,11 +131,10 @@ public class PostService {
 
             Optional<ImageOnlyDto> optionalImageDto = repository.findImageById(postId);
 
-            ImageOnlyDto imageDto = optionalImageDto
-                    .orElseThrow(ImageNotFoundException::new);
+            ImageOnlyDto imageDto = optionalImageDto.orElseThrow(ImageNotFoundException::new);
 
             byte[] imageData = imageDto.imageData();
-            if (imageData.length == 0) {
+            if (imageData == null || imageData.length == 0) {
                 throw new ImageNotFoundException();
             }
             cache.cacheImage(postId, imageData);
