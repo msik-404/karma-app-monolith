@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.2
 
-from eclipse-temurin:20-jdk-alpine as build-stage
+from amazoncorretto:21 as build-stage
 
 WORKDIR /app
 
@@ -15,7 +15,7 @@ RUN --mount=type=cache,target=/root/.m2 ./mvnw install -DskipTests
 RUN java -Djarmode=layertools -jar target/*.jar extract
 
 # move to release stage
-from eclipse-temurin:20-jre-alpine as release-stage
+from amazoncorretto:21-alpine as release-stage
 
 WORKDIR /app
 # copy files from build-stage
