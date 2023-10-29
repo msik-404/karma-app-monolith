@@ -129,12 +129,12 @@ public class PostService {
 
         return cache.getCachedImage(postId).orElseGet(() -> {
 
-            Optional<ImageOnlyDto> optionalPostImageDataProjection = repository.findImageById(postId);
+            Optional<ImageOnlyDto> optionalImageDto = repository.findImageById(postId);
 
-            ImageOnlyDto postImageDataProjection = optionalPostImageDataProjection
+            ImageOnlyDto imageDto = optionalImageDto
                     .orElseThrow(ImageNotFoundException::new);
 
-            byte[] imageData = postImageDataProjection.imageData();
+            byte[] imageData = imageDto.imageData();
             if (imageData.length == 0) {
                 throw new ImageNotFoundException();
             }
