@@ -146,14 +146,14 @@ public class PostService {
     @Transactional
     public void create(
             @NonNull PostCreationRequest request,
-            @NonNull MultipartFile image) throws FileProcessingException {
+            @Nullable MultipartFile image) throws FileProcessingException {
 
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         var clientId = (long) authentication.getPrincipal();
 
         try {
             byte[] imageData = null;
-            if (!image.isEmpty()) {
+            if (image != null && !image.isEmpty()) {
                 // Load the image from the multipart file
                 var bufferedImage = ImageIO.read(image.getInputStream());
                 if (bufferedImage == null) {

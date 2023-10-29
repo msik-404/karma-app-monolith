@@ -11,6 +11,7 @@ import com.msik404.karmaapp.post.dto.PostCreationRequest;
 import com.msik404.karmaapp.post.dto.PostRatingResponse;
 import com.msik404.karmaapp.post.dto.PostResponse;
 import com.msik404.karmaapp.post.exception.*;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpHeaders;
@@ -201,8 +202,8 @@ public class PostController {
 
     @PostMapping("user/posts")
     public ResponseEntity<Void> create(
-            @RequestPart("json_data") PostCreationRequest jsonData,
-            @RequestPart("image") MultipartFile image) throws FileProcessingException {
+            @Valid @RequestPart("json_data") PostCreationRequest jsonData,
+            @RequestPart(value = "image", required = false) MultipartFile image) throws FileProcessingException {
 
         postService.create(jsonData, image);
         return ResponseEntity.ok(null);
