@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.msik404.karmaapp.RedisConfiguration;
 import com.msik404.karmaapp.TestingDataCreator;
 import com.msik404.karmaapp.TestingImageDataCreator;
+import com.msik404.karmaapp.position.ScrollPosition;
 import com.msik404.karmaapp.post.Visibility;
 import com.msik404.karmaapp.post.dto.PostDto;
 import org.junit.jupiter.api.AfterEach;
@@ -198,10 +199,11 @@ class PostRedisCacheTest {
         int nextSize = 2;
         int topSize = 2;
 
-        long lastPostScore = TEST_CACHED_POSTS.get(topSize - 1).getKarmaScore();
+        PostDto lastPost = TEST_CACHED_POSTS.get(topSize - 1);
+        ScrollPosition position = new ScrollPosition(lastPost.getId(), lastPost.getKarmaScore());
 
         // when
-        Optional<List<PostDto>> optionalNextCachedPosts = redisCache.findNextNCached(nextSize, lastPostScore);
+        Optional<List<PostDto>> optionalNextCachedPosts = redisCache.findNextNCached(nextSize, position);
 
         // then
         assertTrue(optionalNextCachedPosts.isPresent());
@@ -339,45 +341,43 @@ class PostRedisCacheTest {
     }
 
     @Test
-    void isKarmaScoreGreaterThanLowestScoreInZSet_KarmaScoreIsGreater_OptionalOfTrue() {
+    void isKarmaScoreGreaterThanLowestScoreInZSet_KarmaScoreIsGreater_True() {
 
         // given
         long karmaScore = 5;
 
         // when
-        Optional<Boolean> result = redisCache.isKarmaScoreGreaterThanLowestScoreInZSet(karmaScore);
+        boolean result = redisCache.isKarmaScoreGreaterThanLowestScoreInZSet(karmaScore);
 
         // then
-        assertTrue(result.isPresent());
-        assertTrue(result.get());
+        assertTrue(result);
     }
 
     @Test
-    void isKarmaScoreGreaterThanLowestScoreInZSet_KarmaScoreIsNotGreater_OptionalOfFalse() {
+    void isKarmaScoreGreaterThanLowestScoreInZSet_KarmaScoreIsNotGreater_False() {
 
         // given
         long karmaScore = -100;
 
         // when
-        Optional<Boolean> result = redisCache.isKarmaScoreGreaterThanLowestScoreInZSet(karmaScore);
+        boolean result = redisCache.isKarmaScoreGreaterThanLowestScoreInZSet(karmaScore);
 
         // then
-        assertTrue(result.isPresent());
-        assertFalse(result.get());
+        assertFalse(result);
     }
 
     @Test
-    void isKarmaScoreGreaterThanLowestScoreInZSet_CacheIsEmpty_OptionalEmpty() {
+    void isKarmaScoreGreaterThanLowestScoreInZSet_CacheIsEmpty_True() {
 
         // given
         redisConnectionFactory.getConnection().serverCommands().flushAll();
         long karmaScore = 404;
 
         // when
-        Optional<Boolean> result = redisCache.isKarmaScoreGreaterThanLowestScoreInZSet(karmaScore);
+        boolean result = redisCache.isKarmaScoreGreaterThanLowestScoreInZSet(karmaScore);
 
         // then
-        assertTrue(result.isEmpty());
+        assertTrue(result);
     }
 
     @Test

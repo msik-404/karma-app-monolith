@@ -8,7 +8,7 @@ import com.msik404.karmaapp.TestingImageDataCreator;
 import com.msik404.karmaapp.position.ScrollPosition;
 import com.msik404.karmaapp.post.Visibility;
 import com.msik404.karmaapp.post.dto.PostDto;
-import com.msik404.karmaapp.post.dto.PostDtoWithImageData;
+import com.msik404.karmaapp.post.dto.PostWithImageDataDto;
 import com.msik404.karmaapp.post.repository.PostRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -148,14 +148,14 @@ class PostRedisCacheHandlerServiceTest {
         boolean isCacheEmpty = false;
         when(cache.isEmpty()).thenReturn(isCacheEmpty);
 
-        when(cache.findNextNCached(size, pagination.karmaScore())).thenReturn(Optional.of(getPosts(size)));
+        when(cache.findNextNCached(size, pagination)).thenReturn(Optional.of(getPosts(size)));
 
         // when
         cacheHandler.findNextNHandler(size, visibilities, pagination);
 
         // then
         verify(cache).isEmpty();
-        verify(cache).findNextNCached(size, pagination.karmaScore());
+        verify(cache).findNextNCached(size, pagination);
         verify(repository, never()).findTopNPosts(size, visibilities);
     }
 
@@ -170,14 +170,14 @@ class PostRedisCacheHandlerServiceTest {
         boolean isCacheEmpty = false;
         when(cache.isEmpty()).thenReturn(isCacheEmpty);
 
-        when(cache.findNextNCached(size, pagination.karmaScore())).thenReturn(Optional.empty());
+        when(cache.findNextNCached(size, pagination)).thenReturn(Optional.empty());
 
         // when
         cacheHandler.findNextNHandler(size, visibilities, pagination);
 
         // then
         verify(cache).isEmpty();
-        verify(cache).findNextNCached(size, pagination.karmaScore());
+        verify(cache).findNextNCached(size, pagination);
         verify(repository).findNextNPosts(size, visibilities, pagination);
     }
 
@@ -216,7 +216,7 @@ class PostRedisCacheHandlerServiceTest {
         // then
         verify(cache).isEmpty();
         verify(cacheHandler).updateCache();
-        verify(cache, never()).findNextNCached(size, pagination.karmaScore());
+        verify(cache, never()).findNextNCached(size, pagination);
 
         assertEquals(size, results.size());
 
@@ -257,7 +257,7 @@ class PostRedisCacheHandlerServiceTest {
         // then
         verify(cache).isEmpty();
         verify(cacheHandler).updateCache();
-        verify(cache, never()).findNextNCached(size, pagination.karmaScore());
+        verify(cache, never()).findNextNCached(size, pagination);
 
         int startIdx = 4;
         List<PostDto> groundTruthNextPosts = groundTruthPosts.subList(startIdx, groundTruthPosts.size());
@@ -288,7 +288,7 @@ class PostRedisCacheHandlerServiceTest {
     }
 
     @Test
-    void loadPostDataToCacheIfKarmaScoreIsHighEnough_DtoIsFoundAndContainsImageDataAndScoreIsHighEnoughForCaching_DtoWithImageShouldBeCached() {
+    void loadPostDataToCacheIfKarmaScoreIsHighEnough_DtoIsFoundAndContainsImageDataAndScoreIsHighEnoughForCachingAndCacheIsNotEmpty_DtoWithImageShouldBeCached() {
 
         // given
         long postId = 404;
@@ -303,17 +303,18 @@ class PostRedisCacheHandlerServiceTest {
                 Visibility.ACTIVE
         );
 
-        var post = new PostDtoWithImageData(
+        var post = new PostWithImageDataDto(
                 postDto,
                 TestingImageDataCreator.getTestingImage()
         );
 
         when(repository.findPostDtoWithImageDataById(postId)).thenReturn(Optional.of(post));
-        when(cache.isKarmaScoreGreaterThanLowestScoreInZSet(karmaScore)).thenReturn(Optional.of(true));
+        when(cache.isKarmaScoreGreaterThanLowestScoreInZSet(karmaScore)).thenReturn(true);
         when(cache.insertPost(postDto, post.imageData())).thenReturn(true);
+        when(cache.getZSetSize()).thenReturn((long) PostRedisCache.getMaxCachedPosts());
 
         // when
-        assertTrue(cacheHandler.loadPostDataToCacheIfKarmaScoreIsHighEnough(postId));
+        assertTrue(cacheHandler.loadPostDataToCacheIfPossible(postId));
 
         // then
         verify(repository).findPostDtoWithImageDataById(postId);
@@ -322,7 +323,7 @@ class PostRedisCacheHandlerServiceTest {
     }
 
     @Test
-    void loadPostDataToCacheIfKarmaScoreIsHighEnough_DtoIsFoundAndDoesNotContainImageDataAndScoreIsHighEnoughForCaching_DtoWithImageShouldBeCached() {
+    void loadPostDataToCacheIfKarmaScoreIsHighEnough_DtoIsFoundAndDoesNotContainImageDataAndScoreIsHighEnoughForCachingAndCacheIsNotEmpty_DtoWithImageShouldBeCached() {
 
         // given
         long postId = 404;
@@ -337,17 +338,18 @@ class PostRedisCacheHandlerServiceTest {
                 Visibility.ACTIVE
         );
 
-        var post = new PostDtoWithImageData(
+        var post = new PostWithImageDataDto(
                 postDto,
                 TestingImageDataCreator.getTestingImage()
         );
 
         when(repository.findPostDtoWithImageDataById(postId)).thenReturn(Optional.of(post));
-        when(cache.isKarmaScoreGreaterThanLowestScoreInZSet(karmaScore)).thenReturn(Optional.of(true));
+        when(cache.isKarmaScoreGreaterThanLowestScoreInZSet(karmaScore)).thenReturn(true);
         when(cache.insertPost(postDto, post.imageData())).thenReturn(true);
+        when(cache.getZSetSize()).thenReturn((long) PostRedisCache.getMaxCachedPosts());
 
         // when
-        assertTrue(cacheHandler.loadPostDataToCacheIfKarmaScoreIsHighEnough(postId));
+        assertTrue(cacheHandler.loadPostDataToCacheIfPossible(postId));
 
         // then
         verify(repository).findPostDtoWithImageDataById(postId);
@@ -356,7 +358,7 @@ class PostRedisCacheHandlerServiceTest {
     }
 
     @Test
-    void loadPostDataToCacheIfKarmaScoreIsHighEnough_DtoIsFoundAndContainsImageDataAndScoreIsNotHighEnoughForCaching_DtoWithImageShouldNotBeCached() {
+    void loadPostDataToCacheIfKarmaScoreIsHighEnough_DtoIsFoundAndContainsImageDataAndScoreIsNotHighEnoughForCachingAndCacheIsNotEmpty_DtoWithImageShouldNotBeCached() {
 
         // given
         long postId = 404;
@@ -371,16 +373,17 @@ class PostRedisCacheHandlerServiceTest {
                 Visibility.ACTIVE
         );
 
-        var post = new PostDtoWithImageData(
+        var post = new PostWithImageDataDto(
                 postDto,
                 TestingImageDataCreator.getTestingImage()
         );
 
         when(repository.findPostDtoWithImageDataById(postId)).thenReturn(Optional.of(post));
-        when(cache.isKarmaScoreGreaterThanLowestScoreInZSet(karmaScore)).thenReturn(Optional.of(false));
+        when(cache.isKarmaScoreGreaterThanLowestScoreInZSet(karmaScore)).thenReturn(false);
+        when(cache.getZSetSize()).thenReturn((long) PostRedisCache.getMaxCachedPosts());
 
         // when
-        assertFalse(cacheHandler.loadPostDataToCacheIfKarmaScoreIsHighEnough(postId));
+        assertFalse(cacheHandler.loadPostDataToCacheIfPossible(postId));
 
         // then
         verify(repository).findPostDtoWithImageDataById(postId);
@@ -389,7 +392,7 @@ class PostRedisCacheHandlerServiceTest {
     }
 
     @Test
-    void loadPostDataToCacheIfKarmaScoreIsHighEnough_DtoIsFoundAndContainsImageDataAndCacheIsEmpty_DtoWithImageShouldNotBeCached() {
+    void loadPostDataToCacheIfKarmaScoreIsHighEnough_DtoIsFoundAndContainsImageDataAndCacheIsEmpty_DtoWithImageShouldBeCached() {
 
         // given
         long postId = 404;
@@ -404,21 +407,21 @@ class PostRedisCacheHandlerServiceTest {
                 Visibility.ACTIVE
         );
 
-        var post = new PostDtoWithImageData(
+        var post = new PostWithImageDataDto(
                 postDto,
                 TestingImageDataCreator.getTestingImage()
         );
 
         when(repository.findPostDtoWithImageDataById(postId)).thenReturn(Optional.of(post));
-        when(cache.isKarmaScoreGreaterThanLowestScoreInZSet(karmaScore)).thenReturn(Optional.empty());
+        when(cache.getZSetSize()).thenReturn(0L);
 
         // when
-        assertFalse(cacheHandler.loadPostDataToCacheIfKarmaScoreIsHighEnough(postId));
+        assertFalse(cacheHandler.loadPostDataToCacheIfPossible(postId));
 
         // then
         verify(repository).findPostDtoWithImageDataById(postId);
-        verify(cache).isKarmaScoreGreaterThanLowestScoreInZSet(karmaScore);
-        verify(cache, never()).insertPost(postDto, post.imageData());
+        verify(cache, never()).isKarmaScoreGreaterThanLowestScoreInZSet(karmaScore);
+        verify(cache).insertPost(postDto, post.imageData());
     }
 
     @Test
@@ -429,7 +432,7 @@ class PostRedisCacheHandlerServiceTest {
         when(repository.findPostDtoWithImageDataById(postId)).thenReturn(Optional.empty());
 
         // when
-        assertFalse(cacheHandler.loadPostDataToCacheIfKarmaScoreIsHighEnough(postId));
+        assertFalse(cacheHandler.loadPostDataToCacheIfPossible(postId));
 
         // then
         verify(repository).findPostDtoWithImageDataById(postId);

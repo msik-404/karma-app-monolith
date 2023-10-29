@@ -4,9 +4,9 @@ import com.msik404.karmaapp.post.Visibility;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
-public record PostDtoWithImageData(@NonNull PostDto postDto, @Nullable byte[] imageData) {
+public record PostWithImageDataDto(@NonNull PostDto postDto, @Nullable byte[] imageData) {
 
-    public PostDtoWithImageData(
+    public PostWithImageDataDto(
             long id,
             long userId,
             @NonNull String username,

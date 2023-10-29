@@ -9,41 +9,42 @@ import com.msik404.karmaapp.post.Visibility;
 import com.msik404.karmaapp.post.comparator.BasicComparablePost;
 import com.msik404.karmaapp.post.comparator.PostComparator;
 import com.msik404.karmaapp.post.dto.PostDto;
-import com.msik404.karmaapp.post.dto.PostDtoWithImageData;
+import com.msik404.karmaapp.post.dto.PostWithImageDataDto;
+import com.msik404.karmaapp.post.exception.PostNotFoundException;
 import com.msik404.karmaapp.post.repository.PostRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class PostRedisCacheHandlerService {
-
-    private static final int CACHED_POSTS_AMOUNT = 10_000;
 
     private final PostRedisCache cache;
     private final PostRepository repository;
-
-    public PostRedisCacheHandlerService(PostRedisCache cache, PostRepository repository) {
-
-        this.cache = cache;
-        this.repository = repository;
-    }
 
     private static boolean isOnlyActive(@NonNull List<Visibility> visibilities) {
         return visibilities.size() == 1 && visibilities.contains(Visibility.ACTIVE);
     }
 
+    @NonNull
     public List<PostDto> updateCache() {
 
         final List<PostDto> newValuesForCache = repository.findTopNPosts(
-                CACHED_POSTS_AMOUNT, List.of(Visibility.ACTIVE));
+                PostRedisCache.getMaxCachedPosts(),
+                List.of(Visibility.ACTIVE)
+        );
 
-        cache.reinitializeCache(newValuesForCache);
+        if (!newValuesForCache.isEmpty()) {
+            cache.reinitializeCache(newValuesForCache);
+        }
 
         return newValuesForCache;
     }
 
     @Transactional(readOnly = true)
+    @NonNull
     public List<PostDto> findTopNHandler(int size, @NonNull List<Visibility> visibilities) {
 
         List<PostDto> results;
@@ -54,7 +55,8 @@ public class PostRedisCacheHandlerService {
                 int endBound = Math.min(size, newValuesForCache.size());
                 results = newValuesForCache.subList(0, endBound);
             } else {
-                results = cache.findTopNCached(size).orElseGet(() -> repository.findTopNPosts(size, visibilities));
+                results = cache.findTopNCached(size)
+                        .orElseGet(() -> repository.findTopNPosts(size, visibilities));
             }
         } else {
             results = repository.findTopNPosts(size, visibilities);
@@ -80,6 +82,7 @@ public class PostRedisCacheHandlerService {
     }
 
     @Transactional(readOnly = true)
+    @NonNull
     public List<PostDto> findNextNHandler(
             int size,
             @NonNull List<Visibility> visibilities,
@@ -95,7 +98,7 @@ public class PostRedisCacheHandlerService {
                 int endBound = Math.min(firstSmallerElementIdx + size, newValuesForCache.size());
                 results = newValuesForCache.subList(firstSmallerElementIdx, endBound);
             } else {
-                results = cache.findNextNCached(size, position.karmaScore())
+                results = cache.findNextNCached(size, position)
                         .orElseGet(() -> repository.findNextNPosts(size, visibilities, position));
             }
         } else {
@@ -105,35 +108,45 @@ public class PostRedisCacheHandlerService {
         return results;
     }
 
+    /*
+     * Post will be cached if less than CACHED_POSTS_AMOUNT posts are cached or input post score is higher than
+     * the lowest cached post score. Because of this functionality there may be more cached posts than specified
+     * amount allows, but I doubt that this would be problematic, because cache gets refreshed every PostRedisCache.TIMEOUT.
+     *
+     * @param post Input post with image data to be cached.
+     * @return true if cached else false.
+     */
     @Transactional(readOnly = true)
-    public boolean loadToCacheIfKarmaScoreIsHighEnough(@NonNull PostDtoWithImageData post) {
+    public boolean loadToCacheIfPossible(@NonNull PostWithImageDataDto post) {
 
-        Optional<Boolean> optionalIsHighEnough = cache.isKarmaScoreGreaterThanLowestScoreInZSet(
-                post.postDto().getKarmaScore());
+        long cacheSize = cache.getZSetSize();
 
-        if (optionalIsHighEnough.isEmpty()) {
-            return false;
-        }
+        if (cacheSize >= PostRedisCache.getMaxCachedPosts()) {
 
-        boolean isHighEnough = optionalIsHighEnough.get();
-        if (!isHighEnough) {
-            return false;
+            boolean isAccepted = cache.isKarmaScoreGreaterThanLowestScoreInZSet(
+                    post.postDto().getKarmaScore());
+
+            if (!isAccepted) {
+                return false;
+            }
         }
 
         return cache.insertPost(post.postDto(), post.imageData());
     }
 
+    /**
+     * @param postId Id of post with image data if found to be cached.
+     * @return true if cached else false.
+     * @throws PostNotFoundException thrown when post with requested postId is not found.
+     */
     @Transactional(readOnly = true)
-    public boolean loadPostDataToCacheIfKarmaScoreIsHighEnough(long postId) {
+    public boolean loadPostDataToCacheIfPossible(long postId) {
 
-        Optional<PostDtoWithImageData> optionalPost = repository.findPostDtoWithImageDataById(postId);
-
+        Optional<PostWithImageDataDto> optionalPost = repository.findPostDtoWithImageDataById(postId);
         if (optionalPost.isEmpty()) {
             return false;
         }
-
-        PostDtoWithImageData post = optionalPost.get();
-        return loadToCacheIfKarmaScoreIsHighEnough(post);
+        return loadToCacheIfPossible(optionalPost.get());
     }
 
 }

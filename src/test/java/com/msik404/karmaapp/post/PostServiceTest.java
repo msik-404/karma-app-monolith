@@ -19,7 +19,7 @@ import com.msik404.karmaapp.post.cache.PostRedisCacheHandlerService;
 import com.msik404.karmaapp.post.dto.ImageOnlyDto;
 import com.msik404.karmaapp.post.dto.PostCreationRequest;
 import com.msik404.karmaapp.post.dto.PostDto;
-import com.msik404.karmaapp.post.dto.PostDtoWithImageData;
+import com.msik404.karmaapp.post.dto.PostWithImageDataDto;
 import com.msik404.karmaapp.post.exception.FileProcessingException;
 import com.msik404.karmaapp.post.exception.ImageNotFoundException;
 import com.msik404.karmaapp.post.exception.PostNotFoundException;
@@ -388,7 +388,7 @@ class PostServiceTest {
     }
 
     @Test
-    void create_ImageIsNotEmpty_PostWithImageShouldBeSavedAndImageShouldBeCached() {
+    void create_ImageIsNotEmpty_PostWithImageShouldBeSaved() {
 
         // given
         var request = new PostCreationRequest("headline", "text");
@@ -449,7 +449,6 @@ class PostServiceTest {
 
         // then
         verify(repository).save(postCaptor.capture());
-        verify(cache).cacheImage(groundTruthPost.getId(), groundTruthPost.getImageData());
 
         Post postCaptorValue = postCaptor.getValue();
         // post before repository save should have null id
@@ -496,25 +495,11 @@ class PostServiceTest {
                 null
         );
 
-        var groundTruthPost = new Post(
-                11L,
-                request.headline(),
-                request.text(),
-                0L,
-                Visibility.ACTIVE,
-                groundTruthUser,
-                null,
-                null
-        );
-
-        when(userRepository.getReferenceById(userId)).thenReturn(groundTruthUser);
-
         // when
         assertThrows(FileProcessingException.class, () -> postService.create(request, image));
 
         // then
         verify(repository, never()).save(any(Post.class));
-        verify(cache, never()).cacheImage(groundTruthPost.getId(), groundTruthPost.getImageData());
     }
 
     @Test
@@ -603,7 +588,7 @@ class PostServiceTest {
 
         when(cache.updateKarmaScoreIfPresent(postId, delta)).thenReturn(OptionalDouble.empty());
 
-        when(cacheHandler.loadPostDataToCacheIfKarmaScoreIsHighEnough(postId)).thenReturn(true);
+        when(cacheHandler.loadPostDataToCacheIfPossible(postId)).thenReturn(true);
 
         // when
         postService.rate(postId, isNewRatingPositive);
@@ -613,7 +598,7 @@ class PostServiceTest {
         verify(karmaScoreService, never()).create(userId, postId, isNewRatingPositive);
         verify(repository).addKarmaScoreToPost(postId, delta);
         verify(cache).updateKarmaScoreIfPresent(postId, (double) delta);
-        verify(cacheHandler).loadPostDataToCacheIfKarmaScoreIsHighEnough(postId);
+        verify(cacheHandler).loadPostDataToCacheIfPossible(postId);
     }
 
     @Test
@@ -643,7 +628,7 @@ class PostServiceTest {
 
         when(cache.updateKarmaScoreIfPresent(postId, delta)).thenReturn(OptionalDouble.empty());
 
-        when(cacheHandler.loadPostDataToCacheIfKarmaScoreIsHighEnough(postId)).thenReturn(true);
+        when(cacheHandler.loadPostDataToCacheIfPossible(postId)).thenReturn(true);
 
         // when
         postService.rate(postId, isNewRatingPositive);
@@ -653,7 +638,7 @@ class PostServiceTest {
         verify(karmaScoreService, never()).create(userId, postId, isNewRatingPositive);
         verify(repository).addKarmaScoreToPost(postId, delta);
         verify(cache).updateKarmaScoreIfPresent(postId, (double) delta);
-        verify(cacheHandler).loadPostDataToCacheIfKarmaScoreIsHighEnough(postId);
+        verify(cacheHandler).loadPostDataToCacheIfPossible(postId);
     }
 
     @Test
@@ -681,7 +666,7 @@ class PostServiceTest {
 
         when(cache.updateKarmaScoreIfPresent(postId, delta)).thenReturn(OptionalDouble.empty());
 
-        when(cacheHandler.loadPostDataToCacheIfKarmaScoreIsHighEnough(postId)).thenReturn(true);
+        when(cacheHandler.loadPostDataToCacheIfPossible(postId)).thenReturn(true);
 
         // when
         postService.rate(postId, isNewRatingPositive);
@@ -691,7 +676,7 @@ class PostServiceTest {
         verify(karmaScoreService).create(userId, postId, isNewRatingPositive);
         verify(repository).addKarmaScoreToPost(postId, delta);
         verify(cache).updateKarmaScoreIfPresent(postId, (double) delta);
-        verify(cacheHandler).loadPostDataToCacheIfKarmaScoreIsHighEnough(postId);
+        verify(cacheHandler).loadPostDataToCacheIfPossible(postId);
     }
 
     @Test
@@ -725,7 +710,7 @@ class PostServiceTest {
         verify(karmaScoreService).create(userId, postId, isNewRatingPositive);
         verify(repository).addKarmaScoreToPost(postId, delta);
         verify(cache, never()).updateKarmaScoreIfPresent(postId, (double) delta);
-        verify(cacheHandler, never()).loadPostDataToCacheIfKarmaScoreIsHighEnough(postId);
+        verify(cacheHandler, never()).loadPostDataToCacheIfPossible(postId);
     }
 
     @Test
@@ -790,7 +775,7 @@ class PostServiceTest {
         verify(karmaScoreService).create(userId, postId, isNewRatingPositive);
         verify(repository).addKarmaScoreToPost(postId, delta);
         verify(cache).updateKarmaScoreIfPresent(postId, (double) delta);
-        verify(cacheHandler, never()).loadPostDataToCacheIfKarmaScoreIsHighEnough(postId);
+        verify(cacheHandler, never()).loadPostDataToCacheIfPossible(postId);
     }
 
     @Test
@@ -826,7 +811,7 @@ class PostServiceTest {
         verify(repository).addKarmaScoreToPost(postId, delta);
         verify(karmaScoreService).deleteById(karmaKey);
         verify(cache).updateKarmaScoreIfPresent(postId, (double) delta);
-        verify(cacheHandler, never()).loadPostDataToCacheIfKarmaScoreIsHighEnough(postId);
+        verify(cacheHandler, never()).loadPostDataToCacheIfPossible(postId);
     }
 
     @Test
@@ -862,7 +847,7 @@ class PostServiceTest {
         verify(repository).addKarmaScoreToPost(postId, delta);
         verify(karmaScoreService).deleteById(karmaKey);
         verify(cache).updateKarmaScoreIfPresent(postId, (double) delta);
-        verify(cacheHandler).loadPostDataToCacheIfKarmaScoreIsHighEnough(postId);
+        verify(cacheHandler).loadPostDataToCacheIfPossible(postId);
     }
 
     @Test
@@ -938,7 +923,7 @@ class PostServiceTest {
         // then
         verify(repository).changeVisibilityById(postId, visibility);
         verify(cache).deletePostFromCache(postId);
-        verify(cacheHandler, never()).loadPostDataToCacheIfKarmaScoreIsHighEnough(postId);
+        verify(cacheHandler, never()).loadPostDataToCacheIfPossible(postId);
     }
 
     @Test
@@ -964,7 +949,7 @@ class PostServiceTest {
         // then
         verify(repository).changeVisibilityById(postId, visibility);
         verify(cache, never()).deletePostFromCache(postId);
-        verify(cacheHandler).loadPostDataToCacheIfKarmaScoreIsHighEnough(postId);
+        verify(cacheHandler).loadPostDataToCacheIfPossible(postId);
     }
 
     @Test
@@ -982,7 +967,7 @@ class PostServiceTest {
         // then
         verify(repository).changeVisibilityById(postId, visibility);
         verify(cache, never()).deletePostFromCache(postId);
-        verify(cacheHandler, never()).loadPostDataToCacheIfKarmaScoreIsHighEnough(postId);
+        verify(cacheHandler, never()).loadPostDataToCacheIfPossible(postId);
     }
 
     @Test
@@ -992,7 +977,7 @@ class PostServiceTest {
         var postId = 1;
         var visibility = Visibility.DELETED;
         var postDto = new PostDto(null, null, null, null, null, null, Visibility.ACTIVE);
-        var post = new PostDtoWithImageData(postDto, null);
+        var post = new PostWithImageDataDto(postDto, null);
 
         // mock authentication
         Authentication authentication = mock(Authentication.class);
@@ -1006,7 +991,7 @@ class PostServiceTest {
         doReturn(authorities).when(authentication).getAuthorities();
         SecurityContextHolder.setContext(securityContext);
 
-        Optional<PostDtoWithImageData> result = Optional.of(post);
+        Optional<PostWithImageDataDto> result = Optional.of(post);
         when(repository.findPostDtoWithImageDataByIdAndUserId(postId, userId)).thenReturn(result);
 
         // when
@@ -1015,7 +1000,7 @@ class PostServiceTest {
         // then
         verify(repository).findPostDtoWithImageDataByIdAndUserId(postId, userId);
         verify(repository).changeVisibilityById(postId, visibility);
-        verify(cacheHandler, never()).loadToCacheIfKarmaScoreIsHighEnough(same(result.get()));
+        verify(cacheHandler, never()).loadToCacheIfPossible(same(result.get()));
         verify(cache).deletePostFromCache(postId);
     }
 
@@ -1026,7 +1011,7 @@ class PostServiceTest {
         var postId = 1;
         var visibility = Visibility.ACTIVE;
         var postDto = new PostDto(null, null, null, null, null, null, Visibility.ACTIVE);
-        var post = new PostDtoWithImageData(postDto, null);
+        var post = new PostWithImageDataDto(postDto, null);
 
         // mock authentication
         Authentication authentication = mock(Authentication.class);
@@ -1040,7 +1025,7 @@ class PostServiceTest {
         doReturn(authorities).when(authentication).getAuthorities();
         SecurityContextHolder.setContext(securityContext);
 
-        Optional<PostDtoWithImageData> result = Optional.of(post);
+        Optional<PostWithImageDataDto> result = Optional.of(post);
         when(repository.findPostDtoWithImageDataByIdAndUserId(postId, userId)).thenReturn(result);
 
         // when
@@ -1049,7 +1034,7 @@ class PostServiceTest {
         // then
         verify(repository).findPostDtoWithImageDataByIdAndUserId(postId, userId);
         verify(repository).changeVisibilityById(postId, visibility);
-        verify(cacheHandler).loadToCacheIfKarmaScoreIsHighEnough(same(result.get()));
+        verify(cacheHandler).loadToCacheIfPossible(same(result.get()));
         verify(cache, never()).deletePostFromCache(postId);
     }
 
@@ -1068,7 +1053,7 @@ class PostServiceTest {
                 null,
                 Visibility.DELETED
         );
-        var post = new PostDtoWithImageData(postDto, null);
+        var post = new PostWithImageDataDto(postDto, null);
 
         // mock authentication
         Authentication authentication = mock(Authentication.class);
@@ -1082,7 +1067,7 @@ class PostServiceTest {
         doReturn(authorities).when(authentication).getAuthorities();
         SecurityContextHolder.setContext(securityContext);
 
-        Optional<PostDtoWithImageData> result = Optional.of(post);
+        Optional<PostWithImageDataDto> result = Optional.of(post);
         when(repository.findPostDtoWithImageDataByIdAndUserId(postId, userId)).thenReturn(result);
 
         // when
@@ -1091,7 +1076,7 @@ class PostServiceTest {
         // then
         verify(repository).findPostDtoWithImageDataByIdAndUserId(postId, userId);
         verify(repository, never()).changeVisibilityById(postId, visibility);
-        verify(cacheHandler, never()).loadToCacheIfKarmaScoreIsHighEnough(same(result.get()));
+        verify(cacheHandler, never()).loadToCacheIfPossible(same(result.get()));
         verify(cache, never()).deletePostFromCache(postId);
     }
 
@@ -1110,7 +1095,7 @@ class PostServiceTest {
         when(authentication.getPrincipal()).thenReturn(userId);
         SecurityContextHolder.setContext(securityContext);
 
-        Optional<PostDtoWithImageData> result = Optional.empty();
+        Optional<PostWithImageDataDto> result = Optional.empty();
         when(repository.findPostDtoWithImageDataByIdAndUserId(postId, userId)).thenReturn(result);
 
         // when
@@ -1119,7 +1104,7 @@ class PostServiceTest {
         // then
         verify(repository).findPostDtoWithImageDataByIdAndUserId(postId, userId);
         verify(repository, never()).changeVisibilityById(postId, visibility);
-        verify(cacheHandler, never()).loadToCacheIfKarmaScoreIsHighEnough(any(PostDtoWithImageData.class));
+        verify(cacheHandler, never()).loadToCacheIfPossible(any(PostWithImageDataDto.class));
         verify(cache, never()).deletePostFromCache(postId);
     }
 }
