@@ -1,4 +1,4 @@
-# karma-app-gateway
+# karma-app
 karma-app monolith version. karma-app is http server which exposes rest endpoints, it uses PostgreSQL and Redis. 
 
 There is also [microservices](https://github.com/msik-404/karma-app-gateway) version of this app which uses MongoDB instead of PostgreSQL.
@@ -280,7 +280,7 @@ Request json:
 ```
 POST /login
 ```
-This endpoint is used for acquiring `JWT_STRING`. This JWT is signed with HMAC-SHA256 using KARMA_APP_GATEWAY_SECRET
+This endpoint is used for acquiring `JWT_STRING`. This JWT is signed with HMAC-SHA256 using SECRET
 environment variable secret.
 
 JWT has two claims set:
@@ -310,8 +310,8 @@ Response json:
 If user fails to log-in `HTTP status code 401 Unauthorized` response with appropriate message is returned.
 
 ## Cache
-As one could notice from endpoint documentation this microservice uses caching. Cache can be used for fetching any subset
-of [MAX_CACHED_POSTS](https://github.com/msik-404/karma-app-gateway/blob/main/src/main/java/com/msik404/karmaappgateway/post/cache/PostRedisCache.java#L37)
+As one could notice from endpoint documentation this app uses caching. Cache can be used for fetching any subset
+of [MAX_CACHED_POSTS](https://github.com/msik-404/karma-app/blob/main/src/main/java/com/msik404/karmaapp/post/cache/PostRedisCache.java#L36)
 posts as long as no filtering rules are set (filter by username or visibility other
 than active). Each post state change which is persisted in database is being reflected to the cache.
 That is post score and visibility changes. Rating posts high enough might make them present in cache. Making post
@@ -322,7 +322,7 @@ is not yet reached.
 
 I use several redis structures for this:
 
-- [Redis sorted sets](https://redis.io/docs/data-types/sorted-sets/) (ZSet) for preserving top posts rating (all cached posts). ZSet is set under the [KARMA_SCORE_ZSET_KEY](https://github.com/msik-404/karma-app-gateway/blob/main/src/main/java/com/msik404/karmaappgateway/post/cache/PostRedisCache.java#L28).
+- [Redis sorted sets](https://redis.io/docs/data-types/sorted-sets/) (ZSet) for preserving top posts rating (all cached posts). ZSet is set under the [KARMA_SCORE_ZSET_KEY](https://github.com/msik-404/karma-app/blob/main/src/main/java/com/msik404/karmaapp/post/cache/PostRedisCache.java#L27).
   ZSet contains Keys in [post_key](https://github.com/msik-404/karma-app/blob/main/src/main/java/com/msik404/karmaapp/post/cache/PostRedisCache.java#L43)
   format, each post_key has score which is post karmaScore. Score is being updated in real time, so that post score does not become stale.
   KARMA_SCORE_ZSET_KEY expires after [TIMEOUT](https://github.com/msik-404/karma-app/blob/main/src/main/java/com/msik404/karmaapp/post/cache/PostRedisCache.java#L31).
