@@ -68,6 +68,10 @@ public class User implements UserDetails {
         return Set.of(new SimpleGrantedAuthority(role.name()));
     }
 
+    public String username() {
+        return username;
+    }
+
     @Override
     public String getUsername() {
         return email;

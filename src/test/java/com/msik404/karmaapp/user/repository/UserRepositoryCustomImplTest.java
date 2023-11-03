@@ -86,6 +86,7 @@ class UserRepositoryCustomImplTest {
         this.transactionTemplate = transactionTemplate;
     }
 
+    @NonNull
     private User getUserForTesting(int userId) {
 
         final String username = TestingDataCreator.getTestingUsername(userId);
@@ -155,7 +156,7 @@ class UserRepositoryCustomImplTest {
         User newUser = optionalNewUser.get();
 
         assertEquals(persistedUserId, newUser.getId());
-        assertEquals(newUsername, newUser.getUsername());
+        assertEquals(newUsername, newUser.username());
         assertEquals(newEmail, newUser.getEmail());
         assertTrue(bCryptPasswordEncoder.matches(newUsername, newUser.getPassword()));
         assertEquals(newRole, newUser.getRole());
@@ -186,7 +187,7 @@ class UserRepositoryCustomImplTest {
         var dto = new UserUpdateRequestWithUserPrivilege(
                 null,
                 null,
-                newUser.getUsername(),
+                newUser.username(),
                 null,
                 null
         );
