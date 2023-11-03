@@ -44,7 +44,7 @@ Response json:
 ```
 [
     {
-        "id": "SOME_24_CHAR_HEX_STRING", # this is always set
+        "id": "SOME_LONG", # this is always set
         "username": "USERNAME",          # this is always set
         "headline": "HEADLINE",          # this might not be set
         "text": "TEXT",                  # this might not be set
@@ -94,7 +94,7 @@ Response json:
 ```
 [
     {
-        "id": "SOME_24_CHAR_HEX_STRING", # this is always set
+        "id": "SOME_LONG", # this is always set
         "wasRatedPositively": null       # this is either null, false or true
     },
     ...                                  # and so on other size - 1 post ratings
@@ -127,7 +127,7 @@ This endpoint works similar to `mod/posts/ratings` but admin user can also see d
 logged-in and have admin role.
 
 ```
-GET /guests/posts/{postId}/image # postId is SOME_24_CHAR_HEX_STRING
+GET /guests/posts/{postId}/image # postId is SOME_LONG
 ```
 This endpoint is used for getting image of a given post. If post is not found HTTP error 404 with appropriate message is
 returned. Image is returned as byte array with media type IMAGE_JPEG.
@@ -240,7 +240,7 @@ Request json:
 ```
 
 ```
-PUT /admin/users/{userId} # userId is SOME_24_CHAR_HEX_STRING
+PUT /admin/users/{userId} # userId is SOME_LONG
 ```
 This endpoint is similar to `user/users` but it enables user with admin privilege to update any user. Additionally, it
 enables admin to change role(privilege) of other users.
