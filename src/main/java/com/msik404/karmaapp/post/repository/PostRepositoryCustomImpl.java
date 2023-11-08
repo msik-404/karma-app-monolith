@@ -43,7 +43,8 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     public List<PostDto> findNextNPosts(
             int size,
             @NonNull List<Visibility> visibilities,
-            @NonNull ScrollPosition position) throws InternalServerErrorException {
+            @NonNull ScrollPosition position
+    ) throws InternalServerErrorException {
 
         var finder = new FindNPosts(entityManager, cb);
         if (!visibilities.isEmpty()) {
@@ -89,7 +90,11 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<PostDto> findTopNWithUserId(int size, @NonNull List<Visibility> visibilities, long userId) {
+    public List<PostDto> findTopNWithUserId(
+            int size,
+            @NonNull List<Visibility> visibilities,
+            long userId
+    ) throws InternalServerErrorException {
 
         var finder = new FindNPosts(entityManager, cb);
         finder.setVisibilitiesIn(visibilities);
@@ -103,7 +108,8 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
             int size,
             @NonNull List<Visibility> visibilities,
             long userId,
-            @NonNull ScrollPosition position) {
+            @NonNull ScrollPosition position
+    ) throws InternalServerErrorException {
 
         var finder = new FindNPosts(entityManager, cb);
         finder.setVisibilitiesIn(visibilities);

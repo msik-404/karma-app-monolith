@@ -34,13 +34,18 @@ public interface PostRepositoryCustom {
             @NonNull String username
     ) throws InternalServerErrorException;
 
-    List<PostDto> findTopNWithUserId(int size, @NonNull List<Visibility> visibilities, long userId);
+    List<PostDto> findTopNWithUserId(
+            int size,
+            @NonNull List<Visibility> visibilities,
+            long userId
+    ) throws InternalServerErrorException;
 
     List<PostDto> findNextNWithUserId(
             int size,
             @NonNull List<Visibility> visibilities,
             long userId,
-            @NonNull ScrollPosition position);
+            @NonNull ScrollPosition position
+    ) throws InternalServerErrorException;
 
     List<PostRatingResponse> findTopNRatings(
             int size,
@@ -52,7 +57,8 @@ public interface PostRepositoryCustom {
             int size,
             @NonNull List<Visibility> visibilities,
             long userId,
-            @NonNull ScrollPosition position) throws InternalServerErrorException;
+            @NonNull ScrollPosition position
+    ) throws InternalServerErrorException;
 
     List<PostRatingResponse> findTopNRatingsWithUsername(
             int size,
