@@ -39,7 +39,7 @@ public abstract class FindTemplate<T> {
         }
     }
 
-    List<T> execute(int size) {
+    List<T> execute(int size) throws InternalServerErrorException {
 
         selectMethod(cb);
 
