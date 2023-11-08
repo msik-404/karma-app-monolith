@@ -11,6 +11,11 @@ import com.msik404.karmaapp.post.dto.PostCreationRequest;
 import com.msik404.karmaapp.post.dto.PostRatingResponse;
 import com.msik404.karmaapp.post.dto.PostResponse;
 import com.msik404.karmaapp.post.exception.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.EntityModel;
@@ -29,6 +34,25 @@ public class PostController {
     private final PostService postService;
     private final PostResponseModelAssembler assembler;
 
+    @Operation(summary = "Get key-set (karma_score, post_id) paginated posts.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Returned paginated posts.",
+                    content = {@Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = PostResponse.class)
+                    )}
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Returned paginated posts.",
+                    content = {@Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = PostResponse.class)
+                    )}
+            ),
+    })
     @GetMapping("guest/posts")
     public List<EntityModel<PostResponse>> findPaginatedPosts(
             @RequestParam(value = "size", defaultValue = "100") int size,
@@ -211,14 +235,15 @@ public class PostController {
 
     @PostMapping("user/posts/{postId}/rate")
     public ResponseEntity<Void> rate(@PathVariable Long postId, @RequestParam("is_positive") boolean isPositive)
-            throws PostNotFoundException {
+            throws InternalServerErrorException, PostNotFoundException {
 
         postService.rate(postId, isPositive);
         return ResponseEntity.ok(null);
     }
 
     @PostMapping("user/posts/{postId}/unrate")
-    public ResponseEntity<Void> unrate(@PathVariable Long postId) throws KarmaScoreNotFoundException, PostNotFoundException {
+    public ResponseEntity<Void> unrate(@PathVariable Long postId)
+            throws InternalServerErrorException, KarmaScoreNotFoundException, PostNotFoundException {
 
         postService.unrate(postId);
         return ResponseEntity.ok(null);
@@ -227,7 +252,8 @@ public class PostController {
     @PostMapping("user/posts/{postId}/hide")
     public ResponseEntity<Void> hideByUser(
             @PathVariable Long postId
-    ) throws InsufficientRoleException, PostNotFoundOrClientIsNotOwnerException, PostNotFoundException {
+    ) throws InternalServerErrorException, InsufficientRoleException, PostNotFoundOrClientIsNotOwnerException,
+            PostNotFoundException {
 
         postService.changeOwnedPostVisibility(postId, Visibility.HIDDEN);
         return ResponseEntity.ok(null);
@@ -236,7 +262,8 @@ public class PostController {
     @PostMapping("user/posts/{postId}/unhide")
     public ResponseEntity<Void> unhideByUser(
             @PathVariable Long postId
-    ) throws InsufficientRoleException, PostNotFoundOrClientIsNotOwnerException, PostNotFoundException {
+    ) throws InternalServerErrorException, InsufficientRoleException, PostNotFoundOrClientIsNotOwnerException,
+            PostNotFoundException {
 
         postService.changeOwnedPostVisibility(postId, Visibility.ACTIVE);
         return ResponseEntity.ok(null);
@@ -245,7 +272,7 @@ public class PostController {
     @PostMapping("mod/posts/{postId}/hide")
     public ResponseEntity<Void> hideByMod(
             @PathVariable Long postId
-    ) throws InsufficientRoleException, PostNotFoundException {
+    ) throws InternalServerErrorException, InsufficientRoleException, PostNotFoundException {
 
         postService.changeVisibility(postId, Visibility.HIDDEN);
         return ResponseEntity.ok(null);
@@ -254,7 +281,8 @@ public class PostController {
     @PostMapping("user/posts/{postId}/delete")
     public ResponseEntity<Void> deleteByUser(
             @PathVariable Long postId
-    ) throws InsufficientRoleException, PostNotFoundOrClientIsNotOwnerException, PostNotFoundException {
+    ) throws InternalServerErrorException, InsufficientRoleException, PostNotFoundOrClientIsNotOwnerException,
+            PostNotFoundException {
 
         postService.changeOwnedPostVisibility(postId, Visibility.DELETED);
         return ResponseEntity.ok(null);
@@ -263,7 +291,7 @@ public class PostController {
     @PostMapping("admin/posts/{postId}/delete")
     public ResponseEntity<Void> deleteByAdmin(
             @PathVariable Long postId
-    ) throws InsufficientRoleException, PostNotFoundException {
+    ) throws InternalServerErrorException, InsufficientRoleException, PostNotFoundException {
 
         postService.changeVisibility(postId, Visibility.DELETED);
         return ResponseEntity.ok(null);
@@ -272,7 +300,7 @@ public class PostController {
     @PostMapping("admin/posts/{postId}/activate")
     public ResponseEntity<Void> activateByAdmin(
             @PathVariable Long postId
-    ) throws InsufficientRoleException, PostNotFoundException {
+    ) throws InternalServerErrorException, InsufficientRoleException, PostNotFoundException {
 
         postService.changeVisibility(postId, Visibility.ACTIVE);
         return ResponseEntity.ok(null);

@@ -188,7 +188,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public int addKarmaScoreToPost(long postId, long value) {
+    public int addKarmaScoreToPost(long postId, long value) throws InternalServerErrorException {
 
         var criteriaUpdate = cb.createCriteriaUpdate(Post.class);
         var root = criteriaUpdate.getRoot();
@@ -198,11 +198,15 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         criteriaUpdate.set(karmaScorePath, cb.sum(karmaScorePath, value));
         criteriaUpdate.where(cb.equal(root.get("id"), postId));
 
-        return entityManager.createQuery(criteriaUpdate).executeUpdate();
+        try {
+            return entityManager.createQuery(criteriaUpdate).executeUpdate();
+        } catch (RuntimeException ex) {
+            throw new InternalServerErrorException("Could not add karma score to post.");
+        }
     }
 
     @Override
-    public int changeVisibilityById(long postId, @NonNull Visibility visibility) {
+    public int changeVisibilityById(long postId, @NonNull Visibility visibility) throws InternalServerErrorException {
 
         var criteriaUpdate = cb.createCriteriaUpdate(Post.class);
         var root = criteriaUpdate.getRoot();
@@ -210,7 +214,11 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom {
         criteriaUpdate.set(root.get("visibility"), visibility);
         criteriaUpdate.where(cb.equal(root.get("id"), postId));
 
-        return entityManager.createQuery(criteriaUpdate).executeUpdate();
+        try {
+            return entityManager.createQuery(criteriaUpdate).executeUpdate();
+        } catch (RuntimeException ex) {
+            throw new InternalServerErrorException("Could not change visibility of the post.");
+        }
     }
 
 }

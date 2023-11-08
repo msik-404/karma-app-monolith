@@ -187,7 +187,7 @@ public class PostService {
      */
     @Transactional
     public void rate(long postId, boolean isNewRatingPositive)
-            throws PostNotFoundException {
+            throws InternalServerErrorException, PostNotFoundException {
 
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         var userId = (long) authentication.getPrincipal();
@@ -222,7 +222,7 @@ public class PostService {
      */
     @Transactional
     @NonNull
-    public void unrate(long postId) throws KarmaScoreNotFoundException, PostNotFoundException {
+    public void unrate(long postId) throws InternalServerErrorException, KarmaScoreNotFoundException, PostNotFoundException {
 
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         var userId = (long) authentication.getPrincipal();
@@ -261,7 +261,7 @@ public class PostService {
     public void changeVisibility(
             long postId,
             @NonNull Visibility visibility
-    ) throws PostNotFoundException, InsufficientRoleException {
+    ) throws InternalServerErrorException, PostNotFoundException, InsufficientRoleException {
 
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         Collection<? extends GrantedAuthority> clientAuthorities = authentication.getAuthorities();
@@ -291,7 +291,8 @@ public class PostService {
     @Transactional
     @NonNull
     public void changeOwnedPostVisibility(long postId, @NonNull Visibility visibility)
-            throws PostNotFoundException, PostNotFoundOrClientIsNotOwnerException, InsufficientRoleException {
+            throws InternalServerErrorException, PostNotFoundException, PostNotFoundOrClientIsNotOwnerException,
+            InsufficientRoleException {
 
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         var clientId = (long) authentication.getPrincipal();
