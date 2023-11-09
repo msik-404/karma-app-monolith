@@ -495,7 +495,6 @@ public class PostController {
             @Parameter(
                     description = KarmaAppEndpointDocs.PARAM_DESC_POST_CREATION_REQUEST,
                     required = true,
-                    schema = @Schema(type = "string", format = "binary"),
                     content = @Content(
                             encoding = @Encoding(
                                     name = "postCreationRequest",
@@ -505,9 +504,7 @@ public class PostController {
             )
             @Valid @RequestPart(value = "postCreationRequest") PostCreationRequest jsonData,
 
-            @Parameter(
-                    description = KarmaAppEndpointDocs.PARAM_DESC_IMAGE_DATA
-            )
+            @Parameter(description = KarmaAppEndpointDocs.PARAM_DESC_IMAGE_DATA)
             @RequestPart(value = "image", required = false) MultipartFile image
     ) throws FileProcessingException {
 
