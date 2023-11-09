@@ -1,6 +1,8 @@
 package com.msik404.karmaapp.user;
 
 import com.msik404.karmaapp.docs.KarmaAppEndpointDocs;
+import com.msik404.karmaapp.docs.SwaggerConfiguration;
+import com.msik404.karmaapp.docs.UserUpdateRequestWithAdminPrivilegeDoc;
 import com.msik404.karmaapp.exception.constraint.exception.DuplicateEmailException;
 import com.msik404.karmaapp.exception.constraint.exception.DuplicateUnexpectedFieldException;
 import com.msik404.karmaapp.exception.constraint.exception.DuplicateUsernameException;
@@ -8,13 +10,13 @@ import com.msik404.karmaapp.user.dto.UserUpdateRequestWithAdminPrivilege;
 import com.msik404.karmaapp.user.dto.UserUpdateRequestWithUserPrivilege;
 import com.msik404.karmaapp.user.exception.NoFieldSetException;
 import com.msik404.karmaapp.user.exception.UserNotFoundException;
-import com.msik404.karmaapp.docs.UserUpdateRequestWithAdminPrivilegeDoc;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@SecurityRequirement(name = SwaggerConfiguration.AUTH)
 public class UserController {
 
     private final UserService userService;

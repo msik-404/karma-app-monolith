@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.msik404.karmaapp.docs.KarmaAppEndpointDocs;
 import com.msik404.karmaapp.auth.exception.InsufficientRoleException;
+import com.msik404.karmaapp.docs.KarmaAppEndpointDocs;
+import com.msik404.karmaapp.docs.SwaggerConfiguration;
 import com.msik404.karmaapp.position.ScrollPosition;
 import com.msik404.karmaapp.post.dto.PostCreationRequest;
 import com.msik404.karmaapp.post.dto.PostRatingResponse;
@@ -18,6 +19,7 @@ import io.swagger.v3.oas.annotations.media.Encoding;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.EntityModel;
@@ -105,6 +107,7 @@ public class PostController {
                     )}
             ),
     })
+    @SecurityRequirement(name = SwaggerConfiguration.AUTH)
     @GetMapping("user/posts")
     public List<EntityModel<PostResponse>> findPaginatedOwnedPosts(
 
@@ -159,6 +162,7 @@ public class PostController {
                     )}
             ),
     })
+    @SecurityRequirement(name = SwaggerConfiguration.AUTH)
     @GetMapping("user/posts/ratings")
     public List<PostRatingResponse> findPersonalPostRatings(
 
@@ -222,6 +226,7 @@ public class PostController {
                     )}
             ),
     })
+    @SecurityRequirement(name = SwaggerConfiguration.AUTH)
     @GetMapping("mod/posts")
     public List<EntityModel<PostResponse>> findPaginatedPostsForMod(
 
@@ -279,6 +284,7 @@ public class PostController {
                     )}
             ),
     })
+    @SecurityRequirement(name = SwaggerConfiguration.AUTH)
     @GetMapping("mod/posts/ratings")
     public List<PostRatingResponse> findPersonalPostRatingsForMod(
 
@@ -333,6 +339,7 @@ public class PostController {
                     )}
             ),
     })
+    @SecurityRequirement(name = SwaggerConfiguration.AUTH)
     @GetMapping("admin/posts")
     public List<EntityModel<PostResponse>> findPaginatedPostsForAdmin(
 
@@ -393,6 +400,7 @@ public class PostController {
                     )}
             ),
     })
+    @SecurityRequirement(name = SwaggerConfiguration.AUTH)
     @GetMapping("admin/posts/ratings")
     public List<PostRatingResponse> findPersonalPostRatingsForAdmin(
 
@@ -480,6 +488,7 @@ public class PostController {
                     )}
             ),
     })
+    @SecurityRequirement(name = SwaggerConfiguration.AUTH)
     @PostMapping(value = "user/posts", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> create(
 
@@ -532,6 +541,7 @@ public class PostController {
                     )}
             ),
     })
+    @SecurityRequirement(name = SwaggerConfiguration.AUTH)
     @PostMapping("user/posts/{postId}/rate")
     public ResponseEntity<Void> rate(
 
@@ -572,6 +582,7 @@ public class PostController {
                     )}
             ),
     })
+    @SecurityRequirement(name = SwaggerConfiguration.AUTH)
     @PostMapping("user/posts/{postId}/unrate")
     public ResponseEntity<Void> unrate(
 
@@ -617,6 +628,7 @@ public class PostController {
                     )}
             ),
     })
+    @SecurityRequirement(name = SwaggerConfiguration.AUTH)
     @PostMapping("user/posts/{postId}/hide")
     public ResponseEntity<Void> hideByUser(
 
@@ -663,6 +675,7 @@ public class PostController {
                     )}
             ),
     })
+    @SecurityRequirement(name = SwaggerConfiguration.AUTH)
     @PostMapping("user/posts/{postId}/unhide")
     public ResponseEntity<Void> unhideByUser(
 
@@ -709,6 +722,7 @@ public class PostController {
                     )}
             ),
     })
+    @SecurityRequirement(name = SwaggerConfiguration.AUTH)
     @PostMapping("mod/posts/{postId}/hide")
     public ResponseEntity<Void> hideByMod(
 
@@ -755,6 +769,7 @@ public class PostController {
                     )}
             ),
     })
+    @SecurityRequirement(name = SwaggerConfiguration.AUTH)
     @PostMapping("user/posts/{postId}/delete")
     public ResponseEntity<Void> deleteByUser(
 
@@ -801,6 +816,7 @@ public class PostController {
                     )}
             ),
     })
+    @SecurityRequirement(name = SwaggerConfiguration.AUTH)
     @PostMapping("admin/posts/{postId}/delete")
     public ResponseEntity<Void> deleteByAdmin(
 
@@ -847,6 +863,7 @@ public class PostController {
                     )}
             ),
     })
+    @SecurityRequirement(name = SwaggerConfiguration.AUTH)
     @PostMapping("admin/posts/{postId}/activate")
     public ResponseEntity<Void> activateByAdmin(
 
