@@ -37,7 +37,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -64,9 +63,12 @@ class PostRepositoryCustomImplTest {
 
     private final TransactionTemplate transactionTemplate;
 
-    @Container
     private static final PostgreSQLContainer<?> POSTGRESQL_CONTAINER =
             new PostgreSQLContainer<>("postgres:alpine");
+
+    static {
+        POSTGRESQL_CONTAINER.start();
+    }
 
     public static class DataSourceInitializer
             implements ApplicationContextInitializer<ConfigurableApplicationContext> {

@@ -11,6 +11,7 @@ import com.msik404.karmaapp.TestingImageDataCreator;
 import com.msik404.karmaapp.auth.exception.InsufficientRoleException;
 import com.msik404.karmaapp.karma.KarmaKey;
 import com.msik404.karmaapp.karma.KarmaScore;
+import com.msik404.karmaapp.karma.KarmaScoreRepository;
 import com.msik404.karmaapp.karma.KarmaScoreService;
 import com.msik404.karmaapp.karma.exception.KarmaScoreNotFoundException;
 import com.msik404.karmaapp.position.ScrollPosition;
@@ -51,6 +52,10 @@ class PostServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+
+    @Mock
+    private KarmaScoreRepository karmaScoreRepository;
 
     @Mock
     private KarmaScoreService karmaScoreService;
@@ -796,7 +801,7 @@ class PostServiceTest {
         var karmaKey = new KarmaKey(userId, postId);
         var karmaScore = new KarmaScore(karmaKey, null, null, isPositive);
 
-        when(karmaScoreService.findById(karmaKey)).thenReturn(karmaScore);
+        when(karmaScoreRepository.findById(karmaKey)).thenReturn(Optional.of(karmaScore));
 
         long delta = -1;
         when(repository.addKarmaScoreToPost(postId, delta)).thenReturn(1);
@@ -807,7 +812,7 @@ class PostServiceTest {
         postService.unrate(postId);
 
         // then
-        verify(karmaScoreService).findById(karmaKey);
+        verify(karmaScoreRepository).findById(karmaKey);
         verify(repository).addKarmaScoreToPost(postId, delta);
         verify(karmaScoreService).deleteById(karmaKey);
         verify(cache).updateKarmaScoreIfPresent(postId, (double) delta);
@@ -832,7 +837,7 @@ class PostServiceTest {
         var karmaKey = new KarmaKey(userId, postId);
         var karmaScore = new KarmaScore(karmaKey, null, null, isPositive);
 
-        when(karmaScoreService.findById(karmaKey)).thenReturn(karmaScore);
+        when(karmaScoreRepository.findById(karmaKey)).thenReturn(Optional.of(karmaScore));
 
         long delta = -1;
         when(repository.addKarmaScoreToPost(postId, delta)).thenReturn(1);
@@ -843,33 +848,11 @@ class PostServiceTest {
         postService.unrate(postId);
 
         // then
-        verify(karmaScoreService).findById(karmaKey);
+        verify(karmaScoreRepository).findById(karmaKey);
         verify(repository).addKarmaScoreToPost(postId, delta);
         verify(karmaScoreService).deleteById(karmaKey);
         verify(cache).updateKarmaScoreIfPresent(postId, (double) delta);
         verify(cacheHandler).loadPostDataToCacheIfPossible(postId);
-    }
-
-    @Test
-    void unrate_PostWasNotRated_KarmaScoreNotFoundExceptionShouldBeThrown() {
-
-        // given
-        long postId = 1;
-
-        // mock authentication
-        Authentication authentication = mock(Authentication.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        long userId = 10L;
-        when(authentication.getPrincipal()).thenReturn(userId);
-        SecurityContextHolder.setContext(securityContext);
-
-        var karmaKey = new KarmaKey(userId, postId);
-
-        when(karmaScoreService.findById(karmaKey)).thenThrow(KarmaScoreNotFoundException.class);
-
-        // then                                               // when
-        assertThrows(KarmaScoreNotFoundException.class, () -> postService.unrate(postId));
     }
 
     @Test
@@ -890,7 +873,7 @@ class PostServiceTest {
         var karmaKey = new KarmaKey(userId, postId);
         var karmaScore = new KarmaScore(karmaKey, null, null, isPositive);
 
-        when(karmaScoreService.findById(karmaKey)).thenReturn(karmaScore);
+        when(karmaScoreRepository.findById(karmaKey)).thenReturn(Optional.of(karmaScore));
 
         long delta = -1;
         when(repository.addKarmaScoreToPost(postId, delta)).thenReturn(0);
