@@ -7,7 +7,7 @@ import org.springframework.lang.NonNull;
 
 public class ImageNotFoundException extends AbstractRestException {
 
-    private static final String ERROR_MESSAGE = "Requested image was not found";
+    public static final String ERROR_MESSAGE = "Requested image was not found.";
 
     public ImageNotFoundException() {
         super(ERROR_MESSAGE);

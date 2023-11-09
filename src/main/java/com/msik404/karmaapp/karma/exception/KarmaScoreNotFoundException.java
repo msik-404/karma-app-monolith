@@ -7,8 +7,10 @@ import org.springframework.lang.NonNull;
 
 public class KarmaScoreNotFoundException extends AbstractRestException {
 
+    public static final String ERROR_MESSAGE = "KarmaScore with that id was not found.";
+
     public KarmaScoreNotFoundException() {
-        super("KarmaScore with that id was not found");
+        super(ERROR_MESSAGE);
     }
 
     @NonNull

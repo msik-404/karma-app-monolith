@@ -7,7 +7,7 @@ import org.springframework.lang.NonNull;
 
 public class PostNotFoundException extends AbstractRestException {
 
-    private static final String ERROR_MESSAGE = "Post with that id was not found";
+    public static final String ERROR_MESSAGE = "Post with that id was not found.";
 
     public PostNotFoundException() {
         super(ERROR_MESSAGE);

@@ -11,6 +11,7 @@ import javax.imageio.ImageIO;
 
 import com.msik404.karmaapp.auth.exception.InsufficientRoleException;
 import com.msik404.karmaapp.karma.KarmaKey;
+import com.msik404.karmaapp.karma.KarmaScoreRepository;
 import com.msik404.karmaapp.karma.KarmaScoreService;
 import com.msik404.karmaapp.karma.exception.KarmaScoreNotFoundException;
 import com.msik404.karmaapp.position.ScrollPosition;
@@ -37,6 +38,7 @@ public class PostService {
 
     private final PostRepository repository;
     private final UserRepository userRepository;
+    private final KarmaScoreRepository karmaScoreRepository;
     private final KarmaScoreService karmaScoreService;
     private final PostRedisCache cache;
     private final PostRedisCacheHandlerService cacheHandler;
@@ -222,15 +224,19 @@ public class PostService {
      */
     @Transactional
     @NonNull
-    public void unrate(long postId) throws InternalServerErrorException, KarmaScoreNotFoundException, PostNotFoundException {
+    public void unrate(long postId) throws InternalServerErrorException, PostNotFoundException {
 
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         var userId = (long) authentication.getPrincipal();
 
         var karmaKey = new KarmaKey(userId, postId);
-        var karmaScore = karmaScoreService.findById(karmaKey);
 
-        long delta = karmaScore.isPositive() ? -1L : 1L;
+        var optionalKarmaScore = karmaScoreRepository.findById(karmaKey);
+        if (optionalKarmaScore.isEmpty()) { // If rating was not found, return, because requested state is persisted.
+            return;
+        }
+
+        long delta = optionalKarmaScore.get().isPositive() ? -1L : 1L;
 
         int rowsAffected = repository.addKarmaScoreToPost(postId, delta);
         if (rowsAffected == 0) {

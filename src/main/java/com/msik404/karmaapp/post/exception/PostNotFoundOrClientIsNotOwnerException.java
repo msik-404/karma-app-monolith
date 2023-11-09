@@ -7,7 +7,7 @@ import org.springframework.lang.NonNull;
 
 public class PostNotFoundOrClientIsNotOwnerException extends AbstractRestException {
 
-    private static final String ERROR_MESSAGE = "Requested post was not found or you are not the owner.";
+    public static final String ERROR_MESSAGE = "Requested post was not found or you are not the owner.";
 
     public PostNotFoundOrClientIsNotOwnerException() {
         super(ERROR_MESSAGE);

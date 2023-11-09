@@ -7,7 +7,7 @@ import org.springframework.lang.NonNull;
 
 public class FileProcessingException extends AbstractRestException {
 
-    private static final String ERROR_MESSAGE = "File could not be processed for some reason";
+    public static final String ERROR_MESSAGE = "File could not be processed for some reason.";
 
     public FileProcessingException() {
         super(ERROR_MESSAGE);
