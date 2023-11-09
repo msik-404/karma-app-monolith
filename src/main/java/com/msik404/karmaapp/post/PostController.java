@@ -85,7 +85,7 @@ public class PostController {
 
     @Operation(
             summary = KarmaAppEndpointDocs.OP_SUM_FIND_PAGINATED_OWNED_POSTS,
-            description = KarmaAppEndpointDocs.OP_BASE_DESC_FIND_PAGINATED_OWNED_POSTS
+            description = KarmaAppEndpointDocs.OP_DESC_FIND_PAGINATED_OWNED_POSTS
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -138,8 +138,8 @@ public class PostController {
     }
 
     @Operation(
-            summary = KarmaAppEndpointDocs.OP_BASE_SUM_FIND_PERSONAL_POST_RATINGS,
-            description = KarmaAppEndpointDocs.OP_BASE_DESC_FIND_PERSONAL_POST_RATINGS
+            summary = KarmaAppEndpointDocs.OP_SUM_FIND_PAGINATED_POSTS_RATINGS,
+            description = KarmaAppEndpointDocs.OP_DESC_FIND_PERSONAL_POST_RATINGS
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -202,7 +202,7 @@ public class PostController {
 
     @Operation(
             summary = KarmaAppEndpointDocs.OP_SUM_FIND_PAGINATED_POSTS_FOR_MOD,
-            description = KarmaAppEndpointDocs.OP_BASE_FIND_PAGINATED_POSTS_FOR_MOD
+            description = KarmaAppEndpointDocs.OP_FIND_PAGINATED_POSTS_FOR_MOD
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -258,7 +258,7 @@ public class PostController {
     }
 
     @Operation(
-            summary = KarmaAppEndpointDocs.OP_SUM_FIND_PERSONAL_POST_RATINGS_FOR_MOD,
+            summary = KarmaAppEndpointDocs.OP_SUM_FIND_PERSONAL_POSTS_RATINGS_FOR_MOD,
             description = KarmaAppEndpointDocs.OP_DESC_FIND_PERSONAL_POST_RATINGS_FOR_MOD
     )
     @ApiResponses(value = {
@@ -318,7 +318,7 @@ public class PostController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Returned paginated posts.",
+                    description = KarmaAppEndpointDocs.RESP_OK_DESC_PAGINATED_POSTS,
                     content = {@Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = PostResponse.class)
@@ -326,7 +326,7 @@ public class PostController {
             ),
             @ApiResponse(
                     responseCode = "500",
-                    description = "Could not get posts ratings from the database for some reason.",
+                    description = KarmaAppEndpointDocs.RESP_INTERNAL_DESC_PAGINATED_POSTS,
                     content = {@Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = ProblemDetail.class)
