@@ -310,7 +310,7 @@ Response json:
 If user fails to log-in `HTTP status code 401 Unauthorized` response with appropriate message is returned.
 
 ## Cache
-As one could notice from endpoint documentation this app uses caching. Cache can be used for fetching any subset
+Most of the endpoints use cache in some way but primarily cache is used for fetching any subset
 of [MAX_CACHED_POSTS](https://github.com/msik-404/karma-app/blob/main/src/main/java/com/msik404/karmaapp/post/cache/PostRedisCache.java#L36)
 posts as long as no filtering rules are set (filter by username or visibility other
 than active). Each post state change which is persisted in database is being reflected to the cache.
