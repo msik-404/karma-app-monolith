@@ -22,8 +22,8 @@ paths:
               $ref: '#/components/schemas/UserUpdateRequestWithUserPrivilege'
         required: true
       responses:
-        "404":
-          description: Requested User was not found.
+        "409":
+          description: At least one set field which should be unique is not.
           content:
             application/json:
               schema:
@@ -35,14 +35,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
-        "200":
-          description: User account was updated successfully.
-        "409":
-          description: At least one set field which should be unique is not.
+        "404":
+          description: Requested User was not found.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
+        "200":
+          description: User account was updated successfully.
       security:
       - Bearer Authentication: []
   /admin/users/{userId}:
@@ -69,8 +69,8 @@ paths:
               $ref: '#/components/schemas/UserUpdateRequestWithAdminPrivilegeDoc'
         required: true
       responses:
-        "404":
-          description: Requested User was not found.
+        "409":
+          description: At least one set field which should be unique is not.
           content:
             application/json:
               schema:
@@ -82,14 +82,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
-        "200":
-          description: User account was updated successfully.
-        "409":
-          description: At least one set field which should be unique is not.
+        "404":
+          description: Requested User was not found.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
+        "200":
+          description: User account was updated successfully.
       security:
       - Bearer Authentication: []
   /user/posts:
@@ -148,18 +148,18 @@ paths:
           type: integer
           format: int64
       responses:
-        "200":
-          description: Returned paginated posts.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PostResponse'
         "500":
           description: Could not get posts from the database for some reason.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
+        "200":
+          description: Returned paginated posts.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
       security:
       - Bearer Authentication: []
     post:
@@ -218,14 +218,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
+        "200":
+          description: Post was unrated successfully.
         "500":
           description: Could not unrate post for some reason.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
-        "200":
-          description: Post was unrated successfully.
       security:
       - Bearer Authentication: []
   /user/posts/{postId}/unhide:
@@ -246,6 +246,12 @@ paths:
           type: integer
           format: int64
       responses:
+        "500":
+          description: Could not change visibility of the post for some reason
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
         "401":
           description: Could not change visibility of the post because of not sufficient
             privilege or not being the owner.
@@ -253,20 +259,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
+        "200":
+          description: Post was activated successfully.
         "404":
           description: Post with that id was not found.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
-        "500":
-          description: Could not change visibility of the post for some reason
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
-        "200":
-          description: Post was activated successfully.
       security:
       - Bearer Authentication: []
   /user/posts/{postId}/rate:
@@ -295,20 +295,20 @@ paths:
         schema:
           type: boolean
       responses:
-        "404":
-          description: Post with that id was not found.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
+        "200":
+          description: Post was rated successfully.
         "500":
           description: Could not rate post for some reason.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
-        "200":
-          description: Post was rated successfully.
+        "404":
+          description: Post with that id was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
       security:
       - Bearer Authentication: []
   /user/posts/{postId}/hide:
@@ -331,6 +331,12 @@ paths:
       responses:
         "200":
           description: Post was hidden successfully.
+        "500":
+          description: Could not change visibility of the post for some reason
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
         "401":
           description: Could not change visibility of the post because of not sufficient
             privilege or not being the owner.
@@ -340,12 +346,6 @@ paths:
                 $ref: '#/components/schemas/ProblemDetail'
         "404":
           description: Post with that id was not found.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
-        "500":
-          description: Could not change visibility of the post for some reason
           content:
             application/json:
               schema:
@@ -370,6 +370,12 @@ paths:
           type: integer
           format: int64
       responses:
+        "500":
+          description: Could not change visibility of the post for some reason
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
         "401":
           description: Could not change visibility of the post because of not sufficient
             privilege or not being the owner.
@@ -377,20 +383,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
+        "200":
+          description: Post was deleted successfully.
         "404":
           description: Post with that id was not found.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
-        "500":
-          description: Could not change visibility of the post for some reason
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
-        "200":
-          description: Post was deleted successfully.
       security:
       - Bearer Authentication: []
   /register:
@@ -407,14 +407,14 @@ paths:
               $ref: '#/components/schemas/RegisterRequest'
         required: true
       responses:
-        "200":
-          description: User account was registered successfully.
         "409":
           description: At least one set field which should be unique is not.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
+        "200":
+          description: User account was registered successfully.
   /mod/posts/{postId}/hide:
     post:
       tags:
@@ -435,6 +435,12 @@ paths:
       responses:
         "200":
           description: Post was hidden successfully.
+        "500":
+          description: Could not change visibility of the post for some reason
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
         "401":
           description: Could not change visibility of the post because of not sufficient
             privilege or not being the owner.
@@ -444,12 +450,6 @@ paths:
                 $ref: '#/components/schemas/ProblemDetail'
         "404":
           description: Post with that id was not found.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
-        "500":
-          description: Could not change visibility of the post for some reason
           content:
             application/json:
               schema:
@@ -473,6 +473,12 @@ paths:
               $ref: '#/components/schemas/LoginRequest'
         required: true
       responses:
+        "409":
+          description: At least one set field which should be unique is not.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
         "200":
           description: |
             User logged-in successfully. JWT string is returned. Authorization header should be set with string:
@@ -482,12 +488,6 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/LoginResponse'
-        "409":
-          description: At least one set field which should be unique is not.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
   /admin/posts/{postId}/delete:
     post:
       tags:
@@ -506,6 +506,12 @@ paths:
           type: integer
           format: int64
       responses:
+        "500":
+          description: Could not change visibility of the post for some reason
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
         "401":
           description: Could not change visibility of the post because of not sufficient
             privilege or not being the owner.
@@ -513,20 +519,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
+        "200":
+          description: Post was deleted successfully.
         "404":
           description: Post with that id was not found.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
-        "500":
-          description: Could not change visibility of the post for some reason
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
-        "200":
-          description: Post was deleted successfully.
       security:
       - Bearer Authentication: []
   /admin/posts/{postId}/activate:
@@ -547,6 +547,12 @@ paths:
           type: integer
           format: int64
       responses:
+        "500":
+          description: Could not change visibility of the post for some reason
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
         "401":
           description: Could not change visibility of the post because of not sufficient
             privilege or not being the owner.
@@ -554,20 +560,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
+        "200":
+          description: Post was deleted successfully.
         "404":
           description: Post with that id was not found.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
-        "500":
-          description: Could not change visibility of the post for some reason
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
-        "200":
-          description: Post was deleted successfully.
       security:
       - Bearer Authentication: []
   /user/posts/ratings:
@@ -698,18 +698,18 @@ paths:
         schema:
           type: string
       responses:
-        "200":
-          description: Returned paginated posts.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PostResponse'
         "500":
           description: Could not get posts from the database for some reason.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
+        "200":
+          description: Returned paginated posts.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
       security:
       - Bearer Authentication: []
   /mod/posts/ratings:
@@ -838,18 +838,18 @@ paths:
         schema:
           type: string
       responses:
-        "200":
-          description: Returned paginated posts.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PostResponse'
         "500":
           description: Could not get posts from the database for some reason.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
+        "200":
+          description: Returned paginated posts.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
   /guest/posts/{postId}/image:
     get:
       tags:
@@ -867,12 +867,6 @@ paths:
           type: integer
           format: int64
       responses:
-        "404":
-          description: Requested image was not found.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
         "200":
           description: Returned post's image data
           content:
@@ -880,6 +874,12 @@ paths:
               schema:
                 type: string
                 format: binary
+        "404":
+          description: Requested image was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
   /admin/posts:
     get:
       tags:
@@ -952,18 +952,18 @@ paths:
         schema:
           type: string
       responses:
-        "200":
-          description: Returned paginated posts.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PostResponse'
         "500":
           description: Could not get posts from the database for some reason.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
+        "200":
+          description: Returned paginated posts.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
       security:
       - Bearer Authentication: []
   /admin/posts/ratings:
