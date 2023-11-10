@@ -152,7 +152,6 @@ Test reside in [src/test](https://github.com/msik-404/karma-app-monolith/tree/ma
 The rest of the code was tested manually using postman.
 
 # Starting the microservice | deployment for testing
-
 To start the app locally, docker compose is required.
 
 In this repository one can find [docker-compose-yaml](https://github.com/msik-404/karma-app-monolith/blob/main/docker-compose.yaml).
