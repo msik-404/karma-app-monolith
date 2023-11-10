@@ -84,14 +84,14 @@ Several redis structures for this:
   has expiration time set to TIMEOUT which is one hour. post_image_key is set once the image is requested for the first time. Expiration time is reset each
   time the data is requested within TIMEOUT.
 
-Cache usses this [redis.conf](https://github.com/msik-404/karma-app-monolith/blob/main/redis.conf). The most important things
+The cache uses this [redis.conf](https://github.com/msik-404/karma-app-monolith/blob/main/redis.conf). The most important things
 about it are that is uses: [AOF and RDB](https://redis.io/docs/management/persistence/).
 
-Cache code uses [Redis pipelining](https://redis.io/docs/manual/pipelining/) when more than single operation needs to
+The cache's code uses [Redis pipelining](https://redis.io/docs/manual/pipelining/) when more than single operation needs to
 be preformed. This improves efficiency, by reducing required number of request.
 
-Because ZSet [ZRANGE](https://redis.io/commands/zrange/) cannot be trivially used for getting key-set paginated values I
-had to come up with a solution. If reader is interested in details look inside [findNextNCached](https://github.com/msik-404/karma-app-monolith/blob/main/src/main/java/com/msik404/karmaapp/post/cache/PostRedisCache.java#L194)
+Because ZSet [ZRANGE](https://redis.io/commands/zrange/) cannot be trivially used for getting key-set paginated values, solution had to be found. 
+If reader is interested in details look inside [findNextNCached](https://github.com/msik-404/karma-app-monolith/blob/main/src/main/java/com/msik404/karmaapp/post/cache/PostRedisCache.java#L194)
 method code and comments.
 
 #### Note
