@@ -66,7 +66,6 @@ high enough might make them present in cache. Making post visibility hidden or d
 cached prior. Every post get cached if max cached posts count is not yet reached.
 
 #### How is it implemented?
-
 Several redis structures for this:
 
 - [Redis sorted sets](https://redis.io/docs/data-types/sorted-sets/) (ZSet) for preserving top posts rating (all cached posts). ZSet is set under the [KARMA_SCORE_ZSET_KEY](https://github.com/msik-404/karma-app-monolith/blob/main/src/main/java/com/msik404/karmaapp/post/cache/PostRedisCache.java#L27).
