@@ -31,13 +31,13 @@ The API documentation follows OpenAPI specification. API docs without running th
 - In UI: [Swagger UI](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/msik-404/karma-app-monolith/main/api-docs.yaml)
 
 With running the app under:
-- http://localhost:8080/swagger-ui/index.html
+- http://localhost:8080/swagger-ui/index.html - This allows the app to be tests.
 - http://localhost:8080/v3/api-docs
 
 ### Notes
 
 #### Bearer Token
-Endpoints that have `/user`, `/mod`, `/admin` prefix require user to be authenticated. User need to set 
+Endpoints that have `/user`, `/mod`, `/admin` prefix require user to be authenticated. User needs to set 
 `HTTP Authorization header` to `Berear JWT_STRING`. JWT_STRING is acquired from login endpoint.
 
 JWT has two claims set:
@@ -67,7 +67,7 @@ cached prior. Every post get cached if max cached posts count is not yet reached
 
 #### How is it implemented?
 
-I use several redis structures for this:
+Several redis structures for this:
 
 - [Redis sorted sets](https://redis.io/docs/data-types/sorted-sets/) (ZSet) for preserving top posts rating (all cached posts). ZSet is set under the [KARMA_SCORE_ZSET_KEY](https://github.com/msik-404/karma-app-monolith/blob/main/src/main/java/com/msik404/karmaapp/post/cache/PostRedisCache.java#L27).
   ZSet contains Keys in [post_key](https://github.com/msik-404/karma-app-monolith/blob/main/src/main/java/com/msik404/karmaapp/post/cache/PostRedisCache.java#L43)
@@ -85,10 +85,10 @@ I use several redis structures for this:
   has expiration time set to TIMEOUT which is one hour. post_image_key is set once the image is requested for the first time. Expiration time is reset each
   time the data is requested within TIMEOUT.
 
-I used this [redis.conf](https://github.com/msik-404/karma-app-monolith/blob/main/redis.conf). The most important things
+Cache usses this [redis.conf](https://github.com/msik-404/karma-app-monolith/blob/main/redis.conf). The most important things
 about it are that is uses: [AOF and RDB](https://redis.io/docs/management/persistence/).
 
-My cache code uses [Redis pipelining](https://redis.io/docs/manual/pipelining/) when more than single operation needs to
+Cache code uses [Redis pipelining](https://redis.io/docs/manual/pipelining/) when more than single operation needs to
 be preformed. This improves efficiency, by reducing required number of request.
 
 Because ZSet [ZRANGE](https://redis.io/commands/zrange/) cannot be trivially used for getting key-set paginated values I
@@ -114,7 +114,7 @@ Backend requires five environment variables to be set:
 - REDIS_HOSTNAME
 - SECRET
 
-for details see: [application.yaml](https://github.com/msik-404/karma-app-monolith/blob/main/src/main/resources/application.yaml)
+For details see: [application.yaml](https://github.com/msik-404/karma-app-monolith/blob/main/src/main/resources/application.yaml)
 
 Simply create .env and place it in the root of project.
 
@@ -142,7 +142,8 @@ If one would like to build the project with running the tests, one must have doc
 ```
 
 # Tests
-Docker is required to run tests locally because I use [Testcontainers for Java](https://java.testcontainers.org/).
+Docker is required to run tests locally because [Testcontainers for Java](https://java.testcontainers.org/) are used for
+integration tests.
 
 Code that is directly communicating with Redis and PostgreSQL is fully tested with integration tests.
 There are also unit test for service layer, they use mocking from [Mockito](https://site.mockito.org/).
@@ -170,9 +171,9 @@ docker compose down -v
 ```
 
 # Further development
-- Unfortunately this app does not have frontend yet. Maybe in the future I will create front for it. Because of the lack
+- Unfortunately this app does not have frontend yet. Maybe in the future front will be developed. Because of the lack
   of front, CORS is not configured.
-- Update post text or headline.
-- Search posts by text option.
-- Add comment section feature.
+- Update post text or headline functionality.
+- Search posts by headline functionality.
+- Add comment section under posts feature.
 - Maybe some sort of subreddits feature.
