@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.msik-404</groupId>
-    <artifactId>karma-app</artifactId>
+    <artifactId>karma-app-monolith</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>karma-app</name>
+    <name>karma-app-monolith</name>
     <description> Monolith version of karma-app</description>
     <properties>
         <java.version>21</java.version>
