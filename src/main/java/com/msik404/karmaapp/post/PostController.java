@@ -825,7 +825,6 @@ public class PostController {
         return ResponseEntity.ok(null);
     }
 
-
     @Operation(
             summary = KarmaAppEndpointDocs.OP_SUM_ACTIVATE_POST_BY_ADMIN,
             description = KarmaAppEndpointDocs.OP_DESC_ACTIVE_POST_BY_ADMIN
