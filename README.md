@@ -27,7 +27,7 @@ There is also [microservices](https://github.com/msik-404/karma-app-gateway) ver
 
 ## REST API
 The API documentation follows OpenAPI specification. API docs without running the app can be inspected:
-- In raw form: [openapi.yaml](https://github.com/msik-404/karma-app-monolith/blob/main/api-docs.yaml).
+- In raw form: [api-docs.yaml](https://github.com/msik-404/karma-app-monolith/blob/main/api-docs.yaml).
 - In UI: [Swagger UI](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/msik-404/karma-app-monolith/main/api-docs.yaml)
 
 With running the app under:
