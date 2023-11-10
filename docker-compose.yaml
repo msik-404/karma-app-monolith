@@ -2,16 +2,17 @@ version: '3.9'
 
 services:
   backend:
-    depends_on:
-      - psql
-      - redis
     build: .
+    image: msik/karma-app-monolith
     env_file:
       - .env
     networks:
       - net
     ports:
       - 8080:8080
+    depends_on:
+      - psql
+      - redis
 
   psql:
     image: postgres:alpine
