@@ -1,9 +1,9 @@
 package com.msik404.karmaapp.auth;
 
-import com.msik404.karmaapp.docs.KarmaAppEndpointDocs;
 import com.msik404.karmaapp.auth.dto.LoginRequest;
 import com.msik404.karmaapp.auth.dto.LoginResponse;
 import com.msik404.karmaapp.auth.dto.RegisterRequest;
+import com.msik404.karmaapp.docs.KarmaAppEndpointDocs;
 import com.msik404.karmaapp.exception.constraint.exception.DuplicateEmailException;
 import com.msik404.karmaapp.exception.constraint.exception.DuplicateUnexpectedFieldException;
 import com.msik404.karmaapp.exception.constraint.exception.DuplicateUsernameException;
