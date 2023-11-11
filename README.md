@@ -3,7 +3,7 @@
 karma-app is reddit like application which allows users to publish and rate posts. Posts are displayed based on their
 score (karma score). There are different user roles. Roles allow users to change post visibility states and see posts
 with certain visibilities. Currently, there are three visibility states: active, hidden, deleted. Admin users can move
-every post's visibility state to every other state. Admin users can see posts with ever visibility. Mod users can move
+every post's visibility state to every other state. Admin users can see posts with every visibility. Mod users can move
 every post's visibility state from active to hidden. Mod users can see active and hidden posts. Users who are the
 creators of a given post can move it's state from active to hidden, from hidden to active and from active or hidden to
 deleted. Creator users can see their owned posts with visibility state of active and hidden. Every user, even not
