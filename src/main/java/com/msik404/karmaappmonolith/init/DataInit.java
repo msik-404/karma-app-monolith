@@ -33,7 +33,6 @@ public class DataInit implements CommandLineRunner {
 
     private static final int USER_AMOUNT = 300;
     private static final int MAX_SINGLE_INSERT_SIZE = 100;
-    private static final int MAX_KARMA_SCORE = 100;
     private static final int MAX_POSTS_PER_USER = 10;
     private static final int MIN_POSTS_PER_USER = 3;
     private static final Visibility[] VISIBILITY_OPTIONS = Visibility.class.getEnumConstants();
@@ -107,7 +106,6 @@ public class DataInit implements CommandLineRunner {
                             user,
                             null
                     );
-                    post.setKarmaScore(random.nextLong(MAX_KARMA_SCORE) - random.nextLong(MAX_KARMA_SCORE));
                     post.setVisibility(VISIBILITY_OPTIONS[random.nextInt(VISIBILITY_OPTIONS.length)]);
 
                     postsToSave.add(post);

@@ -186,9 +186,8 @@ SECRET should have at least 32 bytes.
 
 ### Dummy data creation
 
-If SHOULD_INIT_DATA is set to true, dummy data of users and posts is persisted. Post ratings are not persisted. Admin
-and
-mod accounts are created. See [DataInit.java] for dummy login's and password's to test admin and mod accounts.
+If SHOULD_INIT_DATA is set to true, dummy data of users and posts is persisted. Admin and mod accounts are created. See 
+[DataInit.java] for dummy login's and password's to test admin and mod accounts.
 
 # Building the project
 
