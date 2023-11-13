@@ -176,6 +176,7 @@ PSQL_PASSWORD=dev
 PSQL_NAME=karma-app-psql
 REDIS_HOSTNAME=karma-app-redis
 SECRET=BARDZO-POTĘŻNY-SEKRET-JAKI-DŁUGI
+SHOULD_INIT_DATA=true
 ```
 
 ## Important notes
