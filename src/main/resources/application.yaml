@@ -19,3 +19,6 @@ spring:
 
 jwt:
   secret: ${SECRET}
+
+initialize:
+  data: ${SHOULD_INIT_DATA:false}
