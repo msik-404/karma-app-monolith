@@ -38,7 +38,6 @@ public class DataInit implements CommandLineRunner {
     private static final int MIN_POSTS_PER_USER = 3;
     private static final Visibility[] VISIBILITY_OPTIONS = Visibility.class.getEnumConstants();
 
-
     private static final String ADMIN_USERNAME = "ADMIN";
     private static final String MOD_USERNAME = "MOD";
 
@@ -67,7 +66,6 @@ public class DataInit implements CommandLineRunner {
                 null
         );
     }
-
 
     @Value("${initialize.data}")
     private String shouldInitData;
@@ -119,7 +117,6 @@ public class DataInit implements CommandLineRunner {
             userRepository.saveAll(usersToSave); // Save users in batch
             postRepository.saveAll(postsToSave); // Save posts in batch
         }
-
         logger.info("Data initialization is done.");
     }
 
