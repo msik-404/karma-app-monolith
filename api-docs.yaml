@@ -3,13 +3,13 @@ info:
   title: OpenAPI definition
   version: v0
 servers:
-- url: http://localhost:8080
-  description: Generated server url
+  - url: http://localhost:8080
+    description: Generated server url
 paths:
   /user/users:
     put:
       tags:
-      - user-controller
+        - user-controller
       summary: Update user account of currently logged-in user.
       description: |
         Update user account of currently logged-in user. Only sub-set of all fields can be updated with this endpoint.
@@ -44,24 +44,24 @@ paths:
         "200":
           description: User account was updated successfully.
       security:
-      - Bearer Authentication: []
+        - Bearer Authentication: [ ]
   /admin/users/{userId}:
     put:
       tags:
-      - user-controller
+        - user-controller
       summary: Update user account with admin privilege.
       description: Update user account with admin privilege. This endpoint requires
         at least admin privilege. All users accounts and all fields can be modified
         with this endpoint.
       operationId: updateWithAdminPrivilege
       parameters:
-      - name: userId
-        in: path
-        description: Id of the user on which specified operation is being performed.
-        required: true
-        schema:
-          type: integer
-          format: int64
+        - name: userId
+          in: path
+          description: Id of the user on which specified operation is being performed.
+          required: true
+          schema:
+            type: integer
+            format: int64
       requestBody:
         content:
           application/json:
@@ -91,11 +91,11 @@ paths:
         "200":
           description: User account was updated successfully.
       security:
-      - Bearer Authentication: []
+        - Bearer Authentication: [ ]
   /user/posts:
     get:
       tags:
-      - post-controller
+        - post-controller
       summary: "Get key-set (karma_score, post_id) paginated posts. Each post was\
         \ created by currently logged-in user."
       description: |
@@ -103,50 +103,50 @@ paths:
         posts are returned.
       operationId: findPaginatedOwnedPosts
       parameters:
-      - name: size
-        in: query
-        description: |
-          Amount of posts to be returned. If there are less posts than requested, as many posts as possible are
-          returned.
-        required: false
-        schema:
-          type: integer
-          format: int32
-          default: 100
-      - name: active
-        in: query
-        description: "Post visibility, makes returned post have active visibility.\
+        - name: size
+          in: query
+          description: |
+            Amount of posts to be returned. If there are less posts than requested, as many posts as possible are
+            returned.
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 100
+        - name: active
+          in: query
+          description: "Post visibility, makes returned post have active visibility.\
           \ At the same time other visibilities can also be selected."
-        required: false
-        schema:
-          type: boolean
-          default: false
-      - name: hidden
-        in: query
-        description: "Post visibility, makes returned post have hidden visibility\
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: hidden
+          in: query
+          description: "Post visibility, makes returned post have hidden visibility\
           \ At the same time other visibilities can also be selected."
-        required: false
-        schema:
-          type: boolean
-          default: false
-      - name: post_id
-        in: query
-        description: |
-          Id of the last returned post. Used for pagination. Pagination to work requires both karma_score and post_id to be set, otherwise top
-          posts are returned.
-        required: false
-        schema:
-          type: integer
-          format: int64
-      - name: karma_score
-        in: query
-        description: |
-          Score of the last returned post. Used for pagination. Pagination to work requires both karma_score and post_id to be set, otherwise top
-          posts are returned.
-        required: false
-        schema:
-          type: integer
-          format: int64
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: post_id
+          in: query
+          description: |
+            Id of the last returned post. Used for pagination. Pagination to work requires both karma_score and post_id to be set, otherwise top
+            posts are returned.
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: karma_score
+          in: query
+          description: |
+            Score of the last returned post. Used for pagination. Pagination to work requires both karma_score and post_id to be set, otherwise top
+            posts are returned.
+          required: false
+          schema:
+            type: integer
+            format: int64
       responses:
         "500":
           description: Could not get posts from the database for some reason.
@@ -161,10 +161,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/PostResponse'
       security:
-      - Bearer Authentication: []
+        - Bearer Authentication: [ ]
     post:
       tags:
-      - post-controller
+        - post-controller
       summary: Create new post.
       description: Create new post. User needs to be logged-in.
       operationId: create
@@ -173,7 +173,7 @@ paths:
           multipart/form-data:
             schema:
               required:
-              - postCreationRequest
+                - postCreationRequest
               type: object
               properties:
                 postCreationRequest:
@@ -192,11 +192,11 @@ paths:
         "200":
           description: Post was created successfully.
       security:
-      - Bearer Authentication: []
+        - Bearer Authentication: [ ]
   /user/posts/{postId}/unrate:
     post:
       tags:
-      - post-controller
+        - post-controller
       summary: Unrate existing post.
       description: |-
         Unrate existing post. User needs to be logged-in. This operation is idempotent. When client performs it for the first time it is persisted. Performing it
@@ -204,13 +204,13 @@ paths:
          If post was not rated in the first place, this operation does not do anything.
       operationId: unrate
       parameters:
-      - name: postId
-        in: path
-        description: Id of the post on which specified operation is being performed.
-        required: true
-        schema:
-          type: integer
-          format: int64
+        - name: postId
+          in: path
+          description: Id of the post on which specified operation is being performed.
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         "404":
           description: Post with that id was not found.
@@ -227,24 +227,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
       security:
-      - Bearer Authentication: []
+        - Bearer Authentication: [ ]
   /user/posts/{postId}/unhide:
     post:
       tags:
-      - post-controller
+        - post-controller
       summary: Change owned post's visibility from hidden to active
       description: |
         Change owned post's visibility from hidden to active User needs to be logged-in. This operation is idempotent. When client performs it for the first time it is persisted. Performing it
         consecutively for the second time does not do anything.
       operationId: unhideByUser
       parameters:
-      - name: postId
-        in: path
-        description: Id of the post on which specified operation is being performed.
-        required: true
-        schema:
-          type: integer
-          format: int64
+        - name: postId
+          in: path
+          description: Id of the post on which specified operation is being performed.
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         "500":
           description: Could not change visibility of the post for some reason
@@ -268,11 +268,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
       security:
-      - Bearer Authentication: []
+        - Bearer Authentication: [ ]
   /user/posts/{postId}/rate:
     post:
       tags:
-      - post-controller
+        - post-controller
       summary: Rate existing post.
       description: |
         Rate existing post. User needs to be logged-in. This operation is idempotent. When client performs it for the first time it is persisted. Performing it
@@ -281,19 +281,19 @@ paths:
         will get updated accordingly.
       operationId: rate
       parameters:
-      - name: postId
-        in: path
-        description: Id of the post on which specified operation is being performed.
-        required: true
-        schema:
-          type: integer
-          format: int64
-      - name: is_positive
-        in: query
-        description: Indicates whether post rating is positive or negative.
-        required: true
-        schema:
-          type: boolean
+        - name: postId
+          in: path
+          description: Id of the post on which specified operation is being performed.
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: is_positive
+          in: query
+          description: Indicates whether post rating is positive or negative.
+          required: true
+          schema:
+            type: boolean
       responses:
         "200":
           description: Post was rated successfully.
@@ -310,24 +310,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
       security:
-      - Bearer Authentication: []
+        - Bearer Authentication: [ ]
   /user/posts/{postId}/hide:
     post:
       tags:
-      - post-controller
+        - post-controller
       summary: Change owned post's visibility from active to hidden.
       description: |
         Change owned post's visibility from active to hidden. User needs to be logged-in. This operation is idempotent. When client performs it for the first time it is persisted. Performing it
         consecutively for the second time does not do anything.
       operationId: hideByUser
       parameters:
-      - name: postId
-        in: path
-        description: Id of the post on which specified operation is being performed.
-        required: true
-        schema:
-          type: integer
-          format: int64
+        - name: postId
+          in: path
+          description: Id of the post on which specified operation is being performed.
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         "200":
           description: Post was hidden successfully.
@@ -351,24 +351,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
       security:
-      - Bearer Authentication: []
+        - Bearer Authentication: [ ]
   /user/posts/{postId}/delete:
     post:
       tags:
-      - post-controller
+        - post-controller
       summary: Change owned post's visibility from any to deleted.
       description: |
         Change owned post's visibility from any to deleted. User needs to be logged-in. This operation is idempotent. When client performs it for the first time it is persisted. Performing it
         consecutively for the second time does not do anything.
       operationId: deleteByUser
       parameters:
-      - name: postId
-        in: path
-        description: Id of the post on which specified operation is being performed.
-        required: true
-        schema:
-          type: integer
-          format: int64
+        - name: postId
+          in: path
+          description: Id of the post on which specified operation is being performed.
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         "500":
           description: Could not change visibility of the post for some reason
@@ -392,11 +392,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
       security:
-      - Bearer Authentication: []
+        - Bearer Authentication: [ ]
   /register:
     post:
       tags:
-      - auth-controller
+        - auth-controller
       summary: Create new user account.
       description: Create new user account.
       operationId: register
@@ -418,20 +418,20 @@ paths:
   /mod/posts/{postId}/hide:
     post:
       tags:
-      - post-controller
+        - post-controller
       summary: Change post's visibility from active to hidden.
       description: |
         Change post's visibility from active to hidden. User needs to be logged-in. This operation is idempotent. When client performs it for the first time it is persisted. Performing it
         consecutively for the second time does not do anything.
       operationId: hideByMod
       parameters:
-      - name: postId
-        in: path
-        description: Id of the post on which specified operation is being performed.
-        required: true
-        schema:
-          type: integer
-          format: int64
+        - name: postId
+          in: path
+          description: Id of the post on which specified operation is being performed.
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         "200":
           description: Post was hidden successfully.
@@ -455,11 +455,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
       security:
-      - Bearer Authentication: []
+        - Bearer Authentication: [ ]
   /login:
     post:
       tags:
-      - auth-controller
+        - auth-controller
       summary: Login and get JWT.
       description: |
         Used for login. Returns JWT string which should be set in Authorization header in the form of bearer token.
@@ -491,20 +491,20 @@ paths:
   /admin/posts/{postId}/delete:
     post:
       tags:
-      - post-controller
+        - post-controller
       summary: Change post's visibility from any to deleted.
       description: |
         Change post's visibility from any to deleted. This endpoint requires at least admin privilege. This operation is idempotent. When client performs it for the first time it is persisted. Performing it
         consecutively for the second time does not do anything.
       operationId: deleteByAdmin
       parameters:
-      - name: postId
-        in: path
-        description: Id of the post on which specified operation is being performed.
-        required: true
-        schema:
-          type: integer
-          format: int64
+        - name: postId
+          in: path
+          description: Id of the post on which specified operation is being performed.
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         "500":
           description: Could not change visibility of the post for some reason
@@ -528,24 +528,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
       security:
-      - Bearer Authentication: []
+        - Bearer Authentication: [ ]
   /admin/posts/{postId}/activate:
     post:
       tags:
-      - post-controller
+        - post-controller
       summary: Change post's visibility from any to active.
       description: |
         Change post's visibility from any to active. This endpoint requires at least admin privilege. This operation is idempotent. When client performs it for the first time it is persisted. Performing it
         consecutively for the second time does not do anything.
       operationId: activateByAdmin
       parameters:
-      - name: postId
-        in: path
-        description: Id of the post on which specified operation is being performed.
-        required: true
-        schema:
-          type: integer
-          format: int64
+        - name: postId
+          in: path
+          description: Id of the post on which specified operation is being performed.
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         "500":
           description: Could not change visibility of the post for some reason
@@ -569,11 +569,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
       security:
-      - Bearer Authentication: []
+        - Bearer Authentication: [ ]
   /user/posts/ratings:
     get:
       tags:
-      - post-controller
+        - post-controller
       summary: "Get key-set (karma_score, post_id) paginated posts ratings of currently\
         \ logged-in user."
       description: |
@@ -584,42 +584,42 @@ paths:
         is not set post ratings of top posts are returned.
       operationId: findPersonalPostRatings
       parameters:
-      - name: size
-        in: query
-        description: |
-          Amount of posts to be returned. If there are less posts than requested, as many posts as possible are
-          returned.
-        required: false
-        schema:
-          type: integer
-          format: int32
-          default: 100
-      - name: post_id
-        in: query
-        description: |
-          Id of the last returned post. Used for pagination. Pagination to work requires both karma_score and post_id to be set, otherwise top
-          posts are returned.
-        required: false
-        schema:
-          type: integer
-          format: int64
-      - name: karma_score
-        in: query
-        description: |
-          Score of the last returned post. Used for pagination. Pagination to work requires both karma_score and post_id to be set, otherwise top
-          posts are returned.
-        required: false
-        schema:
-          type: integer
-          format: int64
-      - name: username
-        in: query
-        description: |
-          Creator user's username, makes endpoint return only these posts whose creator has this username.
-          Can be omitted, to not filter by username.
-        required: false
-        schema:
-          type: string
+        - name: size
+          in: query
+          description: |
+            Amount of posts to be returned. If there are less posts than requested, as many posts as possible are
+            returned.
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 100
+        - name: post_id
+          in: query
+          description: |
+            Id of the last returned post. Used for pagination. Pagination to work requires both karma_score and post_id to be set, otherwise top
+            posts are returned.
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: karma_score
+          in: query
+          description: |
+            Score of the last returned post. Used for pagination. Pagination to work requires both karma_score and post_id to be set, otherwise top
+            posts are returned.
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: username
+          in: query
+          description: |
+            Creator user's username, makes endpoint return only these posts whose creator has this username.
+            Can be omitted, to not filter by username.
+          required: false
+          schema:
+            type: string
       responses:
         "500":
           description: Could not get posts ratings from the database for some reason.
@@ -634,69 +634,69 @@ paths:
               schema:
                 $ref: '#/components/schemas/PostRatingResponse'
       security:
-      - Bearer Authentication: []
+        - Bearer Authentication: [ ]
   /mod/posts:
     get:
       tags:
-      - post-controller
+        - post-controller
       summary: "Get key-set (karma_score, post_id) paginated posts. This endpoint\
         \ requires at least mod privilege."
       description: "Get key-set (karma_score, post_id) paginated posts. This endpoint\
         \ requires at least mod privilege. Active and hidden posts can be returned."
       operationId: findPaginatedPostsForMod
       parameters:
-      - name: size
-        in: query
-        description: |
-          Amount of posts to be returned. If there are less posts than requested, as many posts as possible are
-          returned.
-        required: false
-        schema:
-          type: integer
-          format: int32
-          default: 100
-      - name: active
-        in: query
-        description: "Post visibility, makes returned post have active visibility.\
+        - name: size
+          in: query
+          description: |
+            Amount of posts to be returned. If there are less posts than requested, as many posts as possible are
+            returned.
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 100
+        - name: active
+          in: query
+          description: "Post visibility, makes returned post have active visibility.\
           \ At the same time other visibilities can also be selected."
-        required: false
-        schema:
-          type: boolean
-          default: false
-      - name: hidden
-        in: query
-        description: "Post visibility, makes returned post have hidden visibility\
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: hidden
+          in: query
+          description: "Post visibility, makes returned post have hidden visibility\
           \ At the same time other visibilities can also be selected."
-        required: false
-        schema:
-          type: boolean
-          default: false
-      - name: post_id
-        in: query
-        description: |
-          Id of the last returned post. Used for pagination. Pagination to work requires both karma_score and post_id to be set, otherwise top
-          posts are returned.
-        required: false
-        schema:
-          type: integer
-          format: int64
-      - name: karma_score
-        in: query
-        description: |
-          Score of the last returned post. Used for pagination. Pagination to work requires both karma_score and post_id to be set, otherwise top
-          posts are returned.
-        required: false
-        schema:
-          type: integer
-          format: int64
-      - name: username
-        in: query
-        description: |
-          Creator user's username, makes endpoint return only these posts whose creator has this username.
-          Can be omitted, to not filter by username.
-        required: false
-        schema:
-          type: string
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: post_id
+          in: query
+          description: |
+            Id of the last returned post. Used for pagination. Pagination to work requires both karma_score and post_id to be set, otherwise top
+            posts are returned.
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: karma_score
+          in: query
+          description: |
+            Score of the last returned post. Used for pagination. Pagination to work requires both karma_score and post_id to be set, otherwise top
+            posts are returned.
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: username
+          in: query
+          description: |
+            Creator user's username, makes endpoint return only these posts whose creator has this username.
+            Can be omitted, to not filter by username.
+          required: false
+          schema:
+            type: string
       responses:
         "500":
           description: Could not get posts from the database for some reason.
@@ -711,11 +711,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/PostResponse'
       security:
-      - Bearer Authentication: []
+        - Bearer Authentication: [ ]
   /mod/posts/ratings:
     get:
       tags:
-      - post-controller
+        - post-controller
       summary: "Get key-set (karma_score, post_id) paginated posts ratings of currently\
         \ logged-in user. This endpoint requires at least mod privilege."
       description: "Get key-set (karma_score, post_id) paginated posts ratings of\
@@ -723,58 +723,58 @@ paths:
         \ Posts ratings of active and hidden posts can be returned."
       operationId: findPersonalPostRatingsForMod
       parameters:
-      - name: size
-        in: query
-        description: |
-          Amount of posts to be returned. If there are less posts than requested, as many posts as possible are
-          returned.
-        required: false
-        schema:
-          type: integer
-          format: int32
-          default: 100
-      - name: active
-        in: query
-        description: "Post visibility, makes returned post have active visibility.\
+        - name: size
+          in: query
+          description: |
+            Amount of posts to be returned. If there are less posts than requested, as many posts as possible are
+            returned.
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 100
+        - name: active
+          in: query
+          description: "Post visibility, makes returned post have active visibility.\
           \ At the same time other visibilities can also be selected."
-        required: false
-        schema:
-          type: boolean
-          default: false
-      - name: hidden
-        in: query
-        description: "Post visibility, makes returned post have hidden visibility\
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: hidden
+          in: query
+          description: "Post visibility, makes returned post have hidden visibility\
           \ At the same time other visibilities can also be selected."
-        required: false
-        schema:
-          type: boolean
-          default: false
-      - name: post_id
-        in: query
-        description: |
-          Id of the last returned post. Used for pagination. Pagination to work requires both karma_score and post_id to be set, otherwise top
-          posts are returned.
-        required: false
-        schema:
-          type: integer
-          format: int64
-      - name: karma_score
-        in: query
-        description: |
-          Score of the last returned post. Used for pagination. Pagination to work requires both karma_score and post_id to be set, otherwise top
-          posts are returned.
-        required: false
-        schema:
-          type: integer
-          format: int64
-      - name: username
-        in: query
-        description: |
-          Creator user's username, makes endpoint return only these posts whose creator has this username.
-          Can be omitted, to not filter by username.
-        required: false
-        schema:
-          type: string
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: post_id
+          in: query
+          description: |
+            Id of the last returned post. Used for pagination. Pagination to work requires both karma_score and post_id to be set, otherwise top
+            posts are returned.
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: karma_score
+          in: query
+          description: |
+            Score of the last returned post. Used for pagination. Pagination to work requires both karma_score and post_id to be set, otherwise top
+            posts are returned.
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: username
+          in: query
+          description: |
+            Creator user's username, makes endpoint return only these posts whose creator has this username.
+            Can be omitted, to not filter by username.
+          required: false
+          schema:
+            type: string
       responses:
         "500":
           description: Could not get posts ratings from the database for some reason.
@@ -789,11 +789,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/PostRatingResponse'
       security:
-      - Bearer Authentication: []
+        - Bearer Authentication: [ ]
   /guest/posts:
     get:
       tags:
-      - post-controller
+        - post-controller
       summary: "Get key-set (karma_score, post_id) paginated posts."
       description: |-
         Get key-set (karma_score, post_id) paginated posts. If two posts karma_scores are the same, post with greater post_id is first. If pagination is not set top
@@ -801,42 +801,42 @@ paths:
         User does not need to be logged-in to use this endpoint. Active posts can be returned.
       operationId: findPaginatedPosts
       parameters:
-      - name: size
-        in: query
-        description: |
-          Amount of posts to be returned. If there are less posts than requested, as many posts as possible are
-          returned.
-        required: false
-        schema:
-          type: integer
-          format: int32
-          default: 100
-      - name: post_id
-        in: query
-        description: |
-          Id of the last returned post. Used for pagination. Pagination to work requires both karma_score and post_id to be set, otherwise top
-          posts are returned.
-        required: false
-        schema:
-          type: integer
-          format: int64
-      - name: karma_score
-        in: query
-        description: |
-          Score of the last returned post. Used for pagination. Pagination to work requires both karma_score and post_id to be set, otherwise top
-          posts are returned.
-        required: false
-        schema:
-          type: integer
-          format: int64
-      - name: username
-        in: query
-        description: |
-          Creator user's username, makes endpoint return only these posts whose creator has this username.
-          Can be omitted, to not filter by username.
-        required: false
-        schema:
-          type: string
+        - name: size
+          in: query
+          description: |
+            Amount of posts to be returned. If there are less posts than requested, as many posts as possible are
+            returned.
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 100
+        - name: post_id
+          in: query
+          description: |
+            Id of the last returned post. Used for pagination. Pagination to work requires both karma_score and post_id to be set, otherwise top
+            posts are returned.
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: karma_score
+          in: query
+          description: |
+            Score of the last returned post. Used for pagination. Pagination to work requires both karma_score and post_id to be set, otherwise top
+            posts are returned.
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: username
+          in: query
+          description: |
+            Creator user's username, makes endpoint return only these posts whose creator has this username.
+            Can be omitted, to not filter by username.
+          required: false
+          schema:
+            type: string
       responses:
         "500":
           description: Could not get posts from the database for some reason.
@@ -853,19 +853,19 @@ paths:
   /guest/posts/{postId}/image:
     get:
       tags:
-      - post-controller
+        - post-controller
       summary: Get image by post id.
       description: Get image by post id.User does not need to be logged-in to use
         this endpoint.
       operationId: findImageById
       parameters:
-      - name: postId
-        in: path
-        description: Id of the post on which specified operation is being performed.
-        required: true
-        schema:
-          type: integer
-          format: int64
+        - name: postId
+          in: path
+          description: Id of the post on which specified operation is being performed.
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         "200":
           description: Returned post's image data
@@ -883,7 +883,7 @@ paths:
   /admin/posts:
     get:
       tags:
-      - post-controller
+        - post-controller
       summary: "Get key-set (karma_score, post_id) paginated posts. This endpoint\
         \ requires at least admin privilege."
       description: "Get key-set (karma_score, post_id) paginated posts. This endpoint\
@@ -891,66 +891,66 @@ paths:
         \ be returned."
       operationId: findPaginatedPostsForAdmin
       parameters:
-      - name: size
-        in: query
-        description: |
-          Amount of posts to be returned. If there are less posts than requested, as many posts as possible are
-          returned.
-        required: false
-        schema:
-          type: integer
-          format: int32
-          default: 100
-      - name: active
-        in: query
-        description: "Post visibility, makes returned post have active visibility.\
+        - name: size
+          in: query
+          description: |
+            Amount of posts to be returned. If there are less posts than requested, as many posts as possible are
+            returned.
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 100
+        - name: active
+          in: query
+          description: "Post visibility, makes returned post have active visibility.\
           \ At the same time other visibilities can also be selected."
-        required: false
-        schema:
-          type: boolean
-          default: false
-      - name: hidden
-        in: query
-        description: "Post visibility, makes returned post have hidden visibility\
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: hidden
+          in: query
+          description: "Post visibility, makes returned post have hidden visibility\
           \ At the same time other visibilities can also be selected."
-        required: false
-        schema:
-          type: boolean
-          default: false
-      - name: deleted
-        in: query
-        description: "Post visibility, makes returned post have deleted visibility\
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: deleted
+          in: query
+          description: "Post visibility, makes returned post have deleted visibility\
           \ At the same time other visibilities can also be selected."
-        required: false
-        schema:
-          type: boolean
-          default: false
-      - name: post_id
-        in: query
-        description: |
-          Id of the last returned post. Used for pagination. Pagination to work requires both karma_score and post_id to be set, otherwise top
-          posts are returned.
-        required: false
-        schema:
-          type: integer
-          format: int64
-      - name: karma_score
-        in: query
-        description: |
-          Score of the last returned post. Used for pagination. Pagination to work requires both karma_score and post_id to be set, otherwise top
-          posts are returned.
-        required: false
-        schema:
-          type: integer
-          format: int64
-      - name: username
-        in: query
-        description: |
-          Creator user's username, makes endpoint return only these posts whose creator has this username.
-          Can be omitted, to not filter by username.
-        required: false
-        schema:
-          type: string
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: post_id
+          in: query
+          description: |
+            Id of the last returned post. Used for pagination. Pagination to work requires both karma_score and post_id to be set, otherwise top
+            posts are returned.
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: karma_score
+          in: query
+          description: |
+            Score of the last returned post. Used for pagination. Pagination to work requires both karma_score and post_id to be set, otherwise top
+            posts are returned.
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: username
+          in: query
+          description: |
+            Creator user's username, makes endpoint return only these posts whose creator has this username.
+            Can be omitted, to not filter by username.
+          required: false
+          schema:
+            type: string
       responses:
         "500":
           description: Could not get posts from the database for some reason.
@@ -965,11 +965,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/PostResponse'
       security:
-      - Bearer Authentication: []
+        - Bearer Authentication: [ ]
   /admin/posts/ratings:
     get:
       tags:
-      - post-controller
+        - post-controller
       summary: "Get key-set (karma_score, post_id) paginated posts ratings of currently\
         \ logged-in user. This endpoint requires at least admin privilege."
       description: "Get key-set (karma_score, post_id) paginated posts ratings of\
@@ -977,66 +977,66 @@ paths:
         \ Posts ratings of active, hidden and deleted posts can be returned."
       operationId: findPersonalPostRatingsForAdmin
       parameters:
-      - name: size
-        in: query
-        description: |
-          Amount of posts to be returned. If there are less posts than requested, as many posts as possible are
-          returned.
-        required: false
-        schema:
-          type: integer
-          format: int32
-          default: 100
-      - name: active
-        in: query
-        description: "Post visibility, makes returned post have active visibility.\
+        - name: size
+          in: query
+          description: |
+            Amount of posts to be returned. If there are less posts than requested, as many posts as possible are
+            returned.
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 100
+        - name: active
+          in: query
+          description: "Post visibility, makes returned post have active visibility.\
           \ At the same time other visibilities can also be selected."
-        required: false
-        schema:
-          type: boolean
-          default: false
-      - name: hidden
-        in: query
-        description: "Post visibility, makes returned post have hidden visibility\
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: hidden
+          in: query
+          description: "Post visibility, makes returned post have hidden visibility\
           \ At the same time other visibilities can also be selected."
-        required: false
-        schema:
-          type: boolean
-          default: false
-      - name: deleted
-        in: query
-        description: "Post visibility, makes returned post have deleted visibility\
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: deleted
+          in: query
+          description: "Post visibility, makes returned post have deleted visibility\
           \ At the same time other visibilities can also be selected."
-        required: false
-        schema:
-          type: boolean
-          default: false
-      - name: post_id
-        in: query
-        description: |
-          Id of the last returned post. Used for pagination. Pagination to work requires both karma_score and post_id to be set, otherwise top
-          posts are returned.
-        required: false
-        schema:
-          type: integer
-          format: int64
-      - name: karma_score
-        in: query
-        description: |
-          Score of the last returned post. Used for pagination. Pagination to work requires both karma_score and post_id to be set, otherwise top
-          posts are returned.
-        required: false
-        schema:
-          type: integer
-          format: int64
-      - name: username
-        in: query
-        description: |
-          Creator user's username, makes endpoint return only these posts whose creator has this username.
-          Can be omitted, to not filter by username.
-        required: false
-        schema:
-          type: string
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: post_id
+          in: query
+          description: |
+            Id of the last returned post. Used for pagination. Pagination to work requires both karma_score and post_id to be set, otherwise top
+            posts are returned.
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: karma_score
+          in: query
+          description: |
+            Score of the last returned post. Used for pagination. Pagination to work requires both karma_score and post_id to be set, otherwise top
+            posts are returned.
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: username
+          in: query
+          description: |
+            Creator user's username, makes endpoint return only these posts whose creator has this username.
+            Can be omitted, to not filter by username.
+          required: false
+          schema:
+            type: string
       responses:
         "500":
           description: Could not get posts ratings from the database for some reason.
@@ -1051,7 +1051,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PostRatingResponse'
       security:
-      - Bearer Authentication: []
+        - Bearer Authentication: [ ]
 components:
   schemas:
     UserUpdateRequestWithUserPrivilege:
@@ -1106,17 +1106,17 @@ components:
         role:
           type: string
           enum:
-          - ADMIN
-          - MOD
-          - USER
+            - ADMIN
+            - MOD
+            - USER
       description: |
         Json with data for performing user update. Each field is optional, only set fields will be used for update.
         This objects contains fields which can be modified with user and admin privilege, thus to use it, one must
         have admin privilege.
     PostCreationRequest:
       required:
-      - headline
-      - text
+        - headline
+        - text
       type: object
       properties:
         headline:
@@ -1126,9 +1126,9 @@ components:
       description: Json with data for creating new post.
     RegisterRequest:
       required:
-      - email
-      - password
-      - username
+        - email
+        - password
+        - username
       type: object
       properties:
         username:
@@ -1144,8 +1144,8 @@ components:
       description: Json with data for creating new user account.
     LoginRequest:
       required:
-      - email
-      - password
+        - email
+        - password
       type: object
       properties:
         email:
@@ -1155,15 +1155,15 @@ components:
       description: Json with data for logging-in.
     LoginResponse:
       required:
-      - jwt
+        - jwt
       type: object
       properties:
         jwt:
           type: string
     PostResponse:
       required:
-      - username
-      - visibility
+        - username
+        - visibility
       type: object
       properties:
         id:
@@ -1181,12 +1181,12 @@ components:
         visibility:
           type: string
           enum:
-          - ACTIVE
-          - HIDDEN
-          - DELETED
+            - ACTIVE
+            - HIDDEN
+            - DELETED
     PostRatingResponse:
       required:
-      - id
+        - id
       type: object
       properties:
         id:
