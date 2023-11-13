@@ -116,6 +116,8 @@ Post will get cached if one of these two things take place at the time of rating
 ```
 But this would be actually rare because all cached posts get expired after [TIMEOUT](https://github.com/msik-404/karma-app-monolith/blob/main/src/main/java/com/msik404/karmaapp/post/cache/PostRedisCache.java#L31).
 
+Additionally, redis may require host machine to have `overcommit_memory=1` set.
+
 # Environment variables
 Backend requires five environment variables to be set:
 - PSQL_HOSTNAME
